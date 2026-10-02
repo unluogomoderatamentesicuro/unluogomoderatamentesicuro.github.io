@@ -528,3 +528,11 @@ body:not(.lit) .deck, body:not(.lit) .actions, body:not(.lit) .hint { opacity: 0
   .strata .sn { display: none; }
   .soglie { padding-right: 22px; }
 }
+
+/* —— nascita e morte */
+.soglia.vertical { border-style: double; border-width: 3px; padding-block: 6px; }
+.soglia.scream { border-color: rgba(230, 100, 80, .6); color: #f0b0a0; touch-action: none; user-select: none; -webkit-user-select: none; }
+.soglia.scream .arrow { color: #e0402a; }
+.soglia.scream.on { background: rgba(200, 40, 30, .35); box-shadow: 0 0 30px rgba(224, 64, 42, .6); }
+.blackout { position: fixed; inset: 0; z-index: 12; background: #000; opacity: 0; pointer-events: none; transition: opacity 2.4s ease; }
+.blackout.on { opacity: 1; pointer-events: auto; }

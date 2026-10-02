@@ -203,12 +203,13 @@ window.ATH = window.ATH || {};
   // —— il cammino tra i luoghi
   const home = {};                       // i valori tuoi, prima che un luogo li cambiasse
   let traveling = false, passageT = -1, passDir = 0, dwell = 0, libraTween = null, hushTween = null, autoT = 0, autoNext = 80;
+  let screamed = false, eroded = 0, flatDone = false, woke = false, doubtT = 0, faceNow = 0, ascendNow = 0;
   let hushNow = 0, helping = null, rescueAmt = 0, urged = false, tombIdx = 0, tombT = 0, darkNow = 0, glowNow = 0;
   const GP = id => ATH.getPlace(id);
   const isGen = id => typeof id === 'string' && id.indexOf('x:') === 0;
   const isKnown = id => { if (isGen(id)) return true; const p = ATH.PLACE[id]; return p && (!p.hidden || state.found.indexOf(id) >= 0); };
   const visibleExits = pl => (pl ? pl.exits : []).map(e => ATH.exitId(e)).filter(isKnown);
-  const LUM = { accese: 0, soffuse: 0.4, candele: 0.62, spente: 0.82 };
+  const LUM = { accese: 0, soffuse: 0.4, candele: 0.62, torcia: 0.94, spente: 0.82 };
 
   function travel(id, quick) {
     const pl = GP(id);
@@ -216,7 +217,8 @@ window.ATH = window.ATH || {};
     const from = GP(state.scene);
     const dl = from ? Math.sign((pl.level || 0) - (from.level || 0)) : 0;
     const dur = dl ? 4.4 : 3.4;
-    traveling = !quick; passageT = quick ? -1 : 0; passDir = quick ? 0 : dl; dwell = 0; urged = false; helping = null;
+    traveling = !quick; passageT = quick ? -1 : 0; passDir = quick ? 0 : dl; dwell = 0; urged = false; helping = null; eroded = 0; flatDone = false; woke = false;
+    if (memoria) { if (memoria.screaming) memoria.scream(false); memoria.flat(false); if (memoria.mon && memoria.mon.next > 1e9) memoria.mon.next = 0; }
     $('journey').classList.add('leaving');
     if (memoria && !quick) {
       if (dl) { memoria.walk('scala', 2.6, 0, dl); memoria.whoosh(dl, 2.8); memoria.walk(pl.terrain, 1.5, 2.6); }
@@ -292,13 +294,16 @@ window.ATH = window.ATH || {};
     const box = $('soglie'); box.innerHTML = '';
     const pl = GP(state.scene); if (!pl) return;
     box.classList.toggle('staying', !!pl.stay);
-    visibleExits(pl).forEach(id => {
-      const p = GP(id); if (!p) return;
-      const up = (p.level || 0) - (pl.level || 0);
+    const exits = visibleExits(pl).map(id => ({ id, p: GP(id) })).filter(o => o.p);
+    exits.forEach(o => { o.up = (o.p.level || 0) - (pl.level || 0); o.dx = pl.gen || o.p.gen ? 0 : o.p.x - pl.x; o.dy = pl.gen || o.p.gen ? 0 : o.p.y - pl.y; });
+    const rank = o => o.p.gen ? 3 : o.up > 0 ? 0 : o.up < 0 ? 2 : 1;
+    exits.sort((a, b) => rank(a) - rank(b) || a.dx - b.dx);
+    exits.forEach(({ id, p, up, dx, dy }) => {
       const b = document.createElement('button');
       const seen = p.gen || state.visited.indexOf(id) >= 0;
       b.type = 'button'; b.className = 'soglia' + (!seen ? ' new' : '') + (id === fresh ? ' fresh' : '') + (p.gen ? ' altrove' : '');
-      const arrow = p.gen ? '⋯' : up > 0 ? '↑' : up < 0 ? '↓' : '→';
+      const arrow = p.gen ? '⋯' : up > 0 ? '⇧' : up < 0 ? '⇩' : compass(dx, dy);
+      if (up) b.classList.add('vertical');
       const label = p.gen && !pl.gen ? 'Più in là' : p.name;
       b.innerHTML = `<span class="arrow" aria-hidden="true">${arrow}</span><span class="sname">${label}</span>`;
       b.title = p.gen ? 'Un posto che nessuno ha mai visto' : up > 0 ? 'Sali: ' + ATH.levelName(p.level) : up < 0 ? 'Scendi: ' + ATH.levelName(p.level) : (seen ? p.ora : 'Non ci sei ancora stato');
@@ -306,6 +311,17 @@ window.ATH = window.ATH || {};
       b.addEventListener('pointerdown', e => e.stopPropagation());
       box.appendChild(b);
     });
+    if (pl.scream) {
+      const u = document.createElement('button');
+      u.type = 'button'; u.className = 'soglia scream'; u.id = 'btnScream';
+      u.innerHTML = `<span class="arrow" aria-hidden="true">◉</span><span class="sname">Tieni premuto per urlare</span>`;
+      const on = e => { e.preventDefault(); e.stopPropagation(); if (memoria && !memoria.screaming) { memoria.scream(true); u.classList.add('on'); screamed = true; } };
+      const off = () => { if (memoria && memoria.screaming) { memoria.scream(false); u.classList.remove('on'); setTimeout(() => toast(Math.random() < 0.5 ? 'Nessuno ha sentito.' : 'Nessuno ha sentito. O forse sì.'), 1500); } };
+      u.addEventListener('pointerdown', on); u.addEventListener('pointerup', off); u.addEventListener('pointerleave', off); u.addEventListener('pointercancel', off);
+      u.addEventListener('keydown', e => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) on(e); });
+      u.addEventListener('keyup', e => { if (e.key === ' ' || e.key === 'Enter') off(); });
+      box.appendChild(u);
+    }
     if (pl.help) {
       const h = document.createElement('button');
       h.type = 'button'; h.className = 'soglia help' + (helping ? ' calling' : ''); h.id = 'btnHelp';
@@ -315,6 +331,13 @@ window.ATH = window.ATH || {};
       box.appendChild(h);
     }
   }
+  // la direzione vera sulla mappa: otto direzioni, il nord in alto
+  function compass(dx, dy) {
+    if (Math.abs(dx) < 0.004 && Math.abs(dy) < 0.004) return '→';
+    const a = Math.atan2(-dy, dx), i = ((Math.round(a / (Math.PI / 4)) % 8) + 8) % 8;
+    return ['→', '↗', '↑', '↖', '←', '↙', '↓', '↘'][i];
+  }
+  ATH.compass = compass;
   function callHelp() {
     if (helping) return;
     helping = { t: 0, wait: 9 + Math.random() * 10 };
@@ -344,6 +367,68 @@ window.ATH = window.ATH || {};
   ['allora', 'libra'].forEach(id => $(id).addEventListener('pointerdown', e => e.stopPropagation()));
   $('journey').addEventListener('pointerdown', e => { if (e.target.closest('.jbar, .soglie, .lumini, .strata')) e.stopPropagation(); });
 
+  // —— cose che succedono nei luoghi
+  const ERODE_KEEP = {};
+  function erodeText(el, txt, k) {
+    let out = '';
+    for (let i = 0; i < txt.length; i++) { const ch = txt[i]; const h = (Math.sin(i * 12.9898 + txt.length) * 43758.5453) % 1; out += ch !== ' ' && Math.abs(h) < k ? ' ' : ch; }
+    el.textContent = out;
+  }
+  function placeMechanics(dt) {
+    const pl = GP(state.scene); if (!pl || !engine.ready || traveling) { faceNow *= 0.98; return; }
+    // le parole perdono le lettere
+    if (pl.erode) {
+      const k = Math.min(0.97, dwell / pl.erode);
+      if (k - eroded > 0.02) { eroded = k; erodeText($('plName'), pl.name, k * 0.8); erodeText($('plOra'), pl.ora, k); erodeText($('plAllora'), pl.allora, k); }
+    }
+    // la voce che se ne va
+    if (pl.fadeOut) {
+      const k = Math.min(1, dwell / pl.fadeOut.secs);
+      pl.fadeOut.ids.forEach(id => { state.base[id] = (pl.levels[id] || 0) * (1 - k); });
+      state.base.oblio = 0.2 + k * 0.75; state.base.distantia = 0.3 + k * 0.6;
+      if (k >= 1 && $('plAllora').dataset.end !== pl.id) { $('plAllora').dataset.end = pl.id; $('plAllora').textContent = pl.fadeOut.end; }
+    } else $('plAllora').dataset.end = '';
+    // il volto che si dissolve
+    faceNow = pl.faceFade ? Math.min(1, dwell / pl.faceFade) : 0;
+    // l'ultimo piano: più resti, più è luce
+    ascendNow = pl.ascend ? Math.min(1, dwell / 60) : 0;
+    // il dubbio: i nomi delle strade non stanno fermi
+    if (pl.doubt) {
+      doubtT += dt;
+      if (doubtT > 1.3) {
+        doubtT = 0;
+        const btns = Array.from($('soglie').querySelectorAll('.soglia:not(.help):not(.scream)'));
+        btns.forEach(b => { const n = b.querySelector('.sname'); if (!n.dataset.real) n.dataset.real = n.textContent; n.textContent = Math.random() < 0.35 ? btns[Math.floor(Math.random() * btns.length)].querySelector('.sname').dataset.real || n.dataset.real : n.dataset.real; b.style.opacity = (0.55 + Math.random() * 0.45).toFixed(2); });
+      }
+    }
+    // l'ultimo respiro
+    if (pl.flatline) {
+      const k = Math.min(1, dwell / pl.flatline);
+      state.base.pulsus = (pl.bpm || 0.3) * (1 - k);
+      state.base.respiratio = 0.3 * (1 - k);
+      if (k >= 1 && !flatDone && memoria) {
+        flatDone = true; memoria.mon.next = 1e12; memoria.flat(true);
+        moveTo({ m_respiro: 0 }, 3);
+        $('plOra').textContent = 'Poi, semplicemente, il respiro dopo non arriva.';
+        setTimeout(() => { if (memoria) memoria.flat(false); }, 7000);
+      }
+    }
+    // risvegliarsi altrove
+    if (pl.wake && dwell > pl.wake && !woke) {
+      woke = true;
+      $('blackout').classList.add('on');
+      setTimeout(() => {
+        const safe = ['giardino', 'alba', 'felicita', 'ninna', 'neve', 'mare_stelle', 'primo_ricordo', 'cucina', 'salvezza'];
+        const scary = ['buio', 'voci', 'ospedale_abb', 'capovolta', 'dormitorio', 'scale_orfano', 'pozzo', 'x:' + Math.floor(Math.random() * 1e9) + ':4:risveglio'];
+        const good = Math.random() < 0.5, pool = good ? safe : scary;
+        const id = pool[Math.floor(Math.random() * pool.length)];
+        if (ATH.PLACE[id] && ATH.PLACE[id].hidden && state.found.indexOf(id) < 0) state.found.push(id);
+        travel(id, true);
+        setTimeout(() => { $('blackout').classList.remove('on'); toast(good ? 'Ti svegli. Qui sei al sicuro.' : 'Ti svegli. Non sai dove sei. Non ti piace.'); }, 1200);
+      }, 2600);
+    }
+  }
+
   // —— i lumini del cimitero
   state.lumini = state.lumini || [];
   $('lumini').addEventListener('submit', e => {
@@ -371,7 +456,7 @@ window.ATH = window.ATH || {};
   const SVGNS = 'http://www.w3.org/2000/svg';
   function drawMap() {
     const svg = $('mapSvg'); svg.innerHTML = '';
-    const BAND = { 0: 640 }, bandTop = {};
+    const BAND = { 0: 760 }, bandTop = {};
     let yy = 20;
     ATH.LEVELS.forEach(l => { bandTop[l.n] = yy; yy += (BAND[l.n] || 210); });
     svg.setAttribute('viewBox', `0 0 1000 ${yy + 10}`);
@@ -490,7 +575,7 @@ window.ATH = window.ATH || {};
     const q = l < 0.5 ? l * (1 + s) : l + s - l * s, p = 2 * l - q;
     return [f(p, q, h + 1 / 3) * 255, f(p, q, h) * 255, f(p, q, h - 1 / 3) * 255];
   }
-  const MOTIFS = ['stars', 'snow', 'haze', 'motes', 'field', 'beam', 'ceiling', 'glass', 'monitor', 'fever', 'sun', 'meet', 'train', 'lights', 'ruin', 'well', 'rose', 'nebula', 'throne', 'city', 'cityFlip', 'windows', 'stairs', 'candles', 'tombs', 'forest', 'whispers', 'void', 'tears', 'cracks', 'river', 'underwater'];
+  const MOTIFS = ['womb', 'face', 'scents', 'doubt', 'purify', 'stars', 'snow', 'haze', 'motes', 'field', 'beam', 'ceiling', 'glass', 'monitor', 'fever', 'sun', 'meet', 'train', 'lights', 'ruin', 'well', 'rose', 'nebula', 'throne', 'city', 'cityFlip', 'windows', 'stairs', 'candles', 'tombs', 'forest', 'whispers', 'void', 'tears', 'cracks', 'river', 'underwater'];
   let hueShift = 0, qVis = 0; const motif = {}; MOTIFS.forEach(m => motif[m] = 0);
 
   // —— registrazione
@@ -651,6 +736,7 @@ window.ATH = window.ATH || {};
       }
     }
     if (!helping) rescueAmt *= Math.pow(0.3, dt);
+    placeMechanics(dt);
     if (hushTween) { hushTween.t += dt; hushNow = lerp(hushTween.from, hushTween.to, smooth(0, 1, hushTween.t / hushTween.dur)); if (hushTween.t >= hushTween.dur) hushTween = null; }
     if (passageT >= 0) { passageT += dt; if (passageT > (passDir ? 4.4 : 3.4)) { passageT = -1; passDir = 0; } }
     // vagare
@@ -728,7 +814,7 @@ window.ATH = window.ATH || {};
         phaseGlyph: ATH.PHASES[phIdx].glyph, q: qVis, motif,
         wave: memoria ? memoria.waveVal : 0, voiceAct: memoria ? memoria.voiceAct : 0,
         breathOn, breath01, passage: passageT >= 0 ? Math.sin(Math.PI * Math.min(1, passageT / (passDir ? 4.4 : 3.4))) : 0, passDir,
-        levelN: sc ? sc.level || 0 : 0, lumini: state.lumini, tombIdx, tombName, rescue: rescueAmt, dark: darkNow, darkMode: lm, candleGlow: glowNow * darkNow
+        levelN: sc ? sc.level || 0 : 0, lumini: state.lumini, tombIdx, tombName, rescue: rescueAmt, faceFade: faceNow, ascend: ascendNow, dark: darkNow * (1 - ascendNow * 0.8), darkMode: lm, candleGlow: glowNow * darkNow
       });
       cssT += dt;
       if (cssT > 0.15) {

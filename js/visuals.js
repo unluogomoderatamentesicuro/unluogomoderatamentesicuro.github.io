@@ -267,7 +267,7 @@ window.ATH = window.ATH || {};
       const dk = S.dark || 0;
       if (dk > 0.01) {
         const cw = this.c.width, ch = this.c.height, d = this.dpr;
-        const px = S.px * cw, py = S.py * ch, pr = (S.darkMode === 'spente' ? 150 : 260) * d * (0.6 + S.presence * 0.6);
+        const px = S.px * cw, py = S.py * ch, pr = (S.darkMode === 'torcia' ? 105 : S.darkMode === 'spente' ? 150 : 260) * d * (0.6 + S.presence * 0.6);
         const g = c.createRadialGradient(px, py, pr * 0.15, px, py, pr);
         g.addColorStop(0, `rgba(0,0,0,${dk * 0.25})`); g.addColorStop(1, `rgba(0,0,0,${dk})`);
         c.globalCompositeOperation = 'source-over'; c.fillStyle = g; c.fillRect(0, 0, cw, ch);

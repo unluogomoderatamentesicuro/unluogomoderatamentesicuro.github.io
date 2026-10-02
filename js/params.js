@@ -122,6 +122,7 @@ window.ATH = window.ATH || {};
     { id: 'm_fruscio', group: 'domus', name: 'Fruscii', glyph: '≋', gloss: 'stoffa, carta, lenzuola, foglie', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_candele', group: 'domus', name: 'Candele', glyph: 'ı', gloss: 'fiammelle che respirano', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_organo', group: 'domus', name: 'Organo', glyph: '⌂', gloss: 'un organo in una chiesa vuota', def: 0, drift: 0.05, fmt: pct },
+    { id: 'm_stoviglie', group: 'domus', name: 'Stoviglie', glyph: '◡', gloss: 'piatti, bicchieri, una cucina di un’altra epoca', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_voci', group: 'homines', name: 'Voci lontane', glyph: '❝', gloss: 'voci di cortile, senza parole', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_bambini', group: 'homines', name: 'Bambini', glyph: '☺', gloss: 'bambini che giocano e ridono', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_passi', group: 'homines', name: 'Passi', glyph: '⁚', gloss: 'passi di qualcuno che passa, o i tuoi', def: 0, drift: 0.05, fmt: pct },
@@ -136,6 +137,7 @@ window.ATH = window.ATH || {};
     { id: 'm_acufene', group: 'corpus', name: 'Acufene', glyph: 'ı', gloss: 'il fischio nelle orecchie', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_monitor', group: 'corpus', name: 'Monitor', glyph: '⌇', gloss: 'il monitor accanto al letto', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_pianto', group: 'corpus', name: 'Pianto', glyph: '◟', gloss: 'un pianto soffocato dietro una porta', def: 0, drift: 0.05, fmt: pct },
+    { id: 'm_vagito', group: 'corpus', name: 'Vagito', glyph: '◠', gloss: 'il primo pianto di qualcuno appena nato', def: 0, drift: 0.05, fmt: pct },
     { id: 'pulsus', group: 'corpus', name: 'Pulsus', glyph: '⌁', gloss: 'quanto batte forte il cuore', def: 0.25, drift: 0.03, fmt: v => Math.round(48 + v * 80) + ' bpm' },
 
     { id: 'memoria', group: 'oblivio', name: 'Memoria', glyph: '◈', gloss: 'quanto forte torna il ricordo', def: 0.7, drift: 0, fmt: db },
@@ -192,7 +194,7 @@ window.ATH = window.ATH || {};
       { v: 'alpha', label: 'α 10 Hz' }, { v: 'gamma', label: 'γ 40 Hz' }] },
     { id: 'lumina', group: 'lumina', name: 'Luci', def: 'luogo', options: [
       { v: 'luogo', label: 'Come il luogo' }, { v: 'accese', label: 'Accese' }, { v: 'soffuse', label: 'Soffuse' },
-      { v: 'candele', label: 'Candele' }, { v: 'spente', label: 'Spente' }] }
+      { v: 'candele', label: 'Candele' }, { v: 'torcia', label: 'Una sola luce' }, { v: 'spente', label: 'Spente' }] }
   ];
   ATH.UNDA = { delta: 2, theta: 6, schumann: 7.83, alpha: 10, gamma: 40 };
 

@@ -540,6 +540,14 @@ body:not(.lit) .deck, body:not(.lit) .actions, body:not(.lit) .hint { opacity: 0
   .soglie { padding-right: 22px; }
 }
 
+/* —— nascita e morte */
+.soglia.vertical { border-style: double; border-width: 3px; padding-block: 6px; }
+.soglia.scream { border-color: rgba(230, 100, 80, .6); color: #f0b0a0; touch-action: none; user-select: none; -webkit-user-select: none; }
+.soglia.scream .arrow { color: #e0402a; }
+.soglia.scream.on { background: rgba(200, 40, 30, .35); box-shadow: 0 0 30px rgba(224, 64, 42, .6); }
+.blackout { position: fixed; inset: 0; z-index: 12; background: #000; opacity: 0; pointer-events: none; transition: opacity 2.4s ease; }
+.blackout.on { opacity: 1; pointer-events: auto; }
+
 </style>
 </head>
 <body data-phase="nigredo">
@@ -623,12 +631,12 @@ body:not(.lit) .deck, body:not(.lit) .actions, body:not(.lit) .hint { opacity: 0
 
 <div class="gate" id="gate">
   <div class="gate-inner">
-    <p class="eyebrow">un luogo moderatamente sicuro · opus IV</p>
+    <p class="eyebrow">un luogo moderatamente sicuro · opus V</p>
     <h2 class="gate-title">Athanor</h2>
-    <p class="gate-lede">Una città verticale di ricordi. In alto la rosa di luce, in basso il fiume dove si dimentica; in mezzo il mare d’infanzia, le stelle, le case abbandonate, il cimitero, la chiesa di notte, la stanza prima di dormire, l’attesa, la paura del buio, il pianto, l’alba. Oltre l’ultima strada c’è l’Altrove, che non finisce mai: lì ci si può perdere davvero.</p>
+    <p class="gate-lede">Una città verticale di ricordi, dal grembo, prima di nascere, fino a ciò che viene dopo l’ultimo respiro. In alto la rosa di luce, in basso il fiume dove si dimentica; in mezzo il mare d’infanzia, le stelle, le case abbandonate, il cimitero, la chiesa di notte, la stanza prima di dormire, l’attesa, la paura del buio, il pianto, l’alba. Oltre l’ultima strada c’è l’Altrove, che non finisce mai: lì ci si può perdere davvero.</p>
     <ul class="gate-notes">
       <li>Meglio in cuffia, con il volume basso all’inizio.</li>
-      <li>Le soglie in basso portano altrove: ↑ sali, ↓ scendi, ⋯ verso ciò che nessuno ha mai visto. <em>Ora · Allora</em> sposta tra ciò che accade e ciò che è accaduto.</li>
+      <li>Le soglie in basso portano altrove. Le frecce seguono la mappa; ⇧ sali, ⇩ scendi, ⋯ verso ciò che nessuno ha mai visto. <em>Ora · Allora</em> sposta tra ciò che accade e ciò che è accaduto.</li>
       <li>Se ti perdi, puoi chiedere aiuto. Qualcuno, forse, verrà.</li>
       <li>Muovi, tocca, gira le manopole anche a caso: il fuoco ascolta pure ciò che non intendi fare.</li>
       <li>Premi <em>Registra</em> e alla fine salva la sessione come file audio.</li>
@@ -648,6 +656,8 @@ body:not(.lit) .deck, body:not(.lit) .actions, body:not(.lit) .hint { opacity: 0
     <p class="map-note">I luoghi accesi li hai già visitati. Quelli vuoti li conosci ma non ci sei ancora stato. Alcuni non compaiono finché non resti abbastanza a lungo nel posto giusto.</p>
   </div>
 </div>
+
+<div class="blackout" id="blackout" aria-hidden="true"></div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -776,6 +786,7 @@ window.ATH = window.ATH || {};
     { id: 'm_fruscio', group: 'domus', name: 'Fruscii', glyph: '≋', gloss: 'stoffa, carta, lenzuola, foglie', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_candele', group: 'domus', name: 'Candele', glyph: 'ı', gloss: 'fiammelle che respirano', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_organo', group: 'domus', name: 'Organo', glyph: '⌂', gloss: 'un organo in una chiesa vuota', def: 0, drift: 0.05, fmt: pct },
+    { id: 'm_stoviglie', group: 'domus', name: 'Stoviglie', glyph: '◡', gloss: 'piatti, bicchieri, una cucina di un’altra epoca', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_voci', group: 'homines', name: 'Voci lontane', glyph: '❝', gloss: 'voci di cortile, senza parole', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_bambini', group: 'homines', name: 'Bambini', glyph: '☺', gloss: 'bambini che giocano e ridono', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_passi', group: 'homines', name: 'Passi', glyph: '⁚', gloss: 'passi di qualcuno che passa, o i tuoi', def: 0, drift: 0.05, fmt: pct },
@@ -790,6 +801,7 @@ window.ATH = window.ATH || {};
     { id: 'm_acufene', group: 'corpus', name: 'Acufene', glyph: 'ı', gloss: 'il fischio nelle orecchie', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_monitor', group: 'corpus', name: 'Monitor', glyph: '⌇', gloss: 'il monitor accanto al letto', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_pianto', group: 'corpus', name: 'Pianto', glyph: '◟', gloss: 'un pianto soffocato dietro una porta', def: 0, drift: 0.05, fmt: pct },
+    { id: 'm_vagito', group: 'corpus', name: 'Vagito', glyph: '◠', gloss: 'il primo pianto di qualcuno appena nato', def: 0, drift: 0.05, fmt: pct },
     { id: 'pulsus', group: 'corpus', name: 'Pulsus', glyph: '⌁', gloss: 'quanto batte forte il cuore', def: 0.25, drift: 0.03, fmt: v => Math.round(48 + v * 80) + ' bpm' },
 
     { id: 'memoria', group: 'oblivio', name: 'Memoria', glyph: '◈', gloss: 'quanto forte torna il ricordo', def: 0.7, drift: 0, fmt: db },
@@ -846,7 +858,7 @@ window.ATH = window.ATH || {};
       { v: 'alpha', label: 'α 10 Hz' }, { v: 'gamma', label: 'γ 40 Hz' }] },
     { id: 'lumina', group: 'lumina', name: 'Luci', def: 'luogo', options: [
       { v: 'luogo', label: 'Come il luogo' }, { v: 'accese', label: 'Accese' }, { v: 'soffuse', label: 'Soffuse' },
-      { v: 'candele', label: 'Candele' }, { v: 'spente', label: 'Spente' }] }
+      { v: 'candele', label: 'Candele' }, { v: 'torcia', label: 'Una sola luce' }, { v: 'spente', label: 'Spente' }] }
   ];
   ATH.UNDA = { delta: 2, theta: 6, schumann: 7.83, alpha: 10, gamma: 40 };
 
@@ -1399,6 +1411,195 @@ window.ATH = window.ATH || {};
 
   // nomi sulle lapidi: inventati, come le vite di cui nessuno si ricorda più
   ATH.TOMB_NAMES = ['Elvira', 'Nello', 'Ada', 'Guido', 'Rina', 'Teresa', 'Augusto', 'Iolanda', 'Primo', 'Settimia', 'Dante', 'Lucia', 'Ettore', 'Gemma', 'Oreste', 'Nives', 'Bruno', 'Annunziata', 'Livio', 'Clelia', 'Tullio', 'Bianca', 'Aldo', 'Ines', 'un bambino senza nome', 'una donna di cui resta solo la data'];
+  ATH.SCENES = ATH.PLACES.slice().sort((a, b) => b.level - a.level);
+})(window.ATH);
+
+</script>
+<script>
+/* ATHANOR — LA NASCITA E LA MORTE. Due livelli nuovi: in fondo il grembo,
+   prima di ogni ricordo; in cima l'oltre, dopo l'ultimo. Tra i due, il lutto,
+   le fotografie, i volti e le voci che si dimenticano, i profumi di una volta,
+   il dubbio, l'urlo, l'orfanotrofio fino all'ultimo piano, il risveglio.
+   un luogo moderatamente sicuro */
+window.ATH = window.ATH || {};
+
+(function (ATH) {
+  ATH.LEVELS.unshift({ n: 4, name: 'L’oltre', gloss: 'dopo l’ultimo respiro' });
+  ATH.LEVELS.push({ n: -3, name: 'Il grembo', gloss: 'prima del primo ricordo' });
+
+  ATH.SCENTS = ['pane caldo', 'cera d’api', 'naftalina', 'mosto', 'fieno tagliato', 'brodo della domenica', 'la colonia del nonno', 'gesso', 'zucchero filato', 'terra bagnata', 'caffè sul fuoco', 'sapone di Marsiglia', 'legna bruciata', 'mandarini', 'incenso', 'inchiostro', 'basilico', 'fiori di tiglio', 'cuoio', 'lenzuola stese al sole'];
+
+  const NEW = [
+    // ——— L'OLTRE
+    { id: 'oltre', name: 'Dall’altra parte', kind: 'stato', level: 4, x: 0.35, y: 0.5, terrain: 'nuvola', modus: 'armonici', hush: 0.95, lumina: 'accese', hidden: true,
+      levels: { m_canto: 0.25, m_campane: 0.1 }, set: { lumen: 0.8, chorus: 0.7, aether: 1, velum: 0.9, distantia: 0.8, cantus: 0.3 }, libra: 0.98,
+      pal: { bg: [20, 20, 22], accent: [250, 248, 240], second: [200, 205, 225] }, motif: { rose: 0.6, purify: 1, haze: 0.5 },
+      ora: 'Non pesi più niente. Non fa più male niente. Una luce bianca, e dentro, lontanissime, delle voci che conosci.',
+      allora: 'Ti avevano detto che saresti stato accolto. Non avevano detto da chi.',
+      exits: ['empireo', 'rinascita', 'ultimo_respiro'] },
+    { id: 'rinascita', name: 'La rinascita', kind: 'stato', level: 4, x: 0.72, y: 0.5, terrain: 'erba', modus: 'lidio', hush: 0.8,
+      levels: { m_uccelli: 0.4, m_canto: 0.3, m_carillon: 0.2, m_vagito: 0.08 }, set: { lumen: 0.65, velum: 0.9, chorus: 0.4, aether: 0.85 }, libra: 0.9,
+      pal: { bg: [14, 16, 10], accent: [230, 255, 190], second: [150, 220, 170] }, motif: { sun: 0.8, purify: 0.6, field: 0.5 },
+      ora: 'Tutto ricomincia. Non sai ancora il tuo nome, ma senti già il caldo sulla pelle.',
+      allora: 'Ogni volta che sei caduto, da qualche parte, qualcosa è ricresciuto.',
+      exits: ['oltre', 'grembo', 'alba', 'giardino'] },
+
+    // ——— I TETTI
+    { id: 'ultimo_piano', name: 'L’ultimo piano', kind: 'stato', level: 2, x: 0.92, y: 0.75, terrain: 'legno', modus: 'lidio', hush: 0.9, lumina: 'accese', ascend: true, hidden: true,
+      levels: { m_vento: 0.4, m_canto: 0.25, m_uccelli: 0.2, m_fruscio: 0.15 }, set: { lumen: 0.5, chorus: 0.5, aether: 0.95, velum: 0.85, oblio: 0.05 }, libra: 0.92,
+      pal: { bg: [14, 14, 16], accent: [245, 238, 225], second: [180, 190, 210] }, motif: { purify: 1, beam: 0.25 },
+      ora: 'Le finestre sono rotte e il vento entra pulito. La luce riempie la stanza piano, come acqua. Lasci andare.',
+      allora: 'Hai attraversato tutti i piani. Ogni gradino era una cosa che non avevi mai detto. Adesso non pesa più.',
+      exits: ['dormitorio', 'scale_orfano', 'campanile', { id: 'empireo', linger: 40 }, 'alba'] },
+
+    // ——— LE TORRI
+    { id: 'sala_parto', name: 'La nascita', kind: 'stato', level: 1, x: 0.06, y: 0.15, terrain: 'pietra', modus: 'ionio', hush: 0.6, lumina: 'accese',
+      levels: { m_vagito: 0.55, m_monitor: 0.2, m_voci: 0.2, m_passi: 0.15, m_cuore: 0.2 }, set: { lumen: 0.55, chorus: 0.3, velum: 0.7 }, libra: 0.8, bpm: 0.55,
+      pal: { bg: [16, 14, 16], accent: [255, 236, 226], second: [220, 180, 200] }, motif: { sun: 0.4, haze: 0.6, meet: 0.4 },
+      ora: 'Un grido, il primo. Qualcuno piange e ride insieme. Una vita intera comincia in questo esatto momento.',
+      allora: 'Non lo ricordi, nessuno lo ricorda. Ma è successo anche a te, ed era la cosa più grande del mondo.',
+      exits: ['grembo', 'ospedale', 'ninna', 'alba'] },
+    { id: 'ospedale', name: 'L’ospedale di notte', kind: 'luogo', level: 1, x: 0.36, y: 0.15, terrain: 'pietra', modus: 'dorico', hush: 0.5, lumina: 'soffuse',
+      levels: { m_ronzio: 0.35, m_monitor: 0.25, m_passi: 0.25, m_voci: 0.1, m_telefono: 0.08 }, set: { lumen: 0.25, distantia: 0.5 }, libra: 0.7,
+      pal: { bg: [8, 12, 12], accent: [190, 230, 220], second: [80, 120, 120] }, motif: { monitor: 0.5, windows: 0.3 },
+      ora: 'Il corridoio verde, le sedie di plastica, il distributore che ronza. Da una porta si nasce, da un’altra si muore.',
+      allora: 'Hai imparato qui che il tempo può fermarsi del tutto, alle quattro del mattino.',
+      exits: ['sala_parto', 'ultimo_respiro', 'torre', 'veglia', 'male'] },
+    { id: 'ultimo_respiro', name: 'L’ultimo respiro', kind: 'stato', level: 1, x: 0.36, y: 0.85, terrain: 'legno', modus: 'eolio', hush: 0.9, lumina: 'soffuse', flatline: 45,
+      levels: { m_monitor: 0.4, m_respiro: 0.4, m_pendolo: 0.2, m_fruscio: 0.1 }, set: { lumen: 0.25, velum: 0.25, chorus: 0.15, respiratio: 0.3 }, libra: 0.85, bpm: 0.3,
+      pal: { bg: [8, 9, 12], accent: [200, 210, 230], second: [90, 100, 130] }, motif: { monitor: 1 },
+      ora: 'Gli tieni la mano. Il respiro si allunga, si allunga ancora. Tra un respiro e l’altro c’è tutto il silenzio del mondo.',
+      allora: 'Volevi dire ancora una cosa. Te la porti dietro da allora.',
+      exits: ['ospedale', 'funerale', 'veglia', { id: 'oltre', linger: 48 }] },
+    { id: 'scale_orfano', name: 'Le scale dell’orfanotrofio', kind: 'luogo', level: 1, x: 0.66, y: 0.85, terrain: 'scala', modus: 'eolio', hush: 0.8, lumina: 'torcia',
+      levels: { m_scricchiolio: 0.4, m_goccia: 0.3, m_vento: 0.35, m_respiro: 0.2 }, set: { lumen: 0.15, distantia: 0.6 }, libra: 0.7,
+      pal: { bg: [6, 6, 8], accent: [210, 205, 190], second: [80, 80, 90] }, motif: { stairs: 0.6, ruin: 0.6 },
+      ora: 'Una sola luce, la tua. I gradini scricchiolano. A ogni piano il silenzio è più grande e la paura più piccola.',
+      allora: 'Di notte qualcuno saliva queste scale contando i gradini, per non pensare ad altro.',
+      exits: ['orfanotrofio', 'dormitorio', { id: 'ultimo_piano', linger: 25 }] },
+    { id: 'dormitorio', name: 'Il dormitorio', kind: 'luogo', level: 1, x: 0.9, y: 0.85, terrain: 'legno', modus: 'insen', hush: 0.85, lumina: 'torcia',
+      levels: { m_carillon: 0.35, m_vento: 0.3, m_scricchiolio: 0.2, m_bambini: 0.08, m_sussurri: 0.1 }, set: { lumen: 0.2, oblio: 0.6, distantia: 0.8 }, libra: 0.75,
+      pal: { bg: [8, 8, 10], accent: [196, 200, 214], second: [90, 90, 110] }, motif: { ruin: 0.6, motes: 0.6 },
+      ora: 'Trenta letti di ferro in fila. Su uno c’è ancora un nome inciso, con la punta di una forchetta.',
+      allora: 'Si addormentavano raccontandosi le famiglie che avrebbero avuto, un giorno.',
+      exits: ['scale_orfano', { id: 'ultimo_piano', linger: 20 }, 'stanza'] },
+
+    // ——— LA TERRA
+    { id: 'funerale', name: 'Il giorno del funerale', kind: 'stato', level: 0, x: 0.84, y: 0.5, terrain: 'pietra', modus: 'eolio', hush: 0.6, lumina: 'soffuse',
+      levels: { m_campane: 0.45, m_voci: 0.25, m_passi: 0.3, m_pioggia: 0.2, m_stoviglie: 0.1, m_organo: 0.2 }, set: { lumen: 0.25, chorus: 0.3, distantia: 0.5 }, libra: 0.7,
+      pal: { bg: [9, 9, 10], accent: [200, 196, 190], second: [90, 90, 96] }, motif: { haze: 0.3, scents: 0.3 },
+      ora: 'Tutti vestiti di scuro, tutti gentili. Qualcuno ti stringe la mano e dice una frase che non ascolti.',
+      allora: 'La sera, a casa, qualcuno ha apparecchiato anche per chi non c’era più. Nessuno ha avuto il coraggio di dirlo.',
+      exits: ['ultimo_respiro', 'cimitero', 'chiesa', 'stanza_vuota', 'fotografie'] },
+    { id: 'stanza_vuota', name: 'La stanza di chi non c’è più', kind: 'luogo', level: 0, x: 0.68, y: 0.38, terrain: 'legno', modus: 'dorico', hush: 0.85, lumina: 'soffuse',
+      levels: { m_pendolo: 0.35, m_fruscio: 0.2, m_radio: 0.08, m_canto: 0.12 }, set: { lumen: 0.25, oblio: 0.45, distantia: 0.6, nastro: 0.4 }, libra: 0.8,
+      pal: { bg: [12, 10, 9], accent: [226, 206, 176], second: [130, 110, 90] }, motif: { motes: 0.8, scents: 0.6 },
+      ora: 'Gli occhiali sul comodino, la giacca sulla sedia. L’orologio va ancora avanti, e nessuno sa perché.',
+      allora: 'Per mesi non avete toccato niente. Poi un giorno qualcuno ha aperto la finestra, e l’odore è andato via.',
+      exits: ['funerale', 'cucina', 'fotografie', 'voce_persa', 'volti', 'soffitta'] },
+    { id: 'cucina', name: 'I profumi di una volta', kind: 'luogo', level: 0, x: 0.5, y: 0.06, terrain: 'legno', modus: 'lidio', hush: 0.75, lumina: 'accese',
+      levels: { m_stoviglie: 0.45, m_radio: 0.2, m_camino: 0.25, m_voci: 0.15, m_canto: 0.15, m_pendolo: 0.1 }, set: { lumen: 0.4, velum: 0.6, nastro: 0.35 }, libra: 0.75,
+      pal: { bg: [18, 14, 9], accent: [255, 214, 150], second: [210, 140, 80] }, motif: { scents: 1, haze: 0.6 },
+      ora: 'Il sugo sul fuoco dalla mattina, il pane nel forno, la radio accesa piano. Nessuno ti chiede niente.',
+      allora: 'Certi profumi non li hai più sentiti da allora. Se ne sentissi uno adesso, piangeresti.',
+      exits: ['estate', 'stanza_vuota', 'domenica', 'campagna', 'festa_finita'] },
+    { id: 'fotografie', name: 'Le fotografie', kind: 'luogo', level: 0, x: 0.57, y: 0.57, terrain: 'legno', modus: 'insen', hush: 0.85, lumina: 'soffuse',
+      levels: { m_fruscio: 0.4, m_grammofono: 0.2, m_pendolo: 0.15 }, set: { lumen: 0.3, oblio: 0.5, nastro: 0.55, distantia: 0.5 }, libra: 0.8,
+      pal: { bg: [14, 11, 8], accent: [230, 200, 150], second: [140, 110, 80] }, motif: { face: 0.6, motes: 0.5 },
+      ora: 'Una scatola di fotografie. Sorridono tutti. Di metà di loro non sai più il nome.',
+      allora: 'Dietro, a matita, una data e una parola: “felici”. Non sai chi l’ha scritta.',
+      exits: ['stanza_vuota', 'volti', 'funerale', 'soglia', 'casa'] },
+    { id: 'dubbio', name: 'Il dubbio', kind: 'stato', level: 0, x: 0.42, y: 0.47, terrain: 'pietra', modus: 'armonici', hush: 0.3, doubt: true,
+      levels: { m_pendolo: 0.25, m_sussurri: 0.15, m_vento: 0.2 }, set: { lumen: 0.3, mercurius: 0.8, halitus: 0.7, aurora: 0.9 }, libra: 0.55,
+      pal: { bg: [10, 10, 12], accent: [200, 200, 220], second: [140, 120, 160] }, motif: { doubt: 1 },
+      ora: 'Ogni strada sembra giusta e ogni strada sembra sbagliata. Resti fermo, e anche restare è una scelta.',
+      allora: 'Quella volta hai scelto. Ti chiedi ancora cosa sarebbe successo dall’altra parte.',
+      exits: ['soglia', 'centro', 'chiesa', 'urlare', 'letto', 'rinnegare'] },
+    { id: 'ospedale_abb', name: 'L’ospedale abbandonato', kind: 'luogo', level: 0, x: 0.66, y: 0.78, terrain: 'pietra', modus: 'insen', hush: 0.9, lumina: 'torcia',
+      levels: { m_goccia: 0.45, m_scricchiolio: 0.35, m_vento: 0.3, m_ronzio: 0.08 }, set: { lumen: 0.15, distantia: 0.7, crypta: 0.9 }, libra: 0.75,
+      pal: { bg: [5, 6, 6], accent: [200, 215, 205], second: [70, 90, 80] }, motif: { ruin: 1, void: 0.3 },
+      ora: 'Il fascio della torcia trova una sedia a rotelle, un registro aperto, una porta che non dovrebbe essere aperta. Poi solo silenzio.',
+      allora: 'Ci sei entrato per avere paura. Hai trovato qualcosa di più strano: una pace enorme.',
+      exits: ['casa', 'orfanotrofio', 'veglia', 'buio'] },
+    { id: 'treno_notte', name: 'Il treno di notte', kind: 'luogo', level: 0, x: 0.14, y: 0.44, terrain: 'legno', modus: 'dorico', hush: 0.55, lumina: 'soffuse',
+      levels: { m_treno: 0.5, m_respiro: 0.15, m_voci: 0.08, m_vento: 0.15 }, set: { lumen: 0.25, distantia: 0.5 }, libra: 0.7,
+      pal: { bg: [7, 8, 12], accent: [240, 210, 150], second: [80, 90, 130] }, motif: { train: 1, stars: 0.3 },
+      ora: 'Lo scompartimento al buio, le luci delle stazioni che passano senza fermarsi. Non sai dove scenderai.',
+      allora: 'Partivi con una valigia sola e la certezza che sarebbe cambiato tutto. Ed è cambiato tutto.',
+      exits: ['stazione', 'periferia', 'risveglio', 'mare'] },
+    { id: 'risveglio', name: 'Risvegliarsi', kind: 'stato', level: 0, x: 0.26, y: 0.88, terrain: 'legno', modus: 'pentatonico', hush: 0.9, lumina: 'spente', wake: 10,
+      levels: { m_respiro: 0.3, m_fruscio: 0.3, m_pendolo: 0.15 }, set: { lumen: 0.2, oblio: 0.6, distantia: 0.6 }, libra: 0.85,
+      pal: { bg: [6, 6, 8], accent: [200, 200, 210], second: [100, 100, 120] }, motif: { void: 0.4 },
+      ora: 'Gli occhi pesano. Ti lasci andare. Quando li riapri, non sai dove sei.',
+      allora: 'Da bambino ti addormentavi in macchina e ti svegliavi nel tuo letto. Non hai mai capito come.',
+      exits: ['letto', 'treno_notte', 'soglia'] },
+    { id: 'festa_finita', name: 'Dopo la festa', kind: 'luogo', level: 0, x: 0.76, y: 0.08, terrain: 'pietra', modus: 'eolio', hush: 0.6, lumina: 'soffuse',
+      levels: { m_stoviglie: 0.3, m_festa: 0.12, m_vento: 0.2, m_voci: 0.08, m_carillon: 0.15 }, set: { lumen: 0.3, distantia: 0.6, nastro: 0.4 }, libra: 0.7,
+      pal: { bg: [12, 8, 14], accent: [240, 180, 200], second: [140, 100, 160] }, motif: { lights: 0.4, motes: 0.4 },
+      ora: 'Bicchieri a metà, coriandoli per terra, la musica ancora accesa in una stanza vuota. Tutti sono andati via.',
+      allora: 'Era la festa più bella. Te ne sei accorto solo quando è finita.',
+      exits: ['fiera', 'felicita', 'cucina', 'amore'] },
+
+    // ——— IL SOTTOSUOLO
+    { id: 'urlare', name: 'Chiudersi a urlare', kind: 'stato', level: -1, x: 0.3, y: 0.12, terrain: 'pietra', modus: 'insen', hush: 0.6, lumina: 'spente', scream: true,
+      levels: { m_ronzio: 0.2, m_respiro: 0.35, m_cuore: 0.3 }, set: { lumen: 0.15, crypta: 0.6 }, libra: 0.6, bpm: 0.6,
+      pal: { bg: [10, 5, 5], accent: [230, 100, 80], second: [110, 40, 40] }, motif: { cracks: 0.3 },
+      ora: 'Hai chiuso la porta a chiave. Nessuno può sentirti. Puoi urlare finché ne hai.',
+      allora: 'Speravi che nessuno sentisse. Una parte di te sperava il contrario.',
+      exits: ['voci', 'buio', 'pavimento', 'colpa', 'dubbio'] },
+    { id: 'volti', name: 'I volti che non ricordi', kind: 'stato', level: -1, x: 0.7, y: 0.12, terrain: 'pietra', modus: 'insen', hush: 0.9, lumina: 'soffuse', faceFade: 70,
+      levels: { m_fruscio: 0.2, m_canto: 0.15, m_pendolo: 0.15 }, set: { lumen: 0.3, oblio: 0.6, nastro: 0.6, distantia: 0.7 }, libra: 0.85,
+      pal: { bg: [9, 9, 11], accent: [220, 210, 200], second: [120, 110, 120] }, motif: { face: 1 },
+      ora: 'Ricordi la sua sciarpa, la sua risata, il modo in cui diceva il tuo nome. Il volto no. Il volto non lo ricordi più.',
+      allora: 'Ti sei accorto un giorno, all’improvviso, che dovevi guardare una fotografia per ricordarlo. Quel giorno è stato il secondo lutto.',
+      exits: ['fotografie', 'voce_persa', 'lete', { id: 'dimenticarsi', linger: 50 }, 'stanza_vuota'] },
+    { id: 'voce_persa', name: 'La voce che non ricordi', kind: 'stato', level: -1, x: 0.56, y: 0.62, terrain: 'legno', modus: 'dorico', hush: 0.9, lumina: 'soffuse',
+      fadeOut: { ids: ['m_canto', 'm_voci'], secs: 75, end: 'Adesso non la ricordi più. Ricordi solo che c’era.' },
+      levels: { m_canto: 0.55, m_voci: 0.25, m_pioggia: 0.15 }, set: { lumen: 0.3, oblio: 0.2, nastro: 0.3, distantia: 0.3 }, libra: 0.85,
+      pal: { bg: [10, 10, 13], accent: [210, 200, 230], second: [120, 110, 150] }, motif: { haze: 0.3, motes: 0.3 },
+      ora: 'Una voce canticchia. È la sua, ne sei sicuro. Ascolta bene, adesso, perché sta già andando via.',
+      allora: 'Hai tenuto un vecchio messaggio in segreteria per anni, solo per sentirla. Poi il telefono si è rotto.',
+      exits: ['volti', 'stanza_vuota', 'pianto'] },
+
+    // ——— L'ABISSO
+    { id: 'dimenticarsi', name: 'Dimenticarsi', kind: 'stato', level: -2, x: 0.1, y: 0.8, terrain: 'neve', modus: 'insen', hush: 0.95, lumina: 'soffuse', erode: 60, hidden: true,
+      levels: { m_acufene: 0.15, m_vento: 0.2 }, set: { lumen: 0.2, oblio: 0.95, distantia: 0.9, nastro: 0.8 }, libra: 0.9,
+      pal: { bg: [10, 10, 10], accent: [190, 190, 190], second: [110, 110, 110] }, motif: { void: 0.6, river: 0.4 },
+      ora: 'Le parole perdono le lettere. I nomi perdono le facce. Alla fine ti dimentichi anche di te, e non fa male.',
+      allora: 'Avevi paura di dimenticare. Adesso non ricordi più di cosa avessi paura.',
+      exits: ['lete', 'volti', 'primo_ricordo', 'silenzio'] },
+
+    // ——— IL GREMBO
+    { id: 'grembo', name: 'Prima di nascere', kind: 'stato', level: -3, x: 0.35, y: 0.5, terrain: 'acqua', modus: 'pentatonico', hush: 0.98, lumina: 'soffuse',
+      levels: { m_cuore: 0.5, m_bolle: 0.15, m_mare: 0.2, m_canto: 0.15 }, set: { lumen: 0.3, oblio: 0.95, distantia: 0.3, velum: 0.1 }, libra: 0.95, bpm: 0.2,
+      pal: { bg: [16, 4, 6], accent: [255, 120, 110], second: [140, 40, 60] }, motif: { womb: 1 },
+      ora: 'Buio caldo. Un cuore che non è il tuo batte sopra di te. Arriva, attutita, una voce che canta.',
+      allora: 'Non c’è ancora un allora. C’è solo questo, e va bene così.',
+      exits: ['primo_ricordo', 'sala_parto', 'sommerso'] },
+    { id: 'primo_ricordo', name: 'Il primo ricordo', kind: 'luogo', level: -3, x: 0.7, y: 0.5, terrain: 'erba', modus: 'lidio', hush: 0.95, lumina: 'soffuse',
+      levels: { m_carillon: 0.3, m_uccelli: 0.15, m_canto: 0.2, m_fruscio: 0.15 }, set: { lumen: 0.4, oblio: 0.8, nastro: 0.7, velum: 0.6, distantia: 0.7 }, libra: 0.9,
+      pal: { bg: [16, 14, 12], accent: [255, 230, 190], second: [200, 170, 160] }, motif: { haze: 1, sun: 0.4, motes: 0.5 },
+      ora: 'Una finestra, una tenda che si muove, una macchia di sole sul pavimento. Nient’altro. È il primo.',
+      allora: 'Non sai se lo ricordi davvero o se te l’hanno raccontato. Lo tieni lo stesso.',
+      exits: ['grembo', 'dimenticarsi', 'stanza', 'ninna'] }
+  ];
+  NEW.forEach(p => { ATH.PLACES.push(p); ATH.PLACE[p.id] = p; });
+
+  const more = {
+    soglia: ['dubbio', 'fotografie'], letto: ['risveglio'], pavimento: ['risveglio'], silenzio: ['dimenticarsi'],
+    veglia: ['ospedale', 'ultimo_respiro'], orfanotrofio: ['scale_orfano', 'ospedale_abb'], casa: ['ospedale_abb', 'fotografie'],
+    cimitero: ['funerale'], chiesa: ['funerale', 'dubbio'], estate: ['cucina'], domenica: ['cucina'], fiera: ['festa_finita'],
+    felicita: ['festa_finita'], alba: [{ id: 'rinascita', linger: 60 }], giardino: ['rinascita'], empireo: ['oltre'],
+    lete: ['volti', 'dimenticarsi'], sommerso: ['grembo'], stanza: ['primo_ricordo', 'dormitorio'], soffitta: ['stanza_vuota'],
+    ninna: ['sala_parto', 'primo_ricordo'], male: ['ospedale'], voci: ['urlare'], buio: ['urlare', 'ospedale_abb'],
+    pianto: ['voce_persa'], stazione: ['treno_notte'], amore: ['festa_finita'], colpa: ['urlare'], centro: ['dubbio'],
+    campagna: ['cucina'], periferia: ['treno_notte'], torre: ['ospedale'], rinnegare: ['dubbio']
+  };
+  Object.keys(more).forEach(id => { ATH.PLACE[id].exits = ATH.PLACE[id].exits.concat(more[id]); });
+
+  // nell'orfanotrofio si sale fino all'ultimo piano
+  ATH.PLACE.orfanotrofio.ora = 'Le brande sono ancora in fila. Una finestra sbatte da sola. In fondo al corridoio, una scala sale nel buio.';
+
   ATH.SCENES = ATH.PLACES.slice().sort((a, b) => b.level - a.level);
 })(window.ATH);
 
@@ -2948,6 +3149,94 @@ window.ATH = window.ATH || {};
 
 </script>
 <script>
+/* ATHANOR — MEMORIA (quarta parte): stoviglie, il primo vagito, l'urlo nella
+   stanza chiusa, il monitor che smette di battere.
+   un luogo moderatamente sicuro */
+window.ATH = window.ATH || {};
+
+(function (ATH) {
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const P = ATH.Memoria.prototype;
+  Object.assign(ATH.MEM_CAL, { m_stoviglie: 3, m_vagito: 1 });
+  const b0 = P.buildPlus, a0 = P.applyPlus;
+
+  P.buildPlus = function () {
+    b0.call(this);
+    const c = this.c, G = this.G;
+    this.dishes = { next: 0 };
+    // il vagito: una voce piccola, acuta, a singhiozzi
+    this.babyOut = this.filt('lowpass', 3400, 0.6); this.babyOut.connect(this.lv.m_vagito);
+    this.baby = this.makeVoice(460, this.babyOut, 0.1, true);
+    this.babyT = { next: 0, until: 0, on: false };
+    // l'urlo: voce tirata + fiato, mandato dentro la fornace e contro i muri
+    this.screamBus = G(0);
+    const wall = this.filt('lowpass', 1800, 0.8);
+    this.screamBus.connect(wall); wall.connect(this.e.masterSum);
+    this.screamBus.connect(this.e.alembic);
+    this.screamBus.connect(this.e.crypta);
+    this.screamer = this.makeVoice(330, this.screamBus, 0, false);
+    this.screamer.fs.forEach((b, k) => { b.frequency.value = [850, 1250, 2900][k]; b.Q.value = 4; });
+    this.screaming = false;
+    // il monitor piatto
+    this.flatO = c.createOscillator(); this.flatO.frequency.value = 960; this.flatG = G(0);
+    this.flatO.connect(this.flatG); this.flatG.connect(this.lv.m_monitor); this.flatO.start();
+  };
+
+  P.scream = function (on) {
+    const now = this.c.currentTime, v = this.screamer;
+    this.screaming = on;
+    if (on) {
+      v.o.frequency.cancelScheduledValues(now);
+      v.o.frequency.setValueAtTime(v.f0 * 0.9, now);
+      v.o.frequency.exponentialRampToValueAtTime(v.f0 * 1.6, now + 0.35);
+      v.env.gain.setTargetAtTime(1, now, 0.03);
+      this.screamBus.gain.setTargetAtTime(0.9, now, 0.05);
+    } else {
+      v.o.frequency.setTargetAtTime(v.f0 * 0.7, now, 0.25);
+      v.env.gain.setTargetAtTime(0, now, 0.18);
+      this.screamBus.gain.setTargetAtTime(0, now + 0.3, 0.6);
+    }
+    this.e.emit('mem', { kind: 'scream', on, at: now });
+  };
+  P.flat = function (on) { this.flatG.gain.setTargetAtTime(on ? 0.12 : 0, this.c.currentTime, on ? 0.05 : 1.5); };
+
+  P.applyPlus = function (L, S, C, dt, root, scale, now, look) {
+    a0.call(this, L, S, C, dt, root, scale, now, look);
+    const t = this.t;
+    // l'urlo trema e si spezza
+    if (this.screaming) {
+      const v = this.screamer;
+      v.o.frequency.setTargetAtTime(v.f0 * (1.45 + 0.15 * Math.sin(t * 7) + rnd(-0.05, 0.05)), now, 0.06);
+    }
+    // stoviglie: piatti, posate, un bicchiere, l'acqua del lavandino
+    if (L.m_stoviglie > 0.01 && now >= this.dishes.next) {
+      const st = now + 0.03, k = Math.random(), pan = rnd(-0.7, 0.7);
+      if (k < 0.45) { const f = rnd(2200, 4200); [1, 2.32, 4.1].forEach((m, i) => this.tone(this.lv.m_stoviglie, st, f * m, 'sine', [0.08, 0.04, 0.02][i], 0.001, 0.12 + Math.random() * 0.2, 1.2, pan)); }
+      else if (k < 0.75) { for (let i = 0; i < 3; i++) this.burst(this.lv.m_stoviglie, st + i * rnd(0.03, 0.08), 0.008, rnd(0.15, 0.35), rnd(2500, 5000), pan); }
+      else if (k < 0.9) { this.tone(this.lv.m_stoviglie, st, rnd(700, 1100), 'sine', 0.12, 0.002, 0.05, 0.3, pan); this.burst(this.lv.m_stoviglie, st, 0.02, 0.2, 1500, pan); }
+      else { const s = this.src('pink', false), bp = this.filt('bandpass', 1800, 2), g = this.G(0), d = rnd(1.5, 3);
+        g.gain.setValueAtTime(0, st); g.gain.linearRampToValueAtTime(0.18, st + 0.2); g.gain.linearRampToValueAtTime(0, st + d);
+        this.chain([s, bp, g, this.lv.m_stoviglie]); s.start(st, rnd(0, 2), d + 0.1); }
+      this.dishes.next = now + rnd(0.4, 3) * (1.3 - L.m_stoviglie);
+    }
+    // vagito: ondate di pianto e respiri
+    if (L.m_vagito > 0.01) {
+      const b = this.babyT, v = this.baby;
+      if (now >= b.until) { b.on = !b.on; b.until = now + (b.on ? rnd(3, 6) : rnd(2, 5)); }
+      if (b.on && now >= b.next) {
+        const st = now + 0.02, len = rnd(0.5, 1.1);
+        v.fs.forEach((f, i) => f.frequency.setTargetAtTime([900, 1500, 3200][i], st, 0.02));
+        v.o.frequency.setValueAtTime(v.f0 * 0.9, st); v.o.frequency.linearRampToValueAtTime(v.f0 * 1.25, st + len * 0.3); v.o.frequency.linearRampToValueAtTime(v.f0 * 0.85, st + len);
+        v.env.gain.setTargetAtTime(0.45, st, 0.03); v.env.gain.setTargetAtTime(0, st + len * 0.85, 0.05);
+        this.burst(this.lv.m_vagito, st + len + 0.05, 0.15, 0.08, 1500, 0.1);
+        b.next = st + len + rnd(0.3, 0.6);
+      } else if (!b.on) v.env.gain.setTargetAtTime(0, now, 0.15);
+    } else this.baby.env.gain.setTargetAtTime(0, now, 0.2);
+  };
+})(window.ATH);
+
+</script>
+<script>
 /* ATHANOR — lo strato del sogno: aurore, luci sfocate, lucciole, onde, pioggia,
    braci, neve, stelle cadenti, costellazioni del carillon, campane che scendono
    dall'alto. Ogni figura nasce da ciò che suona.
@@ -3728,6 +4017,124 @@ window.ATH = window.ATH || {};
 
 </script>
 <script>
+/* ATHANOR — figure della nascita e della morte: il volto che si dissolve, i
+   profumi che passano, la vista doppia del dubbio, la luce che sale
+   all'ultimo piano, il grembo, l'urlo.
+   un luogo moderatamente sicuro */
+window.ATH = window.ATH || {};
+
+(function (ATH) {
+  const TAU = Math.PI * 2;
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const D = ATH.Dream.prototype;
+  const p0 = D.drawPlus, ev0 = D.event;
+
+  D.event = function (e) {
+    if (e.kind === 'scream') { this.screamOn = e.on; if (e.on) this.screamHit = 1; return; }
+    return ev0.call(this, e);
+  };
+
+  D.drawPlus = function (b, S, dt, W, H, cx, cy, R0, kT, A, B, t) {
+    p0.call(this, b, S, dt, W, H, cx, cy, R0, kT, A, B, t);
+    const mf = k => (S.motif && S.motif[k]) || 0;
+    const sW = this.spr('w', '255,255,255'), sA = this.spr('a', A);
+    b.globalCompositeOperation = 'lighter';
+
+    // il grembo: un bagliore che pulsa col cuore
+    const wb = mf('womb');
+    if (wb > 0.02) {
+      const hp = this.heartPulse || 0, r = Math.max(W, H) * (0.55 + hp * 0.06);
+      b.globalAlpha = wb * (0.12 + hp * 0.18) * kT * 2; b.drawImage(this.spr('e', '255,90,80'), cx - r, cy - r, r * 2, r * 2);
+      for (let k = 0; k < 5; k++) {
+        b.globalAlpha = wb * 0.08; b.strokeStyle = `rgba(${A},1)`; b.lineWidth = 1;
+        b.beginPath(); b.ellipse(cx, cy, R0 * (1.2 + k * 0.45 + hp * 0.1), R0 * (0.9 + k * 0.4), Math.sin(t * 0.1 + k) * 0.2, 0, TAU); b.stroke();
+      }
+    }
+
+    // il volto che si dissolve
+    const fc = mf('face');
+    if (fc > 0.02) {
+      const fade = Math.min(1, S.faceFade || 0), jit = 2 + fade * 40, al = fc * (0.55 - fade * 0.45);
+      const fx = cx, fy = cy - R0 * 0.1, fw = R0 * 0.75, fh = R0 * 1.0;
+      const J = () => (Math.random() - 0.5) * jit;
+      b.strokeStyle = `rgba(${A},1)`; b.lineWidth = 1.2;
+      for (let pass = 0; pass < 3; pass++) {
+        b.globalAlpha = al * (pass ? 0.35 : 0.8);
+        b.beginPath();
+        for (let i = 0; i <= 40; i++) { const a = i / 40 * TAU, x = fx + Math.cos(a) * fw + J(), y = fy + Math.sin(a) * fh * (a > 0 && a < Math.PI ? 1 : 0.95) + J(); i ? b.lineTo(x, y) : b.moveTo(x, y); }
+        b.stroke();
+        if (fade < 0.92) {
+          [-1, 1].forEach(sd => { b.beginPath(); b.ellipse(fx + sd * fw * 0.38 + J(), fy - fh * 0.12 + J(), fw * 0.14, fh * 0.05, 0, 0, TAU); b.stroke(); });
+          b.beginPath(); b.moveTo(fx + J(), fy - fh * 0.05); b.lineTo(fx - fw * 0.06 + J(), fy + fh * 0.25 + J()); b.lineTo(fx + fw * 0.06 + J(), fy + fh * 0.28); b.stroke();
+          b.beginPath(); b.moveTo(fx - fw * 0.3 + J(), fy + fh * 0.48 + J()); b.quadraticCurveTo(fx + J(), fy + fh * 0.56 + J(), fx + fw * 0.3 + J(), fy + fh * 0.48 + J()); b.stroke();
+        }
+      }
+      if (fade > 0.4) { b.globalAlpha = fc * (fade - 0.4) * 0.3; b.drawImage(this.spr('b', B), fx - fw * 1.4, fy - fh * 1.3, fw * 2.8, fh * 2.6); }
+    }
+
+    // i profumi di una volta: parole che salgono come vapore
+    const sc = mf('scents');
+    if (sc > 0.02) {
+      this.scents = this.scents || [];
+      if (this.scents.length < 7 && Math.random() < sc * 0.02) {
+        const list = ATH.SCENTS;
+        this.scents.push({ w: list[Math.floor(Math.random() * list.length)], x: W < 700 ? rnd(0.15, 0.85) : rnd(0.48, 0.92), y: W < 700 ? rnd(0.2, 0.5) : rnd(0.45, 0.85), life: 1, sp: rnd(0.08, 0.16) });
+      }
+      b.globalCompositeOperation = 'source-over'; b.textAlign = 'center';
+      this.scents.forEach(s => {
+        s.life -= dt * s.sp; s.y -= dt * 0.012;
+        const a = Math.sin(Math.PI * Math.max(0, s.life)) * sc;
+        b.globalAlpha = a * 0.75; b.fillStyle = `rgba(${A},1)`;
+        b.font = `italic ${Math.round(15 + (1 - s.life) * 8)}px "IM Fell English", Georgia, serif`;
+        b.fillText(s.w, s.x * W + Math.sin(t * 0.8 + s.y * 12) * 14 * (1 - s.life), s.y * H);
+      });
+      this.scents = this.scents.filter(s => s.life > 0);
+      b.globalCompositeOperation = 'lighter';
+    }
+
+    // il dubbio: tutto si sdoppia
+    const db = mf('doubt');
+    if (db > 0.02) {
+      const off = R0 * (0.25 + 0.2 * Math.sin(t * 0.37));
+      [-1, 1].forEach(sd => {
+        b.globalAlpha = db * 0.3; b.strokeStyle = `rgba(${sd < 0 ? A : B},1)`; b.lineWidth = 1.2;
+        b.beginPath(); b.arc(cx + sd * off, cy, R0 * (1 + 0.04 * Math.sin(t * 2 + sd)), 0, TAU); b.stroke();
+      });
+      b.globalAlpha = db * 0.15; b.strokeStyle = `rgba(${A},1)`;
+      b.beginPath(); b.moveTo(cx, cy + R0 * 1.4); b.lineTo(cx - W * 0.3, H); b.moveTo(cx, cy + R0 * 1.4); b.lineTo(cx + W * 0.3, H); b.stroke();
+    }
+
+    // l'ultimo piano: la luce che sale e lava via
+    const pu = mf('purify');
+    if (pu > 0.02) {
+      const k = Math.min(1, (S.ascend || 0) + 0.25);
+      this.rise = this.rise || Array.from({ length: 90 }, () => ({ x: Math.random(), y: Math.random(), v: rnd(0.03, 0.09), s: rnd(1, 3) }));
+      this.rise.forEach(p => {
+        p.y -= p.v * dt; if (p.y < -0.05) { p.y = 1.05; p.x = Math.random(); }
+        b.globalAlpha = pu * k * 0.6; b.drawImage(sW, p.x * W - p.s, p.y * H - p.s, p.s * 2, p.s * 2);
+      });
+      const g = b.createLinearGradient(0, H, 0, 0);
+      g.addColorStop(0, `rgba(${A},0)`); g.addColorStop(1, `rgba(${A},${pu * k * 0.045 * kT * 2})`);
+      b.globalAlpha = 1; b.fillStyle = g; b.fillRect(0, 0, W, H);
+    }
+
+    // l'urlo: lo schermo trema e diventa rosso
+    if (this.screamOn || (this.screamHit || 0) > 0.01) {
+      const k = this.screamOn ? 1 : this.screamHit;
+      b.save(); b.setTransform(1, 0, 0, 1, 0, 0); b.globalCompositeOperation = 'source-over';
+      const cw = b.canvas.width, ch = b.canvas.height;
+      b.globalAlpha = 0.35 * k; b.drawImage(b.canvas, (Math.random() - 0.5) * 18 * k, (Math.random() - 0.5) * 12 * k);
+      b.restore(); b.globalCompositeOperation = 'lighter';
+      b.globalAlpha = 0.12 * k; b.fillStyle = 'rgba(255,40,30,1)'; b.fillRect(0, 0, W, H);
+      if (this.screamOn) { this.cracks = this.cracks || []; if (this.cracks.length < 40 && Math.random() < 0.4) { const a = Math.random() * TAU, l = rnd(40, 180); const x = Math.random() * W, y = Math.random() * H; this.cracks.push({ x1: x, y1: y, x2: x + Math.cos(a) * l, y2: y + Math.sin(a) * l, a, k: 0 }); } }
+      if (!this.screamOn) this.screamHit *= Math.pow(0.2, dt);
+    }
+    b.globalAlpha = 1; b.globalCompositeOperation = 'lighter';
+  };
+})(window.ATH);
+
+</script>
+<script>
 /* ATHANOR — il crogiolo visivo. Disegna su una tela a bassa risoluzione che si
    sgretola quando il suono si sgretola (Contritio, Plumbum), con scie che durano
    quanto la Crypta.
@@ -3997,7 +4404,7 @@ window.ATH = window.ATH || {};
       const dk = S.dark || 0;
       if (dk > 0.01) {
         const cw = this.c.width, ch = this.c.height, d = this.dpr;
-        const px = S.px * cw, py = S.py * ch, pr = (S.darkMode === 'spente' ? 150 : 260) * d * (0.6 + S.presence * 0.6);
+        const px = S.px * cw, py = S.py * ch, pr = (S.darkMode === 'torcia' ? 105 : S.darkMode === 'spente' ? 150 : 260) * d * (0.6 + S.presence * 0.6);
         const g = c.createRadialGradient(px, py, pr * 0.15, px, py, pr);
         g.addColorStop(0, `rgba(0,0,0,${dk * 0.25})`); g.addColorStop(1, `rgba(0,0,0,${dk})`);
         c.globalCompositeOperation = 'source-over'; c.fillStyle = g; c.fillRect(0, 0, cw, ch);
@@ -4518,12 +4925,13 @@ window.ATH = window.ATH || {};
   // —— il cammino tra i luoghi
   const home = {};                       // i valori tuoi, prima che un luogo li cambiasse
   let traveling = false, passageT = -1, passDir = 0, dwell = 0, libraTween = null, hushTween = null, autoT = 0, autoNext = 80;
+  let screamed = false, eroded = 0, flatDone = false, woke = false, doubtT = 0, faceNow = 0, ascendNow = 0;
   let hushNow = 0, helping = null, rescueAmt = 0, urged = false, tombIdx = 0, tombT = 0, darkNow = 0, glowNow = 0;
   const GP = id => ATH.getPlace(id);
   const isGen = id => typeof id === 'string' && id.indexOf('x:') === 0;
   const isKnown = id => { if (isGen(id)) return true; const p = ATH.PLACE[id]; return p && (!p.hidden || state.found.indexOf(id) >= 0); };
   const visibleExits = pl => (pl ? pl.exits : []).map(e => ATH.exitId(e)).filter(isKnown);
-  const LUM = { accese: 0, soffuse: 0.4, candele: 0.62, spente: 0.82 };
+  const LUM = { accese: 0, soffuse: 0.4, candele: 0.62, torcia: 0.94, spente: 0.82 };
 
   function travel(id, quick) {
     const pl = GP(id);
@@ -4531,7 +4939,8 @@ window.ATH = window.ATH || {};
     const from = GP(state.scene);
     const dl = from ? Math.sign((pl.level || 0) - (from.level || 0)) : 0;
     const dur = dl ? 4.4 : 3.4;
-    traveling = !quick; passageT = quick ? -1 : 0; passDir = quick ? 0 : dl; dwell = 0; urged = false; helping = null;
+    traveling = !quick; passageT = quick ? -1 : 0; passDir = quick ? 0 : dl; dwell = 0; urged = false; helping = null; eroded = 0; flatDone = false; woke = false;
+    if (memoria) { if (memoria.screaming) memoria.scream(false); memoria.flat(false); if (memoria.mon && memoria.mon.next > 1e9) memoria.mon.next = 0; }
     $('journey').classList.add('leaving');
     if (memoria && !quick) {
       if (dl) { memoria.walk('scala', 2.6, 0, dl); memoria.whoosh(dl, 2.8); memoria.walk(pl.terrain, 1.5, 2.6); }
@@ -4607,13 +5016,16 @@ window.ATH = window.ATH || {};
     const box = $('soglie'); box.innerHTML = '';
     const pl = GP(state.scene); if (!pl) return;
     box.classList.toggle('staying', !!pl.stay);
-    visibleExits(pl).forEach(id => {
-      const p = GP(id); if (!p) return;
-      const up = (p.level || 0) - (pl.level || 0);
+    const exits = visibleExits(pl).map(id => ({ id, p: GP(id) })).filter(o => o.p);
+    exits.forEach(o => { o.up = (o.p.level || 0) - (pl.level || 0); o.dx = pl.gen || o.p.gen ? 0 : o.p.x - pl.x; o.dy = pl.gen || o.p.gen ? 0 : o.p.y - pl.y; });
+    const rank = o => o.p.gen ? 3 : o.up > 0 ? 0 : o.up < 0 ? 2 : 1;
+    exits.sort((a, b) => rank(a) - rank(b) || a.dx - b.dx);
+    exits.forEach(({ id, p, up, dx, dy }) => {
       const b = document.createElement('button');
       const seen = p.gen || state.visited.indexOf(id) >= 0;
       b.type = 'button'; b.className = 'soglia' + (!seen ? ' new' : '') + (id === fresh ? ' fresh' : '') + (p.gen ? ' altrove' : '');
-      const arrow = p.gen ? '⋯' : up > 0 ? '↑' : up < 0 ? '↓' : '→';
+      const arrow = p.gen ? '⋯' : up > 0 ? '⇧' : up < 0 ? '⇩' : compass(dx, dy);
+      if (up) b.classList.add('vertical');
       const label = p.gen && !pl.gen ? 'Più in là' : p.name;
       b.innerHTML = `<span class="arrow" aria-hidden="true">${arrow}</span><span class="sname">${label}</span>`;
       b.title = p.gen ? 'Un posto che nessuno ha mai visto' : up > 0 ? 'Sali: ' + ATH.levelName(p.level) : up < 0 ? 'Scendi: ' + ATH.levelName(p.level) : (seen ? p.ora : 'Non ci sei ancora stato');
@@ -4621,6 +5033,17 @@ window.ATH = window.ATH || {};
       b.addEventListener('pointerdown', e => e.stopPropagation());
       box.appendChild(b);
     });
+    if (pl.scream) {
+      const u = document.createElement('button');
+      u.type = 'button'; u.className = 'soglia scream'; u.id = 'btnScream';
+      u.innerHTML = `<span class="arrow" aria-hidden="true">◉</span><span class="sname">Tieni premuto per urlare</span>`;
+      const on = e => { e.preventDefault(); e.stopPropagation(); if (memoria && !memoria.screaming) { memoria.scream(true); u.classList.add('on'); screamed = true; } };
+      const off = () => { if (memoria && memoria.screaming) { memoria.scream(false); u.classList.remove('on'); setTimeout(() => toast(Math.random() < 0.5 ? 'Nessuno ha sentito.' : 'Nessuno ha sentito. O forse sì.'), 1500); } };
+      u.addEventListener('pointerdown', on); u.addEventListener('pointerup', off); u.addEventListener('pointerleave', off); u.addEventListener('pointercancel', off);
+      u.addEventListener('keydown', e => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) on(e); });
+      u.addEventListener('keyup', e => { if (e.key === ' ' || e.key === 'Enter') off(); });
+      box.appendChild(u);
+    }
     if (pl.help) {
       const h = document.createElement('button');
       h.type = 'button'; h.className = 'soglia help' + (helping ? ' calling' : ''); h.id = 'btnHelp';
@@ -4630,6 +5053,13 @@ window.ATH = window.ATH || {};
       box.appendChild(h);
     }
   }
+  // la direzione vera sulla mappa: otto direzioni, il nord in alto
+  function compass(dx, dy) {
+    if (Math.abs(dx) < 0.004 && Math.abs(dy) < 0.004) return '→';
+    const a = Math.atan2(-dy, dx), i = ((Math.round(a / (Math.PI / 4)) % 8) + 8) % 8;
+    return ['→', '↗', '↑', '↖', '←', '↙', '↓', '↘'][i];
+  }
+  ATH.compass = compass;
   function callHelp() {
     if (helping) return;
     helping = { t: 0, wait: 9 + Math.random() * 10 };
@@ -4659,6 +5089,68 @@ window.ATH = window.ATH || {};
   ['allora', 'libra'].forEach(id => $(id).addEventListener('pointerdown', e => e.stopPropagation()));
   $('journey').addEventListener('pointerdown', e => { if (e.target.closest('.jbar, .soglie, .lumini, .strata')) e.stopPropagation(); });
 
+  // —— cose che succedono nei luoghi
+  const ERODE_KEEP = {};
+  function erodeText(el, txt, k) {
+    let out = '';
+    for (let i = 0; i < txt.length; i++) { const ch = txt[i]; const h = (Math.sin(i * 12.9898 + txt.length) * 43758.5453) % 1; out += ch !== ' ' && Math.abs(h) < k ? ' ' : ch; }
+    el.textContent = out;
+  }
+  function placeMechanics(dt) {
+    const pl = GP(state.scene); if (!pl || !engine.ready || traveling) { faceNow *= 0.98; return; }
+    // le parole perdono le lettere
+    if (pl.erode) {
+      const k = Math.min(0.97, dwell / pl.erode);
+      if (k - eroded > 0.02) { eroded = k; erodeText($('plName'), pl.name, k * 0.8); erodeText($('plOra'), pl.ora, k); erodeText($('plAllora'), pl.allora, k); }
+    }
+    // la voce che se ne va
+    if (pl.fadeOut) {
+      const k = Math.min(1, dwell / pl.fadeOut.secs);
+      pl.fadeOut.ids.forEach(id => { state.base[id] = (pl.levels[id] || 0) * (1 - k); });
+      state.base.oblio = 0.2 + k * 0.75; state.base.distantia = 0.3 + k * 0.6;
+      if (k >= 1 && $('plAllora').dataset.end !== pl.id) { $('plAllora').dataset.end = pl.id; $('plAllora').textContent = pl.fadeOut.end; }
+    } else $('plAllora').dataset.end = '';
+    // il volto che si dissolve
+    faceNow = pl.faceFade ? Math.min(1, dwell / pl.faceFade) : 0;
+    // l'ultimo piano: più resti, più è luce
+    ascendNow = pl.ascend ? Math.min(1, dwell / 60) : 0;
+    // il dubbio: i nomi delle strade non stanno fermi
+    if (pl.doubt) {
+      doubtT += dt;
+      if (doubtT > 1.3) {
+        doubtT = 0;
+        const btns = Array.from($('soglie').querySelectorAll('.soglia:not(.help):not(.scream)'));
+        btns.forEach(b => { const n = b.querySelector('.sname'); if (!n.dataset.real) n.dataset.real = n.textContent; n.textContent = Math.random() < 0.35 ? btns[Math.floor(Math.random() * btns.length)].querySelector('.sname').dataset.real || n.dataset.real : n.dataset.real; b.style.opacity = (0.55 + Math.random() * 0.45).toFixed(2); });
+      }
+    }
+    // l'ultimo respiro
+    if (pl.flatline) {
+      const k = Math.min(1, dwell / pl.flatline);
+      state.base.pulsus = (pl.bpm || 0.3) * (1 - k);
+      state.base.respiratio = 0.3 * (1 - k);
+      if (k >= 1 && !flatDone && memoria) {
+        flatDone = true; memoria.mon.next = 1e12; memoria.flat(true);
+        moveTo({ m_respiro: 0 }, 3);
+        $('plOra').textContent = 'Poi, semplicemente, il respiro dopo non arriva.';
+        setTimeout(() => { if (memoria) memoria.flat(false); }, 7000);
+      }
+    }
+    // risvegliarsi altrove
+    if (pl.wake && dwell > pl.wake && !woke) {
+      woke = true;
+      $('blackout').classList.add('on');
+      setTimeout(() => {
+        const safe = ['giardino', 'alba', 'felicita', 'ninna', 'neve', 'mare_stelle', 'primo_ricordo', 'cucina', 'salvezza'];
+        const scary = ['buio', 'voci', 'ospedale_abb', 'capovolta', 'dormitorio', 'scale_orfano', 'pozzo', 'x:' + Math.floor(Math.random() * 1e9) + ':4:risveglio'];
+        const good = Math.random() < 0.5, pool = good ? safe : scary;
+        const id = pool[Math.floor(Math.random() * pool.length)];
+        if (ATH.PLACE[id] && ATH.PLACE[id].hidden && state.found.indexOf(id) < 0) state.found.push(id);
+        travel(id, true);
+        setTimeout(() => { $('blackout').classList.remove('on'); toast(good ? 'Ti svegli. Qui sei al sicuro.' : 'Ti svegli. Non sai dove sei. Non ti piace.'); }, 1200);
+      }, 2600);
+    }
+  }
+
   // —— i lumini del cimitero
   state.lumini = state.lumini || [];
   $('lumini').addEventListener('submit', e => {
@@ -4686,7 +5178,7 @@ window.ATH = window.ATH || {};
   const SVGNS = 'http://www.w3.org/2000/svg';
   function drawMap() {
     const svg = $('mapSvg'); svg.innerHTML = '';
-    const BAND = { 0: 640 }, bandTop = {};
+    const BAND = { 0: 760 }, bandTop = {};
     let yy = 20;
     ATH.LEVELS.forEach(l => { bandTop[l.n] = yy; yy += (BAND[l.n] || 210); });
     svg.setAttribute('viewBox', `0 0 1000 ${yy + 10}`);
@@ -4805,7 +5297,7 @@ window.ATH = window.ATH || {};
     const q = l < 0.5 ? l * (1 + s) : l + s - l * s, p = 2 * l - q;
     return [f(p, q, h + 1 / 3) * 255, f(p, q, h) * 255, f(p, q, h - 1 / 3) * 255];
   }
-  const MOTIFS = ['stars', 'snow', 'haze', 'motes', 'field', 'beam', 'ceiling', 'glass', 'monitor', 'fever', 'sun', 'meet', 'train', 'lights', 'ruin', 'well', 'rose', 'nebula', 'throne', 'city', 'cityFlip', 'windows', 'stairs', 'candles', 'tombs', 'forest', 'whispers', 'void', 'tears', 'cracks', 'river', 'underwater'];
+  const MOTIFS = ['womb', 'face', 'scents', 'doubt', 'purify', 'stars', 'snow', 'haze', 'motes', 'field', 'beam', 'ceiling', 'glass', 'monitor', 'fever', 'sun', 'meet', 'train', 'lights', 'ruin', 'well', 'rose', 'nebula', 'throne', 'city', 'cityFlip', 'windows', 'stairs', 'candles', 'tombs', 'forest', 'whispers', 'void', 'tears', 'cracks', 'river', 'underwater'];
   let hueShift = 0, qVis = 0; const motif = {}; MOTIFS.forEach(m => motif[m] = 0);
 
   // —— registrazione
@@ -4966,6 +5458,7 @@ window.ATH = window.ATH || {};
       }
     }
     if (!helping) rescueAmt *= Math.pow(0.3, dt);
+    placeMechanics(dt);
     if (hushTween) { hushTween.t += dt; hushNow = lerp(hushTween.from, hushTween.to, smooth(0, 1, hushTween.t / hushTween.dur)); if (hushTween.t >= hushTween.dur) hushTween = null; }
     if (passageT >= 0) { passageT += dt; if (passageT > (passDir ? 4.4 : 3.4)) { passageT = -1; passDir = 0; } }
     // vagare
@@ -5043,7 +5536,7 @@ window.ATH = window.ATH || {};
         phaseGlyph: ATH.PHASES[phIdx].glyph, q: qVis, motif,
         wave: memoria ? memoria.waveVal : 0, voiceAct: memoria ? memoria.voiceAct : 0,
         breathOn, breath01, passage: passageT >= 0 ? Math.sin(Math.PI * Math.min(1, passageT / (passDir ? 4.4 : 3.4))) : 0, passDir,
-        levelN: sc ? sc.level || 0 : 0, lumini: state.lumini, tombIdx, tombName, rescue: rescueAmt, dark: darkNow, darkMode: lm, candleGlow: glowNow * darkNow
+        levelN: sc ? sc.level || 0 : 0, lumini: state.lumini, tombIdx, tombName, rescue: rescueAmt, faceFade: faceNow, ascend: ascendNow, dark: darkNow * (1 - ascendNow * 0.8), darkMode: lm, candleGlow: glowNow * darkNow
       });
       cssT += dt;
       if (cssT > 0.15) {
