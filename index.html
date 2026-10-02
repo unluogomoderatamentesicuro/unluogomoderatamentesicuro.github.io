@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=IM+Fell+English:ital@0;1&family=Fragment+Mono&display=swap">
-<link rel="stylesheet" href="css/athanor.css?v=5">
+<link rel="stylesheet" href="css/athanor.css?v=6">
 </head>
 <body data-phase="nigredo">
 <!--ATHANOR:BODY-->
@@ -32,19 +32,22 @@
     </div>
 
     <nav class="actions" aria-label="Comandi">
-      <button type="button" class="btn" id="btnTrans" title="Sposta tutto insieme, lentamente">Transmuta</button>
       <span class="rec">
         <button type="button" class="btn btn-rec" id="btnRec" aria-pressed="false"><span class="dot" aria-hidden="true"></span><span id="recLabel">Registra</span></button>
         <span class="rec-time" id="recTime">00:00</span>
       </span>
       <button type="button" class="btn btn-save" id="btnSaveWav" hidden>Salva WAV</button>
       <button type="button" class="btn btn-save" id="btnSaveCmp" hidden>Salva WEBM</button>
-      <span class="sep" aria-hidden="true"></span>
-      <button type="button" class="btn" id="btnFormula" title="Salva tutte le manopole e i sigilli in un file"><span class="long">Salva formula</span><span class="short">↓ Formula</span></button>
-      <button type="button" class="btn" id="btnLoad" title="Carica una formula salvata"><span class="long">Apri formula</span><span class="short">↑ Formula</span></button>
-      <input type="file" id="fileFormula" accept=".json,application/json" hidden>
-      <button type="button" class="btn" id="btnVeil" aria-pressed="false" title="Nasconde le manopole: resta solo il crogiolo">Vela</button>
-      <button type="button" class="btn" id="btnQuiet">Quiete</button>
+      <button type="button" class="btn btn-more" id="btnMore" aria-expanded="false" aria-controls="moreMenu">Altro</button>
+      <span class="more" id="moreMenu">
+        <span class="sep" aria-hidden="true"></span>
+        <button type="button" class="btn" id="btnTrans" title="Sposta insieme, lentamente, le manopole della scheda aperta">Transmuta</button>
+        <button type="button" class="btn" id="btnFormula" title="Salva manopole, sigilli, luogo e scoperte in un file">Salva formula</button>
+        <button type="button" class="btn" id="btnLoad" title="Carica una formula salvata">Apri formula</button>
+        <input type="file" id="fileFormula" accept=".json,application/json" hidden>
+        <button type="button" class="btn" id="btnVeil" aria-pressed="false" title="Nasconde le manopole: resta solo il crogiolo">Vela</button>
+        <button type="button" class="btn" id="btnQuiet">Quiete</button>
+      </span>
     </nav>
   </header>
 
@@ -71,6 +74,7 @@
         <label for="luminiName" id="luminiForm-l">Accendi un lumino per</label>
         <span class="lumini-row" id="luminiForm"><input type="text" id="luminiName" maxlength="40" placeholder="un nome che non vuoi dimenticare" autocomplete="off"><button type="submit" class="btn">Accendi</button></span>
       </form>
+      <div class="route" id="route" hidden><span id="routeText"></span><button type="button" class="btn" id="routeStop">Fermati</button></div>
       <nav class="soglie" id="soglie" aria-label="Soglie verso altri luoghi"></nav>
       <aside class="strata" id="strata" aria-label="Livelli della città"><ol></ol></aside>
     </div>
@@ -91,12 +95,13 @@
 
 <div class="gate" id="gate">
   <div class="gate-inner">
-    <p class="eyebrow">un luogo moderatamente sicuro · opus V</p>
+    <p class="eyebrow">un luogo moderatamente sicuro · opus VI</p>
     <h2 class="gate-title">Athanor</h2>
     <p class="gate-lede">Una città verticale di ricordi, dal grembo, prima di nascere, fino a ciò che viene dopo l’ultimo respiro. In alto la rosa di luce, in basso il fiume dove si dimentica; in mezzo il mare d’infanzia, le stelle, le case abbandonate, il cimitero, la chiesa di notte, la stanza prima di dormire, l’attesa, la paura del buio, il pianto, l’alba. Oltre l’ultima strada c’è l’Altrove, che non finisce mai: lì ci si può perdere davvero.</p>
     <ul class="gate-notes">
       <li>Meglio in cuffia, con il volume basso all’inizio.</li>
       <li>Le soglie in basso portano altrove. Le frecce seguono la mappa; ⇧ sali, ⇩ scendi, ⋯ verso ciò che nessuno ha mai visto. <em>Ora · Allora</em> sposta tra ciò che accade e ciò che è accaduto.</li>
+      <li>Si parte sempre dalla soglia. Nella <em>Mappa</em> tocchi un luogo lontano e ci cammini, attraversando quelli in mezzo.</li>
       <li>Se ti perdi, puoi chiedere aiuto. Qualcuno, forse, verrà.</li>
       <li>Muovi, tocca, gira le manopole anche a caso: il fuoco ascolta pure ciò che non intendi fare.</li>
       <li>Premi <em>Registra</em> e alla fine salva la sessione come file audio.</li>
@@ -109,11 +114,15 @@
 <div class="mapov" id="mapov" hidden>
   <div class="map-inner" role="dialog" aria-modal="true" aria-labelledby="mapTitle">
     <header class="map-head">
-      <div><h2 id="mapTitle">Mappa dei ricordi</h2><p class="map-count" id="mapCount"></p></div>
+      <div><h2 id="mapTitle">Mappa dei ricordi</h2><p class="map-count" id="mapCount"></p>
+        <ul class="map-legend" aria-label="Legenda">
+          <li><i class="lg-here"></i>sei qui</li><li><i class="lg-trail"></i>il cammino di oggi</li><li><i class="lg-near"></i>a un passo</li><li><i class="lg-known"></i>conosciuti</li><li><i class="lg-never"></i>mai visitati</li>
+        </ul></div>
       <button type="button" class="btn" id="btnMapClose">Chiudi</button>
     </header>
     <div class="map-wrap" id="mapWrap"><svg id="mapSvg" viewBox="0 0 1000 700" role="img" aria-label="Luoghi trovati e soglie tra loro"></svg></div>
-    <p class="map-note">I luoghi accesi li hai già visitati. Quelli vuoti li conosci ma non ci sei ancora stato. Alcuni non compaiono finché non resti abbastanza a lungo nel posto giusto.</p>
+    <div class="map-go" id="mapGo" hidden><span id="mapGoText"></span><button type="button" class="btn btn-go" id="mapGoBtn">Cammina fin lì</button></div>
+    <p class="map-note">Tocca un luogo per vedere la strada, poi cammina fin lì: attraverserai uno dopo l’altro tutti i luoghi in mezzo. Le linee tratteggiate salgono o scendono di livello. Alcuni luoghi non compaiono finché non resti abbastanza a lungo nel posto giusto.</p>
   </div>
 </div>
 
@@ -121,24 +130,25 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="js/params.js?v=5"></script>
-<script src="js/loca.js?v=5"></script>
-<script src="js/loca-plus.js?v=5"></script>
-<script src="js/loca-tertia.js?v=5"></script>
-<script src="js/worklets.js?v=5"></script>
-<script src="js/engine.js?v=5"></script>
-<script src="js/quies.js?v=5"></script>
-<script src="js/memoria.js?v=5"></script>
-<script src="js/memoria-plus.js?v=5"></script>
-<script src="js/memoria-extra.js?v=5"></script>
-<script src="js/memoria-quarta.js?v=5"></script>
-<script src="js/dream.js?v=5"></script>
-<script src="js/dream-plus.js?v=5"></script>
-<script src="js/dream-tertia.js?v=5"></script>
-<script src="js/visuals.js?v=5"></script>
-<script src="js/ui.js?v=5"></script>
-<script src="js/recorder.js?v=5"></script>
-<script src="js/main.js?v=5"></script>
+<script src="js/params.js?v=6"></script>
+<script src="js/loca.js?v=6"></script>
+<script src="js/loca-plus.js?v=6"></script>
+<script src="js/loca-tertia.js?v=6"></script>
+<script src="js/loca-layout.js?v=6"></script>
+<script src="js/worklets.js?v=6"></script>
+<script src="js/engine.js?v=6"></script>
+<script src="js/quies.js?v=6"></script>
+<script src="js/memoria.js?v=6"></script>
+<script src="js/memoria-plus.js?v=6"></script>
+<script src="js/memoria-extra.js?v=6"></script>
+<script src="js/memoria-quarta.js?v=6"></script>
+<script src="js/dream.js?v=6"></script>
+<script src="js/dream-plus.js?v=6"></script>
+<script src="js/dream-tertia.js?v=6"></script>
+<script src="js/visuals.js?v=6"></script>
+<script src="js/ui.js?v=6"></script>
+<script src="js/recorder.js?v=6"></script>
+<script src="js/main.js?v=6"></script>
 <!--/ATHANOR:BODY-->
 </body>
 </html>

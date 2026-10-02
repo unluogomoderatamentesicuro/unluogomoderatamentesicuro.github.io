@@ -8,14 +8,14 @@ window.ATH = window.ATH || {};
   const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
   const lerp = (a, b, t) => a + (b - a) * t;
   const smooth = (e0, e1, x) => { const t = clamp01((x - e0) / (e1 - e0)); return t * t * (3 - 2 * t); };
-  const STORE = 'athanor.formula.v4', TABSTORE = 'athanor.tab';
+  const STORE = 'athanor.formula.v6', TABSTORE = 'athanor.tab';
 
   const engine = new ATH.Engine();
   const recorder = new ATH.Recorder(engine);
   const visuals = new ATH.Visuals($('crucible'));
   let quies = null, memoria = null;
 
-  const state = { base: {}, sw: {}, choice: {}, libra: 0.3, opus: 0, scene: 'soglia', allora: 0, visited: [], found: [] };
+  const state = { base: {}, sw: {}, choice: {}, libra: 0.3, opus: 0, scene: ATH.START || 'soglia', allora: 0, visited: [], trail: [], seen: [], found: [] };
   ATH.PARAMS.forEach(p => state.base[p.id] = p.def);
   ATH.SWITCHES.forEach(s => state.sw[s.id] = s.def);
   ATH.CHOICES.forEach(c => state.choice[c.id] = c.def);
@@ -85,11 +85,18 @@ window.ATH = window.ATH || {};
   function setLibra(v) { state.libra = clamp01(v); libraEl.value = Math.round(state.libra * 1000); }
 
   function formula() {
-    return { athanor: 4, base: Object.assign({}, state.base), sw: Object.assign({}, state.sw), choice: Object.assign({}, state.choice), libra: +state.libra.toFixed(3), place: state.scene, allora: +state.allora.toFixed(3), visited: state.visited.slice(), found: state.found.slice(), lumini: (state.lumini || []).slice(), genCount: state.genCount || 0, opus: +state.opus.toFixed(3) };
+    return { athanor: 6, base: Object.assign({}, state.base), sw: Object.assign({}, state.sw), choice: Object.assign({}, state.choice), libra: +state.libra.toFixed(3), place: state.scene, allora: +state.allora.toFixed(3), seen: state.seen.slice(), found: state.found.slice(), lumini: (state.lumini || []).slice(), genCount: state.genCount || 0, opus: +state.opus.toFixed(3) };
   }
-  function applyFormula(f) {
+  // auto = ricordi del browser: si conservano le scoperte e i lumini, ma il cammino ricomincia dalla soglia
+  function applyFormula(f, auto) {
     if (!f || typeof f !== 'object') return false;
     let n = 0;
+    const seen = Array.isArray(f.seen) ? f.seen : Array.isArray(f.visited) ? f.visited : null;
+    if (seen) state.seen = seen.filter(id => ATH.PLACE[id]);
+    if (Array.isArray(f.found)) state.found = f.found.filter(id => ATH.PLACE[id]);
+    if (Array.isArray(f.lumini)) state.lumini = f.lumini.filter(x => typeof x === 'string').slice(0, 24);
+    if (isFinite(+f.genCount)) state.genCount = +f.genCount;
+    if (auto) { updateAtlas(); return true; }
     if (f.base) ATH.PARAMS.forEach(p => { const v = +f.base[p.id]; if (f.base[p.id] !== undefined && isFinite(v)) { state.base[p.id] = clamp01(v); ui.knobs[p.id].set(state.base[p.id]); n++; } });
     if (f.sw) ATH.SWITCHES.forEach(s => { if (typeof f.sw[s.id] === 'boolean') { state.sw[s.id] = f.sw[s.id]; ui.seals[s.id].set(f.sw[s.id]); n++; } });
     if (f.choice) ATH.CHOICES.forEach(c => { const v = f.choice[c.id]; if (c.options.some(o => o.v === v)) { state.choice[c.id] = v; ui.choices[c.id].set(v); n++; } });
@@ -97,11 +104,7 @@ window.ATH = window.ATH || {};
     if (isFinite(+f.libra)) setLibra(+f.libra);
     if (isFinite(+f.opus)) state.opus = Math.max(0, +f.opus);
     const pid = f.place || f.scene;
-    if (pid && ATH.getPlace(pid)) state.scene = pid;
-    if (Array.isArray(f.visited)) state.visited = f.visited.filter(id => ATH.PLACE[id]);
-    if (Array.isArray(f.found)) state.found = f.found.filter(id => ATH.PLACE[id]);
-    if (Array.isArray(f.lumini)) state.lumini = f.lumini.filter(x => typeof x === 'string').slice(0, 24);
-    if (isFinite(+f.genCount)) state.genCount = +f.genCount;
+    if (pid && ATH.getPlace(pid) && pid !== state.scene) { if (engine.ready) travel(pid); else state.scene = pid; }
     if (isFinite(+f.allora)) setAllora(+f.allora);
     updateAtlas();
     markScene();
@@ -211,9 +214,10 @@ window.ATH = window.ATH || {};
   const visibleExits = pl => (pl ? pl.exits : []).map(e => ATH.exitId(e)).filter(isKnown);
   const LUM = { accese: 0, soffuse: 0.4, candele: 0.62, torcia: 0.94, spente: 0.82 };
 
-  function travel(id, quick) {
+  function travel(id, quick, byRoute) {
     const pl = GP(id);
     if (!pl || (traveling && !quick)) return;
+    if (!byRoute && route) stopRoute(true);
     const from = GP(state.scene);
     const dl = from ? Math.sign((pl.level || 0) - (from.level || 0)) : 0;
     const dur = dl ? 4.4 : 3.4;
@@ -238,9 +242,11 @@ window.ATH = window.ATH || {};
     state.sw.spira = !!pl.spira; ui.seals.spira.set(state.sw.spira);
     if (memoria && Math.random() < 0.4) memoria.newMemory();
     state.scene = id;
+    if (state.trail[state.trail.length - 1] !== id) state.trail.push(id);
     if (pl.gen) state.genCount = (state.genCount || 0) + 1;
     else {
       if (state.visited.indexOf(id) < 0) state.visited.push(id);
+      if (state.seen.indexOf(id) < 0) state.seen.push(id);
       if (pl.hidden && state.found.indexOf(id) < 0) state.found.push(id);
     }
     const hid = pl.exits.filter(e => typeof e !== 'string' && !isKnown(e.id));
@@ -253,11 +259,12 @@ window.ATH = window.ATH || {};
     pulse(0.1); persist();
   }
   function forget(n) {
-    const pool = state.visited.filter(id => ['soglia', state.scene, 'lete'].indexOf(id) < 0);
+    const pool = state.seen.filter(id => ['soglia', state.scene, 'lete'].indexOf(id) < 0);
     const gone = [];
     for (let i = 0; i < n && pool.length; i++) {
       const id = pool.splice(Math.floor(Math.random() * pool.length), 1)[0];
-      state.visited.splice(state.visited.indexOf(id), 1);
+      const vi = state.visited.indexOf(id); if (vi >= 0) state.visited.splice(vi, 1);
+      const si = state.seen.indexOf(id); if (si >= 0) state.seen.splice(si, 1);
       const fi = state.found.indexOf(id); if (fi >= 0) state.found.splice(fi, 1);
       gone.push(GP(id).name);
     }
@@ -281,7 +288,7 @@ window.ATH = window.ATH || {};
   }
   function renderPlace() {
     const pl = GP(state.scene); if (!pl) return;
-    const total = ATH.PLACES.length, n = state.visited.length;
+    const total = ATH.PLACES.length, n = state.seen.length;
     const kind = pl.gen ? 'altrove · profondità ' + pl.depth : (pl.kind === 'stato' ? 'stato dell’animo' : 'luogo') + ' · ' + ATH.levelName(pl.level);
     $('plKind').textContent = kind + ' · ' + n + ' di ' + total + ' trovati' + (state.genCount ? ' · ' + state.genCount + ' stanze senza nome' : '');
     $('plName').textContent = pl.name;
@@ -300,7 +307,7 @@ window.ATH = window.ATH || {};
     exits.sort((a, b) => rank(a) - rank(b) || a.dx - b.dx);
     exits.forEach(({ id, p, up, dx, dy }) => {
       const b = document.createElement('button');
-      const seen = p.gen || state.visited.indexOf(id) >= 0;
+      const seen = p.gen || state.seen.indexOf(id) >= 0;
       b.type = 'button'; b.className = 'soglia' + (!seen ? ' new' : '') + (id === fresh ? ' fresh' : '') + (p.gen ? ' altrove' : '');
       const arrow = p.gen ? '⋯' : up > 0 ? '⇧' : up < 0 ? '⇩' : compass(dx, dy);
       if (up) b.classList.add('vertical');
@@ -352,9 +359,9 @@ window.ATH = window.ATH || {};
       card.setAttribute('aria-pressed', k === state.scene ? 'true' : 'false');
       card.disabled = !known;
       card.classList.toggle('unknown', !known);
-      card.classList.toggle('visited', state.visited.indexOf(k) >= 0);
+      card.classList.toggle('visited', state.seen.indexOf(k) >= 0);
       card.querySelector('.sc-name').textContent = known ? p.name : '· · ·';
-      card.querySelector('.sc-gloss').textContent = known ? ATH.levelName(p.level) + ' · ' + (p.kind === 'stato' ? 'stato dell’animo' : 'luogo') + (state.visited.indexOf(k) < 0 ? ' · non ancora visitato' : '') : 'un luogo che non ricordi';
+      card.querySelector('.sc-gloss').textContent = known ? ATH.levelName(p.level) + ' · ' + (p.kind === 'stato' ? 'stato dell’animo' : 'luogo') + (state.seen.indexOf(k) < 0 ? ' · non ancora visitato' : '') : 'un luogo che non ricordi';
     });
   }
   function updateStrata() {
@@ -452,67 +459,113 @@ window.ATH = window.ATH || {};
     $('strata').querySelector('ol').appendChild(li);
   });
 
+  // —— il percorso verso un luogo lontano
+  let route = null;                      // { target, path: [id, …] }
+  function findPath(from, to) {
+    if (from === to) return [];
+    const prev = { [from]: null }, q = [from];
+    while (q.length) {
+      const c = q.shift();
+      for (const n of visibleExits(GP(c))) {
+        if (isGen(n) || n in prev) continue;
+        prev[n] = c;
+        if (n === to) { const path = []; let k = to; while (k !== from) { path.unshift(k); k = prev[k]; } return path; }
+        q.push(n);
+      }
+    }
+    return null;
+  }
+  function routeTo(id) {
+    const path = findPath(state.scene, id);
+    if (!path) { toast('Da qui non sai ancora come arrivarci.'); return; }
+    if (!path.length) return;
+    route = path.length > 1 ? { target: id, path: path.slice(1) } : null;
+    if (route) toast('Cammini verso ' + GP(id).name + ': ' + path.length + ' passaggi.');
+    travel(path[0], false, true);
+    renderRoute();
+  }
+  function stopRoute(silent) { if (route && !silent) toast('Ti fermi qui.'); route = null; renderRoute(); }
+  function renderRoute() {
+    const el = $('route');
+    if (!route) { el.hidden = true; return; }
+    el.hidden = false;
+    $('routeText').textContent = 'Verso ' + GP(route.target).name + ' · ancora ' + route.path.length + (route.path.length > 1 ? ' passaggi' : ' passaggio');
+  }
+  $('routeStop').addEventListener('click', () => stopRoute());
+  ATH.routeTo = routeTo;
+
   // —— mappa a strati
   const SVGNS = 'http://www.w3.org/2000/svg';
-  function drawMap() {
+  let mapSel = null;
+  const el = (tag, attrs, parent) => { const e = document.createElementNS(SVGNS, tag); Object.keys(attrs).forEach(k => e.setAttribute(k, attrs[k])); if (parent) parent.appendChild(e); return e; };
+  function drawMap(keepScroll) {
     const svg = $('mapSvg'); svg.innerHTML = '';
-    const BAND = { 0: 760 }, bandTop = {};
-    let yy = 20;
-    ATH.LEVELS.forEach(l => { bandTop[l.n] = yy; yy += (BAND[l.n] || 210); });
+    const BAND = { 0: 900 }, bandTop = {};
+    let yy = 10;
+    ATH.LEVELS.forEach(l => { bandTop[l.n] = yy; yy += (BAND[l.n] || 230); });
     svg.setAttribute('viewBox', `0 0 1000 ${yy + 10}`);
-    const X = p => 160 + p.x * 800, Y = p => { const h = BAND[p.level] || 210; return bandTop[p.level] + 40 + p.y * (h - 90); };
+    const X = p => 175 + p.x * 740, Y = p => { const h = BAND[p.level] || 230; return bandTop[p.level] + 34 + p.y * (h - 76); };
     ATH.LEVELS.forEach(l => {
-      const h = BAND[l.n] || 210, r = document.createElementNS(SVGNS, 'rect');
-      r.setAttribute('x', 0); r.setAttribute('y', bandTop[l.n]); r.setAttribute('width', 1000); r.setAttribute('height', h - 6);
-      r.setAttribute('class', 'm-band' + (l.n % 2 ? ' odd' : '')); svg.appendChild(r);
-      const tx = document.createElementNS(SVGNS, 'text');
-      tx.setAttribute('x', 16); tx.setAttribute('y', bandTop[l.n] + 30); tx.setAttribute('class', 'm-level'); tx.textContent = l.name; svg.appendChild(tx);
-      const tg = document.createElementNS(SVGNS, 'text');
-      tg.setAttribute('x', 16); tg.setAttribute('y', bandTop[l.n] + 50); tg.setAttribute('class', 'm-lgloss'); tg.textContent = l.gloss; svg.appendChild(tg);
+      const h = BAND[l.n] || 230;
+      el('rect', { x: 0, y: bandTop[l.n], width: 1000, height: h - 6, class: 'm-band' + (l.n % 2 ? ' odd' : '') }, svg);
+      const t = el('text', { x: 18, y: bandTop[l.n] + 30, class: 'm-level' }, svg); t.textContent = l.name;
+      const g = el('text', { x: 18, y: bandTop[l.n] + 50, class: 'm-lgloss' }, svg); g.textContent = l.gloss;
     });
-    const cur = GP(state.scene), adj = visibleExits(cur);
+    const cur = GP(state.scene), adj = cur && !cur.gen ? visibleExits(cur) : [];
+    const sel = mapSel && ATH.PLACE[mapSel] ? mapSel : null;
+    const selPath = sel ? findPath(state.scene, sel) : null;
+    const onPath = new Set(selPath ? [state.scene].concat(selPath) : []);
+    const pathKey = new Set();
+    if (selPath) { let a = state.scene; selPath.forEach(b => { pathKey.add([a, b].sort().join('|')); a = b; }); }
+    const trailKey = new Set();
+    for (let i = 1; i < state.trail.length; i++) trailKey.add([state.trail[i - 1], state.trail[i]].sort().join('|'));
+    const gEdges = el('g', {}, svg), gTrail = el('g', {}, svg), gNodes = el('g', {}, svg);
     const drawn = {};
     ATH.PLACES.forEach(p => {
       if (!isKnown(p.id)) return;
-      p.exits.forEach(e => {
-        const q = ATH.PLACE[ATH.exitId(e)]; if (!q || !isKnown(q.id)) return;
+      visibleExits(p).forEach(id => {
+        const q = ATH.PLACE[id]; if (!q) return;
         const key = [p.id, q.id].sort().join('|'); if (drawn[key]) return; drawn[key] = 1;
-        const l = document.createElementNS(SVGNS, 'line');
-        l.setAttribute('x1', X(p)); l.setAttribute('y1', Y(p)); l.setAttribute('x2', X(q)); l.setAttribute('y2', Y(q));
-        l.setAttribute('class', 'm-edge' + ((p.id === state.scene || q.id === state.scene) ? ' near' : '') + (p.level !== q.level ? ' vert' : ''));
-        svg.appendChild(l);
+        const x1 = X(p), y1 = Y(p), x2 = X(q), y2 = Y(q);
+        const near = p.id === state.scene || q.id === state.scene;
+        const cls = 'm-edge' + (p.level !== q.level ? ' vert' : '') + (near ? ' near' : '') + (pathKey.has(key) ? ' path' : '') + (trailKey.has(key) ? ' trail' : '');
+        let d;
+        if (p.level !== q.level) { const my = (y1 + y2) / 2; d = `M${x1} ${y1} C${x1} ${my} ${x2} ${my} ${x2} ${y2}`; }
+        else d = `M${x1} ${y1} L${x2} ${y2}`;
+        el('path', { d, class: cls }, trailKey.has(key) || pathKey.has(key) ? gTrail : gEdges);
       });
-      if (p.exits.some(e => isGen(ATH.exitId(e)))) {
-        const l = document.createElementNS(SVGNS, 'text');
-        l.setAttribute('x', X(p) + 14); l.setAttribute('y', Y(p) - 10); l.setAttribute('class', 'm-gen'); l.textContent = '⋯'; svg.appendChild(l);
-      }
     });
     let hereNode = null;
     ATH.PLACES.forEach(p => {
       if (!isKnown(p.id)) return;
-      const g = document.createElementNS(SVGNS, 'g');
-      const visited = state.visited.indexOf(p.id) >= 0, here = p.id === state.scene, reach = visited || adj.indexOf(p.id) >= 0;
-      g.setAttribute('class', 'm-node' + (visited ? ' visited' : '') + (here ? ' here' : '') + (reach ? ' reach' : '') + (p.kind === 'stato' ? ' stato' : ''));
-      g.setAttribute('transform', `translate(${X(p)},${Y(p)})`);
-      g.setAttribute('tabindex', reach && !here ? '0' : '-1');
-      g.setAttribute('role', 'button');
-      g.setAttribute('aria-label', p.name + (here ? ' (sei qui)' : ''));
-      g.innerHTML = (here ? '<circle class="m-halo" r="22"/>' : '') + `<circle class="m-dot" r="${p.kind === 'stato' ? 7 : 9}"/><text class="m-label" y="${p.y > 0.9 ? -16 : 26}">${p.name}</text>`;
+      const here = p.id === state.scene, today = state.visited.indexOf(p.id) >= 0, near = adj.indexOf(p.id) >= 0;
+      const g = el('g', {
+        class: 'm-node' + (here ? ' here' : '') + (today ? ' today' : '') + (near ? ' near' : '') + (p.kind === 'stato' ? ' stato' : '') + (sel === p.id ? ' sel' : '') + (onPath.has(p.id) ? ' onpath' : '') + (state.seen.indexOf(p.id) < 0 ? ' never' : ''),
+        transform: `translate(${X(p)},${Y(p)})`, tabindex: here ? '-1' : '0', role: 'button',
+        'aria-label': p.name + (here ? ' (sei qui)' : near ? ' (a un passo)' : '')
+      }, gNodes);
+      el('circle', { class: 'm-hit', r: 24 }, g);
+      if (here) el('circle', { class: 'm-halo', r: 20 }, g);
+      el('circle', { class: 'm-dot', r: here ? 9 : today ? 6 : 7 }, g);
+      const tx = el('text', { class: 'm-label', y: p.y > 0.88 ? -15 : 24 }, g); tx.textContent = p.name;
       if (here) hereNode = g;
-      const go = () => {
-        if (here) return;
-        if (!reach) { toast('Non sai ancora come arrivarci da qui.'); return; }
-        closeMap(); travel(p.id);
-      };
-      g.addEventListener('click', go);
-      g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
-      svg.appendChild(g);
+      const pick = () => { if (here) return; mapSel = p.id; drawMap(true); };
+      g.addEventListener('click', pick);
+      g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
     });
+    // l'indicazione in basso
+    const bar = $('mapGo');
+    if (sel && sel !== state.scene) {
+      bar.hidden = false;
+      $('mapGoText').textContent = selPath ? GP(sel).name + ' · ' + (selPath.length === 1 ? 'a un passo da qui' : selPath.length + ' passaggi') : GP(sel).name + ' · da qui non sai ancora come arrivarci';
+      $('mapGoBtn').disabled = !selPath;
+    } else bar.hidden = true;
     const known = ATH.PLACES.filter(p => isKnown(p.id)).length;
-    $('mapCount').textContent = `Visitati ${state.visited.length} di ${ATH.PLACES.length} · altri ${ATH.PLACES.length - known} non li ricordi ancora` + (state.genCount ? ` · ${state.genCount} stanze senza nome attraversate` : '') + (cur && cur.gen ? ' · ora sei nell’Altrove, fuori dalla mappa' : '');
-    setTimeout(() => { if (hereNode) { const wrap = $('mapWrap'), r = hereNode.getBoundingClientRect(), w = wrap.getBoundingClientRect(); wrap.scrollTop += r.top - w.top - w.height / 2; } }, 30);
+    $('mapCount').textContent = `Trovati ${state.seen.length} di ${ATH.PLACES.length} · oggi ${state.visited.length}` + (ATH.PLACES.length - known ? ` · ${ATH.PLACES.length - known} non li ricordi ancora` : '') + (state.genCount ? ` · ${state.genCount} stanze senza nome` : '') + (cur && cur.gen ? ' · ora sei nell’Altrove, fuori dalla mappa' : '');
+    if (!keepScroll) setTimeout(() => { if (hereNode) { const wrap = $('mapWrap'), r = hereNode.getBoundingClientRect(), w = wrap.getBoundingClientRect(); wrap.scrollTop += r.top - w.top - w.height / 2; wrap.scrollLeft += r.left - w.left - w.width / 2; } }, 30);
   }
-  function openMap() { drawMap(); $('mapov').hidden = false; $('btnMapClose').focus(); }
+  $('mapGoBtn').addEventListener('click', () => { const id = mapSel; mapSel = null; closeMap(); routeTo(id); });
+  function openMap() { mapSel = null; drawMap(); $('mapov').hidden = false; $('btnMapClose').focus(); }
   function closeMap() { $('mapov').hidden = true; }
   $('btnMap').addEventListener('click', openMap);
   $('btnMapClose').addEventListener('click', closeMap);
@@ -628,6 +681,15 @@ window.ATH = window.ATH || {};
   });
 
   $('btnTrans').addEventListener('click', transmute);
+  // il menu «Altro» su schermi piccoli
+  $('btnMore').addEventListener('click', e => {
+    e.stopPropagation();
+    const open = !document.body.classList.contains('more-open');
+    document.body.classList.toggle('more-open', open);
+    $('btnMore').setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  document.addEventListener('click', e => { if (document.body.classList.contains('more-open') && !e.target.closest('#moreMenu') && !e.target.closest('#btnMore')) { document.body.classList.remove('more-open'); $('btnMore').setAttribute('aria-expanded', 'false'); } });
+  $('moreMenu').addEventListener('click', e => { if (e.target.closest('button') && (window.innerWidth <= 760 || window.innerHeight <= 520)) setTimeout(() => { document.body.classList.remove('more-open'); $('btnMore').setAttribute('aria-expanded', 'false'); }, 150); });
   $('btnVeil').addEventListener('click', () => {
     const veiled = document.body.classList.toggle('veiled');
     $('btnVeil').textContent = veiled ? 'Svela' : 'Vela';
@@ -647,7 +709,8 @@ window.ATH = window.ATH || {};
     clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 3800);
   }
 
-  try { const raw = localStorage.getItem(STORE); if (raw) applyFormula(JSON.parse(raw)); else setLibra(state.libra); } catch (e) { setLibra(state.libra); }
+  setLibra(state.libra);
+  try { const raw = localStorage.getItem(STORE) || localStorage.getItem('athanor.formula.v4'); if (raw) applyFormula(JSON.parse(raw), true); } catch (e) { /* niente memoria */ }
 
   // —— accensione
   $('btnStart').addEventListener('click', async () => {
@@ -666,7 +729,7 @@ window.ATH = window.ATH || {};
       $('gate').hidden = true;
       travel(ATH.getPlace(state.scene) ? state.scene : 'soglia', true);
       setTimeout(hideHint, 9000);
-      if (window.innerWidth <= 760 && !document.body.classList.contains('veiled')) $('btnVeil').click();
+      if ((window.innerWidth <= 760 || window.innerHeight <= 520) && !document.body.classList.contains('veiled')) $('btnVeil').click();
     } catch (err) {
       btn.disabled = false; btn.textContent = 'Riprova';
       $('gateErr').textContent = 'Il motore audio non si è acceso. Ricarica la pagina forzando l’aggiornamento (Cmd+Maiusc+R o Ctrl+F5); se non basta, prova con una versione recente di Chrome, Firefox o Safari. Dettaglio: ' + (err && err.message ? err.message : err);
@@ -737,6 +800,13 @@ window.ATH = window.ATH || {};
       }
     }
     if (!helping) rescueAmt *= Math.pow(0.3, dt);
+    // il percorso continua da solo, un luogo alla volta
+    if (route && engine.ready && !traveling && dwell > 2.8) {
+      const next = route.path.shift();
+      if (!route.path.length) route = null;
+      if (next && GP(next)) travel(next, false, true);
+      renderRoute();
+    }
     placeMechanics(dt);
     if (hushTween) { hushTween.t += dt; hushNow = lerp(hushTween.from, hushTween.to, smooth(0, 1, hushTween.t / hushTween.dur)); if (hushTween.t >= hushTween.dur) hushTween = null; }
     if (passageT >= 0) { passageT += dt; if (passageT > (passDir ? 4.4 : 3.4)) { passageT = -1; passDir = 0; } }
@@ -748,7 +818,7 @@ window.ATH = window.ATH || {};
       if (autoT > autoNext) {
         autoT = 0; autoNext = 55 + Math.random() * 65;
         const ex = visibleExits(GP(state.scene)).filter(id => !isGen(id) || Math.random() < 0.3);
-        const fresh = ex.filter(id => !isGen(id) && state.visited.indexOf(id) < 0);
+        const fresh = ex.filter(id => !isGen(id) && state.seen.indexOf(id) < 0);
         const pool = fresh.length && Math.random() < 0.6 ? fresh : ex;
         if (pool.length) travel(pool[Math.floor(Math.random() * pool.length)]);
       }

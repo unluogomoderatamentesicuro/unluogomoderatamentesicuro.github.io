@@ -28,7 +28,7 @@ Una bilancia va da *Strepitus*, il rumore della fornace, a *Quies*, la quiete: v
 
 ## La città verticale
 
-Si entra dalla **Soglia**. Da lì le strade portano altrove: si cammina, si sale, si scende. Le frecce seguono la mappa, e si sentono i propri passi sulla ghiaia, sulla sabbia, sul legno, sulla neve, sui gradini.
+Ogni viaggio comincia dalla **Soglia**. Da lì le strade portano altrove: si cammina, si sale, si scende, e ogni strada si può ripercorrere all'indietro. Le frecce seguono la mappa, e si sentono i propri passi sulla ghiaia, sulla sabbia, sul legno, sulla neve, sui gradini.
 
 La città ha otto livelli, da prima della nascita a dopo la morte.
 
@@ -88,7 +88,7 @@ Accanto all’ultimo respiro il monitor rallenta, rallenta, e poi smette. Solo r
 
 Nel risveglio si chiudono gli occhi, e quando si riaprono si è altrove: in un posto sicuro, oppure no.
 
-Una mappa a strati tiene traccia di ciò che hai trovato, di ciò che hai solo intravisto e di ciò che hai dimenticato. Se vuoi, puoi smettere di scegliere e lasciarti portare: **Vaga**.
+Una mappa a strati mostra dove sei, la linea del cammino di oggi, i luoghi a un passo da te e quelli che conosci. Tocca un luogo lontano e la mappa ti mostra la strada: puoi camminarci, attraversando uno dopo l'altro tutti i luoghi in mezzo. Le scoperte restano da una volta all'altra; il cammino invece ricomincia ogni volta dalla soglia. Se vuoi, puoi smettere di scegliere e lasciarti portare: **Vaga**.
 
 ---
 
