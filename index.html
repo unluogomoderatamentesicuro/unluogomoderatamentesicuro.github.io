@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Athanor</title>
+<meta name="description" content="Athanor — una fornace alchemica per rumore, bordoni e trasmutazioni. Sintetizzatore nel browser.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=IM+Fell+English:ital@0;1&family=Fragment+Mono&display=swap">
+<link rel="stylesheet" href="css/athanor.css">
+</head>
+<body data-phase="nigredo">
+<!--ATHANOR:BODY-->
+<canvas id="crucible" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <h1>Athanor</h1>
+      <p class="sub">fornace per rumore e trasmutazioni</p>
+    </div>
+
+    <div class="opus" aria-label="Fase dell’Opera">
+      <ol class="phases" id="phases"></ol>
+      <div class="phase-text">
+        <span class="phase-name" id="phaseName">Nigredo</span>
+        <span class="phase-gloss" id="phaseGloss">l’opera al nero</span>
+      </div>
+      <div class="opus-bar" aria-hidden="true"><i></i></div>
+    </div>
+
+    <nav class="actions" aria-label="Comandi">
+      <button type="button" class="btn" id="btnTrans" title="Sposta tutto insieme, lentamente">Transmuta</button>
+      <span class="rec">
+        <button type="button" class="btn btn-rec" id="btnRec" aria-pressed="false"><span class="dot" aria-hidden="true"></span><span id="recLabel">Registra</span></button>
+        <span class="rec-time" id="recTime">00:00</span>
+      </span>
+      <button type="button" class="btn btn-save" id="btnSaveWav" hidden>Salva WAV</button>
+      <button type="button" class="btn btn-save" id="btnSaveCmp" hidden>Salva WEBM</button>
+      <span class="sep" aria-hidden="true"></span>
+      <button type="button" class="btn" id="btnFormula" title="Salva tutte le manopole e i sigilli in un file"><span class="long">Salva formula</span><span class="short">↓ Formula</span></button>
+      <button type="button" class="btn" id="btnLoad" title="Carica una formula salvata"><span class="long">Apri formula</span><span class="short">↑ Formula</span></button>
+      <input type="file" id="fileFormula" accept=".json,application/json" hidden>
+      <button type="button" class="btn" id="btnVeil" aria-pressed="false" title="Nasconde le manopole: resta solo il crogiolo">Vela</button>
+      <button type="button" class="btn" id="btnQuiet">Quiete</button>
+    </nav>
+  </header>
+
+  <main class="stage" id="stage" aria-label="Il crogiolo: muovi il puntatore, tieni premuto, usa la rotella">
+    <p class="hint" id="hint">muovi qui · tieni premuto per coagulare · la rotella piega il tempo · ogni tasto è una campana</p>
+    <div class="journey" id="journey">
+      <div class="jbar">
+        <button type="button" class="btn jbtn" id="btnMap" title="La mappa dei luoghi trovati">Mappa</button>
+        <button type="button" class="btn jbtn jbtn-knobs" id="btnKnobs" aria-pressed="false">Manopole</button>
+        <button type="button" class="btn jbtn" id="btnWander" aria-pressed="false" title="Lasciati portare da un luogo all’altro">Vaga</button>
+        <div class="aetas" title="Dal presente al ricordo">
+          <label for="allora">Ora</label>
+          <input type="range" id="allora" min="0" max="1000" value="0" aria-label="Dal presente (Ora) al ricordo (Allora)">
+          <span aria-hidden="true">Allora</span>
+        </div>
+      </div>
+      <div class="place" id="place" aria-live="polite">
+        <p class="pl-kind" id="plKind"></p>
+        <h2 class="pl-name" id="plName"></h2>
+        <p class="pl-ora" id="plOra"></p>
+        <p class="pl-allora" id="plAllora"></p>
+      </div>
+      <form class="lumini" id="lumini" hidden>
+        <label for="luminiName" id="luminiForm-l">Accendi un lumino per</label>
+        <span class="lumini-row" id="luminiForm"><input type="text" id="luminiName" maxlength="40" placeholder="un nome che non vuoi dimenticare" autocomplete="off"><button type="submit" class="btn">Accendi</button></span>
+      </form>
+      <nav class="soglie" id="soglie" aria-label="Soglie verso altri luoghi"></nav>
+      <aside class="strata" id="strata" aria-label="Livelli della città"><ol></ol></aside>
+    </div>
+  </main>
+
+  <section class="deck" id="deck" aria-label="Manopole e sigilli">
+    <div class="tabbar">
+      <div class="tabs" id="tabs" role="tablist" aria-label="Schede"></div>
+      <div class="libra" title="Bilancia: dal rumore della fornace alla quiete">
+        <label for="libra" class="libra-l">Strepitus</label>
+        <input type="range" id="libra" min="0" max="1000" value="300" aria-label="Bilancia tra Strepitus e Quies">
+        <span class="libra-r" aria-hidden="true">Quies</span>
+      </div>
+    </div>
+    <div class="panel" id="panel"></div>
+  </section>
+</div>
+
+<div class="gate" id="gate">
+  <div class="gate-inner">
+    <p class="eyebrow">un luogo moderatamente sicuro · opus IV</p>
+    <h2 class="gate-title">Athanor</h2>
+    <p class="gate-lede">Una città verticale di ricordi. In alto la rosa di luce, in basso il fiume dove si dimentica; in mezzo il mare d’infanzia, le stelle, le case abbandonate, il cimitero, la chiesa di notte, la stanza prima di dormire, l’attesa, la paura del buio, il pianto, l’alba. Oltre l’ultima strada c’è l’Altrove, che non finisce mai: lì ci si può perdere davvero.</p>
+    <ul class="gate-notes">
+      <li>Meglio in cuffia, con il volume basso all’inizio.</li>
+      <li>Le soglie in basso portano altrove: ↑ sali, ↓ scendi, ⋯ verso ciò che nessuno ha mai visto. <em>Ora · Allora</em> sposta tra ciò che accade e ciò che è accaduto.</li>
+      <li>Se ti perdi, puoi chiedere aiuto. Qualcuno, forse, verrà.</li>
+      <li>Muovi, tocca, gira le manopole anche a caso: il fuoco ascolta pure ciò che non intendi fare.</li>
+      <li>Premi <em>Registra</em> e alla fine salva la sessione come file audio.</li>
+    </ul>
+    <button type="button" class="btn btn-start" id="btnStart">Entra</button>
+    <p class="gate-err" id="gateErr" role="alert"></p>
+  </div>
+</div>
+
+<div class="mapov" id="mapov" hidden>
+  <div class="map-inner" role="dialog" aria-modal="true" aria-labelledby="mapTitle">
+    <header class="map-head">
+      <div><h2 id="mapTitle">Mappa dei ricordi</h2><p class="map-count" id="mapCount"></p></div>
+      <button type="button" class="btn" id="btnMapClose">Chiudi</button>
+    </header>
+    <div class="map-wrap" id="mapWrap"><svg id="mapSvg" viewBox="0 0 1000 700" role="img" aria-label="Luoghi trovati e soglie tra loro"></svg></div>
+    <p class="map-note">I luoghi accesi li hai già visitati. Quelli vuoti li conosci ma non ci sei ancora stato. Alcuni non compaiono finché non resti abbastanza a lungo nel posto giusto.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/params.js"></script>
+<script src="js/loca.js"></script>
+<script src="js/loca-plus.js"></script>
+<script src="js/worklets.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/quies.js"></script>
+<script src="js/memoria.js"></script>
+<script src="js/memoria-plus.js"></script>
+<script src="js/memoria-extra.js"></script>
+<script src="js/dream.js"></script>
+<script src="js/dream-plus.js"></script>
+<script src="js/visuals.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/recorder.js"></script>
+<script src="js/main.js"></script>
+<!--/ATHANOR:BODY-->
+</body>
+</html>
