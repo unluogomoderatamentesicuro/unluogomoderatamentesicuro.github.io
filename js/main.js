@@ -669,7 +669,8 @@ window.ATH = window.ATH || {};
       if (window.innerWidth <= 760 && !document.body.classList.contains('veiled')) $('btnVeil').click();
     } catch (err) {
       btn.disabled = false; btn.textContent = 'Riprova';
-      $('gateErr').textContent = 'Questo browser non ha acceso il motore audio. Prova con una versione recente di Chrome, Firefox o Safari.';
+      $('gateErr').textContent = 'Il motore audio non si è acceso. Ricarica la pagina forzando l’aggiornamento (Cmd+Maiusc+R o Ctrl+F5); se non basta, prova con una versione recente di Chrome, Firefox o Safari. Dettaglio: ' + (err && err.message ? err.message : err);
+      if (window.console) console.error(err);
     }
   });
 
