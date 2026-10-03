@@ -697,6 +697,7 @@ body:not(.lit) .deck, body:not(.lit) .actions, body:not(.lit) .hint { opacity: 0
 @media (max-width: 760px) {
   .aetas { flex: 1 1 100%; order: 5; padding: 2px 2px 0; }
 }
+.diap-read { margin: 12px 0 0; font: 12px/1.4 var(--f-mono); color: var(--accent); letter-spacing: .02em; }
 
 </style>
 </head>
@@ -785,7 +786,7 @@ body:not(.lit) .deck, body:not(.lit) .actions, body:not(.lit) .hint { opacity: 0
 
 <div class="gate" id="gate">
   <div class="gate-inner">
-    <p class="eyebrow">un luogo moderatamente sicuro · opus VI</p>
+    <p class="eyebrow">un luogo moderatamente sicuro · opus VII</p>
     <h2 class="gate-title">Athanor</h2>
     <p class="gate-lede">Una città verticale di ricordi, dal grembo, prima di nascere, fino a ciò che viene dopo l’ultimo respiro. In alto la rosa di luce, in basso il fiume dove si dimentica; in mezzo il mare d’infanzia, le stelle, le case abbandonate, il cimitero, la chiesa di notte, la stanza prima di dormire, l’attesa, la paura del buio, il pianto, l’alba. Oltre l’ultima strada c’è l’Altrove, che non finisce mai: lì ci si può perdere davvero.</p>
     <ul class="gate-notes">
@@ -933,6 +934,7 @@ window.ATH = window.ATH || {};
     { id: 'm_goccia', group: 'natura', name: 'Gocce', glyph: '◦', gloss: 'gocce che cadono in una stanza vuota', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_bolle', group: 'natura', name: 'Bolle', glyph: '∘', gloss: 'sott’acqua', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_tuono', group: 'natura', name: 'Tuono', glyph: 'ϟ', gloss: 'un temporale lontano', def: 0, drift: 0.05, fmt: pct },
+    { id: 'm_scacciapensieri', group: 'natura', name: 'Scacciapensieri', glyph: '⁂', gloss: 'campanelli a vento sotto un portico', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_carillon', group: 'domus', name: 'Carillon', glyph: '✦', gloss: 'il carillon della cameretta', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_piano', group: 'domus', name: 'Pianoforte', glyph: '♩', gloss: 'un pianoforte in un’altra stanza', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_camino', group: 'domus', name: 'Camino', glyph: '✺', gloss: 'la legna che brucia', def: 0, drift: 0.05, fmt: pct },
@@ -946,6 +948,7 @@ window.ATH = window.ATH || {};
     { id: 'm_candele', group: 'domus', name: 'Candele', glyph: 'ı', gloss: 'fiammelle che respirano', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_organo', group: 'domus', name: 'Organo', glyph: '⌂', gloss: 'un organo in una chiesa vuota', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_stoviglie', group: 'domus', name: 'Stoviglie', glyph: '◡', gloss: 'piatti, bicchieri, una cucina di un’altra epoca', def: 0, drift: 0.05, fmt: pct },
+    { id: 'm_tubature', group: 'domus', name: 'Tubature', glyph: '⌇', gloss: 'i tubi di una casa vecchia, di notte', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_voci', group: 'homines', name: 'Voci lontane', glyph: '❝', gloss: 'voci di cortile, senza parole', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_bambini', group: 'homines', name: 'Bambini', glyph: '☺', gloss: 'bambini che giocano e ridono', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_passi', group: 'homines', name: 'Passi', glyph: '⁚', gloss: 'passi di qualcuno che passa, o i tuoi', def: 0, drift: 0.05, fmt: pct },
@@ -961,6 +964,7 @@ window.ATH = window.ATH || {};
     { id: 'm_monitor', group: 'corpus', name: 'Monitor', glyph: '⌇', gloss: 'il monitor accanto al letto', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_pianto', group: 'corpus', name: 'Pianto', glyph: '◟', gloss: 'un pianto soffocato dietro una porta', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_vagito', group: 'corpus', name: 'Vagito', glyph: '◠', gloss: 'il primo pianto di qualcuno appena nato', def: 0, drift: 0.05, fmt: pct },
+    { id: 'm_carezza', group: 'corpus', name: 'Carezza', glyph: '∾', gloss: 'un suono di vetro che accarezza', def: 0, drift: 0.05, fmt: pct },
     { id: 'pulsus', group: 'corpus', name: 'Pulsus', glyph: '⌁', gloss: 'quanto batte forte il cuore', def: 0.25, drift: 0.03, fmt: v => Math.round(48 + v * 80) + ' bpm' },
 
     { id: 'memoria', group: 'oblivio', name: 'Memoria', glyph: '◈', gloss: 'quanto forte torna il ricordo', def: 0.7, drift: 0, fmt: db },
@@ -990,6 +994,7 @@ window.ATH = window.ATH || {};
     { id: 'lapis', group: 'sigilla', name: 'Lapis', glyph: '◆', gloss: 'la pietra: tutto smette di vagare', def: false },
     { id: 'rota', group: 'sigilla', name: 'Rota', glyph: '☸', gloss: 'la ruota delle fasi gira', def: true },
 
+    { id: 'pax', group: 'somnus', name: 'Pax', glyph: '☮', gloss: 'tutto si spegne piano, fino alla pace', def: false },
     { id: 'spira', group: 'somnus', name: 'Spira', glyph: '◯', gloss: 'il suono respira lentamente e ti guida', def: false },
     { id: 'stasis', group: 'lumen', name: 'Stasis', glyph: '═', gloss: 'l’accordo resta fermo', def: false },
     { id: 'mutatio', group: 'oblivio', name: 'Vaga', glyph: '⟲', gloss: 'cammini da solo da un luogo all’altro', def: false },
@@ -1764,6 +1769,150 @@ window.ATH = window.ATH || {};
 
 </script>
 <script>
+/* ATHANOR — LA CASA E I MORTI. La casa vuota e le sue stanze, gli incubi, chi
+   ti ha cresciuto, la mano del nonno, le occasioni perdute, il vuoto, la madre
+   che non hai visto, il padre lontano, la vita che non hai avuto. E la pace.
+   un luogo moderatamente sicuro */
+window.ATH = window.ATH || {};
+
+(function (ATH) {
+  const NEW = [
+    // ——— LA CASA
+    { id: 'casa_vuota', name: 'La casa vuota', kind: 'luogo', level: 0, x: 0.7, y: 0.3, terrain: 'legno', modus: 'eolio', hush: 0.5, swing: 50, lumina: 'soffuse',
+      levels: { m_tubature: 0.45, m_scricchiolio: 0.35, m_ronzio: 0.2, m_pendolo: 0.3, m_goccia: 0.2, m_vento: 0.15 }, set: { lumen: 0.25, distantia: 0.5 }, libra: 0.65,
+      pal: { bg: [11, 10, 9], accent: [214, 196, 166], second: [110, 98, 84] }, motif: { ruin: 0.4, motes: 0.5 },
+      ora: 'Non c’è nessuno, eppure la casa parla: i tubi bussano, il legno si assesta, il frigorifero ronza. Poi, all’improvviso, tace.',
+      allora: 'Era piena di voci, una volta. Le senti ancora, nei momenti in cui si zittisce tutto.',
+      exits: ['casa', 'ripostiglio', 'letto_nonni', 'moquette', 'macchinina', 'occasioni'] },
+    { id: 'ripostiglio', name: 'Il ripostiglio', kind: 'luogo', level: 0, x: 0.78, y: 0.2, terrain: 'legno', modus: 'insen', hush: 0.85, lumina: 'torcia',
+      levels: { m_fruscio: 0.35, m_scricchiolio: 0.2, m_goccia: 0.08 }, set: { lumen: 0.2, oblio: 0.5, nastro: 0.4 }, libra: 0.8,
+      pal: { bg: [10, 9, 8], accent: [210, 190, 160], second: [100, 88, 74] }, motif: { clutter: 1, motes: 1 },
+      ora: 'Scatole su scatole, ammassate da anni. Una bicicletta senza ruote, un ventilatore, un sacco di vestiti che nessuno metterà più.',
+      allora: 'Qui si mettono le cose che non si ha il coraggio di buttare. Anche certi ricordi stanno qui.',
+      exits: ['casa_vuota', 'soffitta', 'macchinina'] },
+    { id: 'letto_nonni', name: 'Il vecchio letto', kind: 'luogo', level: 0, x: 0.8, y: 0.36, terrain: 'legno', modus: 'pentatonico', hush: 0.9, peace: 70, lumina: 'soffuse',
+      levels: { m_pendolo: 0.35, m_fruscio: 0.25, m_canto: 0.12, m_tubature: 0.08 }, set: { lumen: 0.3, velum: 0.4, oblio: 0.3 }, libra: 0.85,
+      pal: { bg: [13, 11, 9], accent: [232, 206, 170], second: [140, 110, 86] }, motif: { motes: 0.6, wallpaper: 0.3 },
+      ora: 'Il letto alto dei nonni, con la coperta all’uncinetto. Il materasso ha ancora la loro forma.',
+      allora: 'Ci dormivi in mezzo, quando avevi paura dei temporali. Nessun posto al mondo è stato più sicuro.',
+      exits: ['casa_vuota', 'moquette', 'mano_nonno', 'stanza_vuota'] },
+    { id: 'moquette', name: 'La stanza della moquette', kind: 'luogo', level: 0, x: 0.86, y: 0.28, terrain: 'sabbia', modus: 'dorico', hush: 0.8, lumina: 'soffuse',
+      levels: { m_radio: 0.12, m_pendolo: 0.2, m_fruscio: 0.2, m_ronzio: 0.1 }, set: { lumen: 0.25, nastro: 0.5, oblio: 0.4 }, libra: 0.8,
+      pal: { bg: [13, 10, 8], accent: [214, 176, 130], second: [130, 90, 70] }, motif: { wallpaper: 1, motes: 0.4 },
+      ora: 'La carta da parati a fiori si stacca in lunghe lingue. Sotto i piedi la moquette dei nonni, consumata dove passavano sempre.',
+      allora: 'Seguivi i disegni della carta con il dito, cercando la fine del motivo. Non l’hai mai trovata.',
+      exits: ['casa_vuota', 'letto_nonni', 'cucina'] },
+    { id: 'macchinina', name: 'La macchinina rossa', kind: 'luogo', level: 0, x: 0.72, y: 0.12, terrain: 'legno', modus: 'lidio', hush: 0.92, lumina: 'soffuse',
+      levels: { m_fruscio: 0.12, m_treno: 0.12, m_carillon: 0.12, m_pendolo: 0.12 }, set: { lumen: 0.3, oblio: 0.4, distantia: 0.5 }, libra: 0.85,
+      pal: { bg: [10, 8, 8], accent: [236, 90, 70], second: [120, 60, 60] }, motif: { toycar: 1, motes: 0.4 },
+      ora: 'Su una mensola, da sola, una macchinina rossa. Una Ferrari in miniatura, con la vernice consumata sugli spigoli.',
+      allora: 'Te l’ha regalata tuo padre, una delle due o tre volte che l’hai visto. Di lui ricordi questo: le sue mani che te la porgevano.',
+      exits: ['casa_vuota', 'ripostiglio', 'treno_notte', { id: 'citta_lontana', linger: 40 }] },
+    { id: 'occasioni', name: 'Le occasioni perdute', kind: 'stato', level: 0, x: 0.66, y: 0.42, terrain: 'pietra', modus: 'dorico', hush: 0.5, lumina: 'soffuse',
+      clues: ['Quella domenica in cui hai detto: la prossima volta.', 'La telefonata che hai lasciato squillare.', 'Il compleanno a cui non sei andato.', 'La passeggiata che ti aveva chiesto, e tu avevi da fare.', 'La domanda che non gli hai mai fatto.'],
+      levels: { m_telefono: 0.4, m_treno: 0.3, m_pendolo: 0.35, m_vento: 0.2 }, set: { lumen: 0.25, nastro: 0.3 }, libra: 0.7,
+      pal: { bg: [10, 10, 12], accent: [200, 200, 214], second: [100, 100, 120] }, motif: { train: 0.4 },
+      ora: 'Il telefono squilla, il treno parte, l’orologio non si ferma. Tutte le volte che c’era tempo, e non l’hai preso.',
+      allora: '',
+      exits: ['mano_nonno', 'casa_vuota', 'ultimo_respiro', 'stazione'] },
+    { id: 'risalita', name: 'Accettare', kind: 'stato', level: 0, x: 0.56, y: 0.16, terrain: 'erba', modus: 'lidio', hush: 0.7, peace: 90,
+      levels: { m_vento: 0.2, m_respiro: 0.15, m_uccelli: 0.15, m_carezza: 0.2 }, set: { lumen: 0.4, velum: 0.6, chorus: 0.25 }, libra: 0.85,
+      pal: { bg: [13, 13, 12], accent: [236, 220, 190], second: [170, 160, 150] }, motif: { sun: 0.3, purify: 0.3, haze: 0.4 },
+      ora: 'Ti rialzi. Hai capito una cosa semplice e difficile: la rabbia non riporta indietro nessuno.',
+      allora: 'Chi hai perso non torna. Puoi solo portarlo con te, e continuare a camminare anche per lui.',
+      exits: ['rabbia', 'alba', 'pace', 'mano_nonno', 'vuoto'] },
+    { id: 'venticinque', name: 'Venticinque anni dopo', kind: 'luogo', level: 0, x: 0.95, y: 0.7, terrain: 'ghiaia', modus: 'eolio', hush: 0.8, lumina: 'soffuse',
+      levels: { m_vento: 0.4, m_passi: 0.15, m_campane: 0.1, m_fruscio: 0.12 }, set: { lumen: 0.3, distantia: 0.6, oblio: 0.4 }, libra: 0.8,
+      pal: { bg: [10, 10, 11], accent: [214, 206, 190], second: [110, 110, 116] }, motif: { loculi: 1 },
+      ora: 'Il muro dei loculi, file e file di fotografie ovali. Le guardi, e pensi che sono lì, proprio lì, dietro il marmo.',
+      allora: 'Sono passati venticinque anni, forse di più. I fiori di plastica hanno perso il colore. Tu non hai perso niente di loro.',
+      exits: ['cimitero', 'madre', 'vuoto', 'funerale'] },
+    { id: 'madre', name: 'La madre che non hai visto', kind: 'stato', level: 0, x: 0.98, y: 0.82, terrain: 'ghiaia', modus: 'pentatonico', hush: 0.96, peace: 80, lumina: 'candele',
+      levels: { m_canto: 0.25, m_vento: 0.2, m_carillon: 0.12, m_candele: 0.2 }, set: { lumen: 0.3, oblio: 0.5, distantia: 0.7, chorus: 0.2 }, libra: 0.9,
+      pal: { bg: [10, 9, 10], accent: [230, 210, 200], second: [130, 110, 120] }, motif: { cameo: 1, candles: 0.4 },
+      ora: 'Sulla lapide, una fotografia ovale. Una ragazza giovane, più giovane di quanto sei tu adesso. È tua madre.',
+      allora: 'Avevi tre mesi. Non hai un ricordo, un odore, una voce. Hai solo questa fotografia, e la conosci a memoria.',
+      exits: ['venticinque', 'cimitero', 'vita_mai', 'volti'] },
+    { id: 'citta_lontana', name: 'La città lontana', kind: 'luogo', level: 0, x: 0.04, y: 0.36, terrain: 'pietra', modus: 'eolio', hush: 0.6, hidden: true, lumina: 'soffuse',
+      levels: { m_treno: 0.2, m_voci: 0.2, m_campane: 0.25, m_vento: 0.3, m_passi: 0.2 }, set: { lumen: 0.3, distantia: 0.7 }, libra: 0.7,
+      pal: { bg: [10, 10, 12], accent: [214, 200, 180], second: [100, 100, 120] }, motif: { city: 0.5, tombs: 0.3 },
+      ora: 'Una città dove non conosci nessuno. Da qualche parte, in un cimitero che non sai trovare, c’è tuo padre.',
+      allora: 'Per anni hai detto: un giorno ci vado. Poi hai capito che bisogna deciderlo, il viaggio. Non succede da solo.',
+      exits: ['treno_notte', 'macchinina', 'vita_mai'] },
+
+    // ——— LE TORRI
+    { id: 'mano_nonno', name: 'La mano del nonno', kind: 'stato', level: 1, x: 0.5, y: 0.7, terrain: 'legno', modus: 'lidio', hush: 0.95, peace: 50, lumina: 'soffuse',
+      levels: { m_carezza: 0.4, m_pendolo: 0.2, m_canto: 0.15, m_uccelli: 0.1 }, set: { lumen: 0.4, velum: 0.5, oblio: 0.35 }, libra: 0.9,
+      pal: { bg: [14, 11, 9], accent: [246, 214, 170], second: [180, 140, 100] }, motif: { hand: 1, haze: 0.5 },
+      ora: 'Una mano enorme, ruvida, calda, ti accarezza la testa. Non dice niente. Non serve.',
+      allora: 'Poi sei cresciuto, e ti sei allontanato. Avevi sempre qualcosa da fare. Lui aspettava, e non te l’ha mai detto.',
+      exits: ['letto_nonni', 'occasioni', 'ultimo_respiro', 'torre', 'ninna'] },
+    { id: 'vita_mai', name: 'La vita che non hai avuto', kind: 'stato', level: 1, x: 0.14, y: 0.6, terrain: 'legno', modus: 'dorico', hush: 0.8, lumina: 'soffuse',
+      clues: ['Come sarebbe stata la sua voce?', 'Ti avrebbero portato al mare, d’estate?', 'Avresti avuto i suoi occhi, o quelli di lui?', 'Chi saresti diventato?', 'Avrebbero capito le tue scelte?', 'Non c’è risposta. Non c’è mai stata.'],
+      levels: { m_stoviglie: 0.25, m_voci: 0.25, m_bambini: 0.1, m_radio: 0.1 }, set: { lumen: 0.3, distantia: 0.85, oblio: 0.5 }, libra: 0.8,
+      pal: { bg: [10, 10, 13], accent: [230, 214, 180], second: [120, 110, 140] }, motif: { windows: 0.4 },
+      ora: 'Oltre il muro, una famiglia a tavola: una donna, un uomo, un bambino. Il bambino sei tu, in una vita che non è successa.',
+      allora: '',
+      exits: ['madre', 'citta_lontana', 'finestre', 'torre'] },
+
+    // ——— I TETTI E L'EMPIREO
+    { id: 'pensieri', name: 'Il silenzio dei pensieri', kind: 'stato', level: 2, x: 0.3, y: 0.3, terrain: 'tegole', modus: 'insen', hush: 1, peace: 40, lumina: 'soffuse',
+      levels: { m_respiro: 0.1, m_carezza: 0.12, m_vento: 0.06 }, set: { lumen: 0.25, chorus: 0.1, velum: 0.4 }, libra: 0.95,
+      pal: { bg: [9, 10, 13], accent: [210, 214, 230], second: [120, 126, 150] }, motif: { motes: 0.4, stars: 0.3 },
+      ora: 'Nessun suono, tranne quello dei pensieri. Per una volta non fanno paura: passano, come nuvole.',
+      allora: 'Credevi che il silenzio fosse vuoto. È pieno di te.',
+      exits: ['tetti', 'pace', 'ultimo_piano'] },
+    { id: 'pace', name: 'La pace', kind: 'stato', level: 3, x: 0.3, y: 0.75, terrain: 'nuvola', modus: 'pentatonico', hush: 1, peace: 90, lumina: 'soffuse',
+      levels: { m_scacciapensieri: 0.3, m_carezza: 0.35, m_canto: 0.12, m_uccelli: 0.08, m_mare: 0.1 }, set: { lumen: 0.55, velum: 0.8, chorus: 0.35, aether: 0.85 }, libra: 0.98,
+      pal: { bg: [14, 14, 16], accent: [236, 230, 214], second: [180, 190, 210] }, motif: { haze: 0.8, sun: 0.3, rose: 0.2 },
+      ora: 'Non succede niente, e va tutto bene. Qualcosa ti accarezza piano, e il respiro trova da solo il suo ritmo.',
+      allora: 'L’hai cercata tanto. Era qui, sotto tutto il rumore.',
+      exits: ['pensieri', 'empireo', 'mare_stelle', 'risalita', 'giardino'] },
+
+    // ——— IL SOTTOSUOLO
+    { id: 'rabbia', name: 'La rabbia', kind: 'stato', level: -1, x: 0.4, y: 0.45, terrain: 'pietra', modus: 'insen', hush: 0, lumina: 'soffuse',
+      levels: { m_cuore: 0.4, m_respiro: 0.3, m_tuono: 0.2 }, set: { calcinatio: 0.6, tempestas: 0.7, cinis: 0.6, crepitus: 0.55, lumen: 0.15 }, libra: 0.1, bpm: 0.7,
+      pal: { bg: [16, 6, 4], accent: [230, 100, 60], second: [120, 40, 30] }, motif: { cracks: 1, fever: 0.3 },
+      ora: 'Sei per terra, e sei arrabbiato con la vita. Per quello che ti ha tolto, per come te l’ha tolto, per quando.',
+      allora: 'Hai urlato contro tutto. Il soffitto non ha risposto.',
+      exits: ['risalita', 'urlare', 'dolore', 'vuoto'] },
+    { id: 'incubo', name: 'L’incubo', kind: 'stato', level: -1, x: 0.2, y: 0.5, terrain: 'pietra', modus: 'insen', hush: 0.5, nightmare: 6, lumina: 'spente',
+      levels: { m_sussurri: 0.3, m_cuore: 0.2, m_tubature: 0.2 }, set: { lumen: 0.15, distantia: 0.5 }, libra: 0.5, bpm: 0.6,
+      pal: { bg: [6, 5, 8], accent: [190, 180, 214], second: [80, 70, 100] }, motif: { void: 0.4, whispers: 0.5 },
+      ora: 'Ti svegli di colpo nel buio, con il cuore in gola. Eri sicuro di aver perso la persona che ami di più.',
+      allora: 'Ti alzi a controllare che respiri. Respira. Torni a letto, ma non dormi più.',
+      exits: ['letto', 'giudizio', 'buio', 'voci'] },
+    { id: 'giudizio', name: 'Il giudizio', kind: 'stato', level: -1, x: 0.15, y: 0.15, terrain: 'legno', modus: 'eolio', hush: 0.4, lumina: 'candele',
+      whisperWords: ['hai sbagliato', 'non ci hai ascoltato', 'non sei venuto', 'te l’avevamo detto', 'guarda cosa sei diventato', 'forse no', 'eri tu', 'va bene così'],
+      levels: { m_sussurri: 0.5, m_voci: 0.15, m_pendolo: 0.3, m_candele: 0.2 }, set: { lumen: 0.2 }, libra: 0.55,
+      pal: { bg: [10, 8, 7], accent: [220, 180, 130], second: [110, 80, 60] }, motif: { whispers: 1, candles: 0.4 },
+      ora: 'Tornano quelli che ti hanno cresciuto. Si siedono intorno al tavolo ed elencano, uno per uno, gli errori che hai fatto da quando non ci sono più.',
+      allora: 'Ma forse non hai sbagliato. Forse hai costruito la tua vita secondo le tue regole, non secondo le loro. Ti sei staccato da chi ti ha guidato. Si chiama crescere.',
+      exits: ['incubo', 'colpa', 'trono', 'risalita'] },
+    { id: 'vuoto', name: 'Il vuoto', kind: 'stato', level: -1, x: 0.6, y: 0.2, terrain: 'pietra', modus: 'insen', hush: 1, lumina: 'soffuse',
+      levels: { m_pendolo: 0.2, m_acufene: 0.08 }, set: { lumen: 0.15, oblio: 0.5 }, libra: 0.92,
+      pal: { bg: [8, 8, 9], accent: [196, 196, 204], second: [96, 96, 104] }, motif: { void: 0.8 },
+      ora: 'Al posto di una persona, adesso, c’è una forma esatta di niente. Ci inciampi dieci volte al giorno.',
+      allora: 'Ti dicono che col tempo passa. Non passa: impari a camminarci intorno.',
+      exits: ['ultimo_respiro', 'funerale', 'stanza_vuota', 'pavimento', 'venticinque', 'rabbia'] }
+  ];
+  NEW.forEach(p => { ATH.PLACES.push(p); ATH.PLACE[p.id] = p; });
+
+  const more = {
+    letto: ['incubo'], casa: ['casa_vuota'], soffitta: ['ripostiglio'], cimitero: ['venticinque', 'madre'],
+    treno_notte: [{ id: 'citta_lontana', linger: 35 }, 'macchinina'], ultimo_respiro: ['mano_nonno', 'vuoto'], funerale: ['vuoto'],
+    tetti: ['pensieri'], empireo: ['pace'], giardino: ['pace'], finestre: ['vita_mai'], stanza_vuota: ['letto_nonni'],
+    alba: ['risalita'], fotografie: ['madre'], dolore: ['rabbia'], urlare: ['rabbia']
+  };
+  Object.keys(more).forEach(id => { ATH.PLACE[id].exits = ATH.PLACE[id].exits.concat(more[id]); });
+
+  // luoghi dove, restando, si scende lentamente nella pace
+  const PEACE = { giardino: 60, neve: 80, ninna: 50, mare_stelle: 70, cappella: 70, alba: 60, primo_ricordo: 60, silenzio: 40, empireo: 80, oltre: 60, rinascita: 70, ultimo_piano: 70 };
+  Object.keys(PEACE).forEach(id => { ATH.PLACE[id].peace = PEACE[id]; });
+})(window.ATH);
+
+</script>
+<script>
 /* ATHANOR — LA PIANTA DELLA CITTÀ. Le posizioni sulla mappa (da cui dipendono
    le frecce) e le strade rese percorribili in entrambi i sensi: se da A si va
    a B, da B si torna sempre ad A.
@@ -1772,85 +1921,103 @@ window.ATH = window.ATH || {};
 
 (function (ATH) {
   const LAYOUT = {
-    oltre: [0.435, 0.5],
-    rinascita: [0.635, 0.5],
-    empireo: [0.507, 0.456],
-    trono: [0.707, 0.392],
-    mare_stelle: [0.307, 0.452],
-    tetti: [0.376, 0.099],
-    campanile: [0.734, 0.05],
-    capovolta: [0.05, 0.239],
+    oltre: [0.425, 0.5],
+    rinascita: [0.645, 0.5],
+    empireo: [0.509, 0.383],
+    trono: [0.95, 0.05],
+    mare_stelle: [0.05, 0.285],
+    pace: [0.225, 0.95],
+    tetti: [0.437, 0.712],
+    campanile: [0.767, 0.366],
+    capovolta: [0.05, 0.722],
     ultimo_piano: [0.95, 0.95],
-    torre: [0.443, 0.427],
-    finestre: [0.122, 0.451],
-    biblioteca: [0.73, 0.432],
-    ninna: [0.603, 0.196],
-    sala_parto: [0.05, 0.05],
-    ospedale: [0.265, 0.221],
-    ultimo_respiro: [0.242, 0.691],
-    scale_orfano: [0.664, 0.95],
+    pensieri: [0.428, 0.05],
+    torre: [0.426, 0.438],
+    finestre: [0.16, 0.371],
+    biblioteca: [0.777, 0.462],
+    ninna: [0.619, 0.243],
+    sala_parto: [0.113, 0.05],
+    ospedale: [0.352, 0.178],
+    ultimo_respiro: [0.314, 0.688],
+    scale_orfano: [0.677, 0.95],
     dormitorio: [0.95, 0.95],
-    soglia: [0.422, 0.561],
-    stelle: [0.355, 0.238],
-    lorenzo: [0.265, 0.055],
-    mare: [0.245, 0.322],
-    faro: [0.123, 0.111],
-    campagna: [0.535, 0.354],
-    estate: [0.508, 0.157],
-    domenica: [0.755, 0.233],
-    fiera: [0.831, 0.131],
-    casa: [0.635, 0.446],
-    soffitta: [0.693, 0.339],
-    stanza: [0.95, 0.412],
-    orfanotrofio: [0.734, 0.536],
-    cappella: [0.677, 0.64],
-    pioggia: [0.519, 0.654],
-    neve: [0.455, 0.758],
-    stazione: [0.197, 0.539],
-    letto: [0.364, 0.664],
-    attesa: [0.206, 0.654],
-    amore: [0.273, 0.754],
-    male: [0.437, 0.95],
-    veglia: [0.544, 0.863],
-    alba: [0.777, 0.728],
-    felicita: [0.848, 0.325],
-    incontro: [0.836, 0.623],
-    centro: [0.48, 0.461],
-    periferia: [0.05, 0.491],
-    chiesa: [0.387, 0.373],
-    cimitero: [0.889, 0.517],
-    bosco: [0.198, 0.213],
-    giardino: [0.925, 0.225],
-    fuga: [0.064, 0.602],
-    crocevia: [0.823, 0.919],
-    salvezza: [0.703, 0.841],
-    funerale: [0.79, 0.43],
-    stanza_vuota: [0.597, 0.25],
-    cucina: [0.566, 0.05],
-    fotografie: [0.578, 0.55],
-    dubbio: [0.323, 0.475],
-    ospedale_abb: [0.615, 0.745],
-    treno_notte: [0.179, 0.426],
-    risveglio: [0.356, 0.849],
-    festa_finita: [0.668, 0.138],
-    pozzo: [0.95, 0.625],
-    dolore: [0.138, 0.95],
-    cripta: [0.506, 0.323],
-    pavimento: [0.246, 0.403],
-    voci: [0.696, 0.517],
-    buio: [0.05, 0.213],
-    pianto: [0.182, 0.673],
-    colpa: [0.768, 0.252],
-    rinnegare: [0.57, 0.845],
-    urlare: [0.312, 0.128],
-    volti: [0.576, 0.05],
-    voce_persa: [0.441, 0.597],
-    lete: [0.411, 0.366],
+    mano_nonno: [0.585, 0.656],
+    vita_mai: [0.05, 0.617],
+    soglia: [0.356, 0.552],
+    stelle: [0.31, 0.256],
+    lorenzo: [0.27, 0.123],
+    mare: [0.288, 0.357],
+    faro: [0.086, 0.108],
+    campagna: [0.484, 0.395],
+    estate: [0.464, 0.2],
+    domenica: [0.633, 0.246],
+    fiera: [0.95, 0.148],
+    casa: [0.645, 0.549],
+    soffitta: [0.794, 0.396],
+    stanza: [0.95, 0.448],
+    orfanotrofio: [0.646, 0.656],
+    cappella: [0.646, 0.757],
+    pioggia: [0.491, 0.706],
+    neve: [0.482, 0.807],
+    stazione: [0.202, 0.591],
+    letto: [0.341, 0.654],
+    attesa: [0.178, 0.702],
+    amore: [0.331, 0.754],
+    male: [0.383, 0.91],
+    veglia: [0.556, 0.95],
+    alba: [0.797, 0.7],
+    felicita: [0.95, 0.346],
+    incontro: [0.95, 0.549],
+    centro: [0.497, 0.501],
+    periferia: [0.05, 0.534],
+    chiesa: [0.353, 0.451],
+    cimitero: [0.796, 0.6],
+    bosco: [0.154, 0.204],
+    giardino: [0.95, 0.053],
+    fuga: [0.05, 0.634],
+    crocevia: [0.79, 0.923],
+    salvezza: [0.799, 0.813],
+    funerale: [0.793, 0.499],
+    stanza_vuota: [0.641, 0.346],
+    cucina: [0.617, 0.05],
+    fotografie: [0.501, 0.604],
+    dubbio: [0.207, 0.493],
+    ospedale_abb: [0.639, 0.859],
+    treno_notte: [0.122, 0.406],
+    risveglio: [0.168, 0.803],
+    festa_finita: [0.781, 0.098],
+    casa_vuota: [0.483, 0.297],
+    ripostiglio: [0.786, 0.196],
+    letto_nonni: [0.793, 0.295],
+    moquette: [0.95, 0.246],
+    macchinina: [0.619, 0.148],
+    occasioni: [0.638, 0.447],
+    risalita: [0.454, 0.099],
+    venticinque: [0.95, 0.651],
+    madre: [0.95, 0.755],
+    citta_lontana: [0.127, 0.304],
+    pozzo: [0.95, 0.642],
+    dolore: [0.23, 0.862],
+    cripta: [0.596, 0.292],
+    pavimento: [0.292, 0.587],
+    voci: [0.531, 0.528],
+    buio: [0.117, 0.407],
+    pianto: [0.461, 0.77],
+    colpa: [0.77, 0.465],
+    rinnegare: [0.636, 0.95],
+    urlare: [0.413, 0.118],
+    volti: [0.837, 0.222],
+    voce_persa: [0.706, 0.707],
+    rabbia: [0.356, 0.352],
+    incubo: [0.05, 0.642],
+    giudizio: [0.168, 0.164],
+    vuoto: [0.653, 0.05],
+    lete: [0.432, 0.367],
     sommerso: [0.95, 0.05],
-    silenzio: [0.561, 0.95],
-    dimenticarsi: [0.05, 0.81],
-    grembo: [0.425, 0.5],
-    primo_ricordo: [0.625, 0.5]
+    silenzio: [0.593, 0.95],
+    dimenticarsi: [0.05, 0.816],
+    grembo: [0.415, 0.5],
+    primo_ricordo: [0.635, 0.5]
   };
   Object.keys(LAYOUT).forEach(id => { const p = ATH.PLACE[id]; if (p) { p.x = LAYOUT[id][0]; p.y = LAYOUT[id][1]; } });
 
@@ -3286,7 +3453,7 @@ window.ATH = window.ATH || {};
         w.fs.forEach((b, k) => b.frequency.setTargetAtTime(vw[k] * rnd(1, 1.2), st, 0.02));
         w.env.gain.setTargetAtTime(rnd(0.5, 0.9), st, 0.015); w.env.gain.setTargetAtTime(0.01, st + len * 0.6, 0.03);
         w.next = st + len + rnd(0.02, 0.1);
-        if (Math.random() < 0.04) this.e.emit('mem', { kind: 'whisper', word: pick(WHISPER), pan: w.pan, at: st });
+        if (Math.random() < (ATH.currentWhispers ? 0.14 : 0.04)) this.e.emit('mem', { kind: 'whisper', word: pick(ATH.currentWhispers || WHISPER), pan: w.pan, at: st });
       } else if (!w.talking) w.env.gain.setTargetAtTime(0, now, 0.1);
     });
 
@@ -3496,6 +3663,77 @@ window.ATH = window.ATH || {};
         b.next = st + len + rnd(0.3, 0.6);
       } else if (!b.on) v.env.gain.setTargetAtTime(0, now, 0.15);
     } else this.baby.env.gain.setTargetAtTime(0, now, 0.2);
+  };
+})(window.ATH);
+
+</script>
+<script>
+/* ATHANOR — MEMORIA (quinta parte): suoni che accarezzano. Campanelli a vento
+   sotto un portico, una carezza di vetro, e i tubi di una casa vecchia.
+   un luogo moderatamente sicuro */
+window.ATH = window.ATH || {};
+
+(function (ATH) {
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const P = ATH.Memoria.prototype;
+  Object.assign(ATH.MEM_CAL, { m_scacciapensieri: 1, m_carezza: 1, m_tubature: 1 });
+  const b0 = P.buildPlus, a0 = P.applyPlus;
+
+  P.buildPlus = function () {
+    b0.call(this);
+    const c = this.c, G = this.G;
+    this.chimes = { next: 0 };
+    // carezza: armoniche alte che salgono e scendono lentissime, come un dito su un bicchiere
+    this.glass = [0, 1, 2, 3, 4].map(i => {
+      const o = c.createOscillator(); o.type = 'sine'; o.frequency.value = 880;
+      const g = G(0), p = c.createStereoPanner(); p.pan.value = [-0.6, 0.5, -0.2, 0.75, 0.1][i];
+      o.connect(g); g.connect(p); p.connect(this.lv.m_carezza); o.start();
+      return { o, g, ph: rnd(0, 6.28), sp: rnd(0.04, 0.09) };
+    });
+    { const s = this.src('pink'); const bp = this.filt('bandpass', 2600, 0.6); this.caressAir = G(0.04); this.chain([s, bp, this.caressAir, this.lv.m_carezza]); s.start(0, 2.2); }
+    this.pipes2 = { next: 0 };
+    // il fruscio dell'acqua nei tubi
+    { const s = this.src('pink'); const bp = this.filt('bandpass', 700, 2); this.flowG = G(0); this.chain([s, bp, this.flowG, this.lv.m_tubature]); s.start(0, 1.1); this.flowT = 0; }
+  };
+
+  P.applyPlus = function (L, S, C, dt, root, scale, now, look) {
+    a0.call(this, L, S, C, dt, root, scale, now, look);
+    const t = this.t, T = (p, v, tau) => this.e.T(p, v, tau);
+    let base = root; while (base < 500) base *= 2;
+
+    // campanelli a vento: note della scala, a grappoli, quando il vento si alza
+    if (L.m_scacciapensieri > 0.01 && now >= this.chimes.next) {
+      const n = Math.random() < 0.4 ? Math.floor(rnd(2, 6)) : 1;
+      for (let i = 0; i < n; i++) {
+        const st = now + 0.03 + i * rnd(0.08, 0.3), f = base * ATH.ratioAt(scale, Math.floor(rnd(0, scale.length * 2))), pan = rnd(-0.8, 0.8);
+        this.tone(this.lv.m_scacciapensieri, st, f, 'sine', 0.07, 0.002, 1.6, 7, pan);
+        this.tone(this.lv.m_scacciapensieri, st, f * 2.76, 'sine', 0.018, 0.001, 0.5, 2.5, pan);
+        if (Math.random() < 0.5) this.e.emit('mem', { kind: 'carillon', freq: f, pan, at: st });
+      }
+      this.chimes.next = now + rnd(1.5, 6) * (1.3 - L.m_scacciapensieri);
+    }
+
+    // carezza
+    this.glass.forEach((v, i) => {
+      const f = base * ATH.ratioAt(scale, [0, 2, 4, 5, 7][i]);
+      T(v.o.frequency, f, 2);
+      const sw = Math.pow(0.5 + 0.5 * Math.sin(t * v.sp + v.ph), 2);
+      T(v.g.gain, 0.05 * sw, 0.4);
+    });
+
+    // tubature: colpi secchi, poi l'acqua che scorre
+    if (L.m_tubature > 0.01 && now >= this.pipes2.next) {
+      const n = Math.floor(rnd(1, 5)), pan = rnd(-0.6, 0.6);
+      for (let i = 0; i < n; i++) {
+        const st = now + 0.05 + i * rnd(0.12, 0.35);
+        this.tone(this.lv.m_tubature, st, rnd(90, 160), 'sine', 0.35, 0.002, 0.05, 0.3, pan);
+        this.tone(this.lv.m_tubature, st, rnd(600, 1200), 'triangle', 0.05, 0.001, 0.03, 0.2, pan);
+      }
+      if (Math.random() < 0.4) this.flowT = rnd(2, 6);
+      this.pipes2.next = now + rnd(3, 12);
+    }
+    this.flowT = Math.max(0, this.flowT - dt);
+    T(this.flowG.gain, this.flowT > 0 ? 0.25 : 0, 0.5);
   };
 })(window.ATH);
 
@@ -4315,25 +4553,33 @@ window.ATH = window.ATH || {};
       }
     }
 
-    // il volto che si dissolve
+    // fotografie antiche: sagome senza volto che si dissolvono (niente sorrisi)
     const fc = mf('face');
     if (fc > 0.02) {
-      const fade = Math.min(1, S.faceFade || 0), jit = 2 + fade * 40, al = fc * (0.55 - fade * 0.45);
-      const fx = cx, fy = cy - R0 * 0.1, fw = R0 * 0.75, fh = R0 * 1.0;
+      const fade = Math.min(1, S.faceFade || 0), jit = 1 + fade * 26, al = fc * (0.6 - fade * 0.45);
       const J = () => (Math.random() - 0.5) * jit;
-      b.strokeStyle = `rgba(${A},1)`; b.lineWidth = 1.2;
-      for (let pass = 0; pass < 3; pass++) {
-        b.globalAlpha = al * (pass ? 0.35 : 0.8);
-        b.beginPath();
-        for (let i = 0; i <= 40; i++) { const a = i / 40 * TAU, x = fx + Math.cos(a) * fw + J(), y = fy + Math.sin(a) * fh * (a > 0 && a < Math.PI ? 1 : 0.95) + J(); i ? b.lineTo(x, y) : b.moveTo(x, y); }
-        b.stroke();
-        if (fade < 0.92) {
-          [-1, 1].forEach(sd => { b.beginPath(); b.ellipse(fx + sd * fw * 0.38 + J(), fy - fh * 0.12 + J(), fw * 0.14, fh * 0.05, 0, 0, TAU); b.stroke(); });
-          b.beginPath(); b.moveTo(fx + J(), fy - fh * 0.05); b.lineTo(fx - fw * 0.06 + J(), fy + fh * 0.25 + J()); b.lineTo(fx + fw * 0.06 + J(), fy + fh * 0.28); b.stroke();
-          b.beginPath(); b.moveTo(fx - fw * 0.3 + J(), fy + fh * 0.48 + J()); b.quadraticCurveTo(fx + J(), fy + fh * 0.56 + J(), fx + fw * 0.3 + J(), fy + fh * 0.48 + J()); b.stroke();
+      const frames = [[-0.62, -0.08, -0.06], [0, 0.04, 0.02], [0.6, -0.12, 0.05]];
+      frames.forEach(([ox, oy, rot], k) => {
+        const w = R0 * 0.62, h = R0 * 0.8, x = cx + ox * R0 * 1.6, y = cy + oy * R0;
+        b.save(); b.translate(x, y); b.rotate(rot + Math.sin(t * 0.1 + k) * 0.01);
+        b.globalCompositeOperation = 'source-over';
+        b.globalAlpha = al * 0.55; b.fillStyle = `rgb(${S.rgbBg})`; b.fillRect(-w / 2, -h / 2, w, h);
+        b.globalCompositeOperation = 'lighter';
+        b.globalAlpha = al * 0.5; b.strokeStyle = `rgba(${A},1)`; b.lineWidth = 1; b.strokeRect(-w / 2, -h / 2, w, h);
+        b.strokeRect(-w / 2 + 6, -h / 2 + 6, w - 12, h - 18);
+        // una o due sagome: testa e spalle, nessun lineamento
+        // figure intere in piedi, piccole, come nelle fotografie di una volta
+        const n = k === 1 ? 3 : k === 0 ? 2 : 1;
+        for (let m = 0; m < n; m++) {
+          const sx = (n === 1 ? 0 : (m / (n - 1) - 0.5) * 0.5) * w + J(), hh = h * (m === n - 1 && n === 3 ? 0.42 : 0.56);
+          const top = h * 0.32 - hh;
+          b.globalAlpha = al * (0.2 + 0.1 * (1 - fade)); b.fillStyle = `rgba(${A},1)`;
+          b.beginPath(); b.arc(sx, top + hh * 0.1, hh * 0.085, 0, TAU); b.fill();
+          b.beginPath(); b.moveTo(sx - hh * 0.12, top + hh * 0.22); b.lineTo(sx + hh * 0.12, top + hh * 0.22); b.lineTo(sx + hh * 0.09, top + hh); b.lineTo(sx - hh * 0.09, top + hh); b.closePath(); b.fill();
         }
-      }
-      if (fade > 0.4) { b.globalAlpha = fc * (fade - 0.4) * 0.3; b.drawImage(this.spr('b', B), fx - fw * 1.4, fy - fh * 1.3, fw * 2.8, fh * 2.6); }
+        if (fade > 0.3) { b.globalAlpha = fc * (fade - 0.3) * 0.25; b.drawImage(this.spr('b', B), -w, -h, w * 2, h * 2); }
+        b.restore();
+      });
     }
 
     // i profumi di una volta: parole che salgono come vapore
@@ -4392,6 +4638,121 @@ window.ATH = window.ATH || {};
       b.globalAlpha = 0.12 * k; b.fillStyle = 'rgba(255,40,30,1)'; b.fillRect(0, 0, W, H);
       if (this.screamOn) { this.cracks = this.cracks || []; if (this.cracks.length < 40 && Math.random() < 0.4) { const a = Math.random() * TAU, l = rnd(40, 180); const x = Math.random() * W, y = Math.random() * H; this.cracks.push({ x1: x, y1: y, x2: x + Math.cos(a) * l, y2: y + Math.sin(a) * l, a, k: 0 }); } }
       if (!this.screamOn) this.screamHit *= Math.pow(0.2, dt);
+    }
+    b.globalAlpha = 1; b.globalCompositeOperation = 'lighter';
+  };
+})(window.ATH);
+
+</script>
+<script>
+/* ATHANOR — figure della casa e dei morti: le cose ammassate nel ripostiglio,
+   la carta da parati che si stacca, la macchinina rossa, il muro dei loculi,
+   la fotografia ovale sulla lapide, la mano del nonno.
+   un luogo moderatamente sicuro */
+window.ATH = window.ATH || {};
+
+(function (ATH) {
+  const TAU = Math.PI * 2;
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const D = ATH.Dream.prototype;
+  const p0 = D.drawPlus;
+
+  D.drawPlus = function (b, S, dt, W, H, cx, cy, R0, kT, A, B, t) {
+    p0.call(this, b, S, dt, W, H, cx, cy, R0, kT, A, B, t);
+    const mf = k => (S.motif && S.motif[k]) || 0;
+    const sA = this.spr('a', A), sW = this.spr('w', '255,255,255');
+
+    // il ripostiglio: scatole ammassate, in controluce
+    const cl = mf('clutter');
+    if (cl > 0.02) {
+      this.boxes = this.boxes || (() => { const a = []; for (let col = 0; col < 9; col++) { let y = 1; const n = 2 + Math.floor(Math.random() * 4); for (let k = 0; k < n; k++) { const h = rnd(0.07, 0.15); a.push({ x: col / 9 + rnd(-0.01, 0.01), w: rnd(0.07, 0.11), y: y - h, h }); y -= h + 0.004; } } return a; })();
+      this.boxes.forEach((bx, i) => {
+        const x = bx.x * W, y = bx.y * H, w = bx.w * W, h = bx.h * H;
+        b.globalCompositeOperation = 'source-over'; b.globalAlpha = 0.6 * cl; b.fillStyle = `rgb(${S.rgbBg})`; b.fillRect(x, y, w, h);
+        b.globalCompositeOperation = 'lighter'; b.globalAlpha = cl * 0.22; b.strokeStyle = `rgba(${A},1)`; b.lineWidth = 1; b.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+        if (i % 3 === 0) { b.beginPath(); b.moveTo(x, y + h * 0.3); b.lineTo(x + w, y + h * 0.3); b.stroke(); }
+      });
+    }
+
+    // la carta da parati: un motivo a fiori sbiadito, con lembi strappati
+    const wp = mf('wallpaper');
+    if (wp > 0.02) {
+      const step = Math.max(64, Math.min(W, H) / 8);
+      this.tears = this.tears || Array.from({ length: 5 }, () => ({ x: Math.random(), y: rnd(0.05, 0.6), w: rnd(0.05, 0.14), h: rnd(0.15, 0.4) }));
+      b.lineWidth = 1;
+      for (let y = step / 2; y < H; y += step) for (let x = ((y / step) % 2) * step / 2; x < W; x += step) {
+        const torn = this.tears.some(tr => x > tr.x * W && x < (tr.x + tr.w) * W && y > tr.y * H && y < (tr.y + tr.h) * H);
+        if (torn) continue;
+        // un motivo a losanghe con un piccolo fiore tondo al centro, sbiadito
+        b.globalAlpha = wp * 0.035; b.strokeStyle = `rgba(${A},1)`;
+        b.beginPath(); b.moveTo(x, y - step * 0.42); b.lineTo(x + step * 0.42, y); b.lineTo(x, y + step * 0.42); b.lineTo(x - step * 0.42, y); b.closePath(); b.stroke();
+        b.globalAlpha = wp * 0.05;
+        b.beginPath(); for (let k = 0; k < 5; k++) { const a = k / 5 * TAU; b.moveTo(x + Math.cos(a) * step * 0.11 + step * 0.05, y + Math.sin(a) * step * 0.11); b.arc(x + Math.cos(a) * step * 0.11, y + Math.sin(a) * step * 0.11, step * 0.05, 0, TAU); } b.stroke();
+      }
+      this.tears.forEach(tr => {
+        b.globalAlpha = wp * 0.3; b.strokeStyle = `rgba(${B},1)`;
+        b.beginPath(); const x = tr.x * W, y = tr.y * H, w = tr.w * W, h = tr.h * H;
+        b.moveTo(x, y); for (let k = 0; k <= 6; k++) b.lineTo(x + w * (k / 6) + rnd(-3, 3), y + h * (0.7 + 0.3 * Math.sin(k * 2 + t * 0.2))); b.lineTo(x + w, y); b.stroke();
+      });
+    }
+
+    // la macchinina rossa, sola, sotto una luce
+    const tc = mf('toycar');
+    if (tc > 0.02) {
+      const s = R0 * 0.5, x = cx, y = cy + R0 * 0.35 + Math.sin(t * 0.4) * 2;
+      b.globalAlpha = tc * 0.18 * kT * 2; b.drawImage(this.spr('e', '255,90,70'), x - s * 2.2, y - s * 1.6, s * 4.4, s * 3.2);
+      b.globalCompositeOperation = 'source-over';
+      b.globalAlpha = tc * 0.85; b.fillStyle = 'rgba(200,40,30,1)';
+      b.beginPath(); b.moveTo(x - s, y); b.lineTo(x - s * 0.95, y - s * 0.16); b.lineTo(x - s * 0.35, y - s * 0.2); b.quadraticCurveTo(x - s * 0.1, y - s * 0.42, x + s * 0.25, y - s * 0.22); b.lineTo(x + s, y - s * 0.12); b.lineTo(x + s, y); b.closePath(); b.fill();
+      b.fillStyle = `rgb(${S.rgbBg})`;
+      [-0.62, 0.62].forEach(k => { b.beginPath(); b.arc(x + k * s, y + s * 0.02, s * 0.14, 0, TAU); b.fill(); });
+      b.globalCompositeOperation = 'lighter';
+      b.globalAlpha = tc * 0.5; b.strokeStyle = 'rgba(255,200,180,1)'; b.lineWidth = 1;
+      [-0.62, 0.62].forEach(k => { b.beginPath(); b.arc(x + k * s, y + s * 0.02, s * 0.14, 0, TAU); b.stroke(); });
+      b.globalAlpha = tc * (0.5 + 0.4 * Math.sin(t * 0.7)); b.drawImage(sW, x - s * 0.1 - 2, y - s * 0.34 - 2, 4, 4);
+    }
+
+    // il muro dei loculi, con le fotografie ovali
+    const lo = mf('loculi');
+    if (lo > 0.02) {
+      const cols = W < 700 ? 5 : 9, rows = 4, cw = Math.min(W * 0.9 / cols, 150), ch = Math.min(H * 0.55 / rows, 110);
+      const x0 = (W - cols * cw) / 2, y0 = H * 0.16;
+      for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+        const x = x0 + c * cw, y = y0 + r * ch, k = r * cols + c;
+        b.globalAlpha = lo * 0.07; b.strokeStyle = `rgba(${A},1)`; b.lineWidth = 1; b.strokeRect(x + 4, y + 4, cw - 8, ch - 8);
+        b.globalAlpha = lo * 0.13; b.beginPath(); b.ellipse(x + cw / 2, y + ch * 0.4, cw * 0.11, ch * 0.18, 0, 0, TAU); b.stroke();
+        b.globalAlpha = lo * 0.05; b.fillStyle = `rgba(${B},1)`; b.fill();
+        if ((k * 7) % 5 === 0) { b.globalAlpha = lo * (0.4 + 0.3 * Math.sin(t * 5 + k)); b.drawImage(this.spr('e', '255,80,40'), x + cw * 0.8 - 5, y + ch * 0.78 - 5, 10, 10); }
+      }
+    }
+
+    // la fotografia ovale sulla lapide
+    const cm = mf('cameo');
+    if (cm > 0.02) {
+      const rx = R0 * 0.42, ry = R0 * 0.56, x = cx, y = cy;
+      b.globalAlpha = cm * 0.16 * kT * 2; b.drawImage(sA, x - rx * 2.4, y - ry * 2, rx * 4.8, ry * 4);
+      b.globalCompositeOperation = 'source-over'; b.globalAlpha = cm * 0.6; b.fillStyle = `rgb(${S.rgbBg})`;
+      b.beginPath(); b.ellipse(x, y, rx, ry, 0, 0, TAU); b.fill();
+      b.globalCompositeOperation = 'lighter';
+      b.globalAlpha = cm * 0.6; b.strokeStyle = `rgba(${A},1)`; b.lineWidth = 2; b.beginPath(); b.ellipse(x, y, rx, ry, 0, 0, TAU); b.stroke();
+      b.lineWidth = 1; b.globalAlpha = cm * 0.3; b.beginPath(); b.ellipse(x, y, rx * 1.12, ry * 1.1, 0, 0, TAU); b.stroke();
+      // una sagoma appena accennata, senza lineamenti: la fotografia è consumata
+      b.globalAlpha = cm * (0.16 + 0.05 * Math.sin(t * 0.3)); b.fillStyle = `rgba(${A},1)`;
+      b.beginPath(); b.ellipse(x, y - ry * 0.18, rx * 0.36, ry * 0.32, 0, 0, TAU); b.fill();
+      b.beginPath(); b.moveTo(x - rx * 0.8, y + ry * 0.85); b.quadraticCurveTo(x, y + ry * 0.05, x + rx * 0.8, y + ry * 0.85); b.closePath(); b.fill();
+    }
+
+    // la mano del nonno: un calore grande che scende piano e accarezza
+    const hd = mf('hand');
+    if (hd > 0.02) {
+      const k = 0.5 + 0.5 * Math.sin(t * 0.35);
+      const x = cx + Math.sin(t * 0.2) * R0 * 0.3, y = cy - R0 * (0.9 - k * 0.5), r = R0 * (1.5 + k * 0.3);
+      b.globalAlpha = hd * (0.1 + k * 0.08) * kT * 2; b.drawImage(this.spr('e', '255,200,140'), x - r, y - r * 0.8, r * 2, r * 1.6);
+      // polvere dorata che segue la carezza
+      for (let i = 0; i < 18; i++) {
+        const a = t * 0.3 + i * 0.35, rr = R0 * (0.4 + (i % 6) * 0.15);
+        b.globalAlpha = hd * (0.3 + 0.3 * Math.sin(t + i)); b.drawImage(sW, x + Math.cos(a) * rr - 1.5, y + R0 * 0.5 + Math.sin(a) * rr * 0.4 - 1.5, 3, 3);
+      }
     }
     b.globalAlpha = 1; b.globalCompositeOperation = 'lighter';
   };
@@ -5033,7 +5394,7 @@ window.ATH = window.ATH || {};
       if (engine.ready && on && id === 'fulmen') engine.strike(0.5);
       persist();
     },
-    choice: (id, v) => { state.choice[id] = v; if (id === 'diapason') ATH.diapason = v; pulse(0.08); persist(); },
+    choice: (id, v) => { state.choice[id] = v; if (id === 'diapason') { ATH.diapason = v; fork(v); } pulse(0.08); persist(); },
     scene: id => recall(id),
     action: id => {
       if (id === 'newMemory') {
@@ -5042,6 +5403,25 @@ window.ATH = window.ATH || {};
       }
     }
   });
+
+  // —— il diapason: un tono puro alla frequenza scelta, e la nota su cui è accordato il mondo
+  function fork(v) {
+    if (!engine.ready || v === 'libero') return;
+    const c = engine.ctx, t = c.currentTime + 0.02, f = +v;
+    const o = c.createOscillator(), o2 = c.createOscillator(), g = c.createGain();
+    o.frequency.value = f; o2.frequency.value = f * 2.0; const g2 = c.createGain(); g2.gain.value = 0.06;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.09, t + 0.01); g.gain.setTargetAtTime(0, t + 0.05, 1.4);
+    o.connect(g); o2.connect(g2); g2.connect(g); g.connect(engine.masterSum); o.start(t); o2.start(t); o.stop(t + 7); o2.stop(t + 7);
+    toast('Diapason: ' + (v === '440' || v === '432' ? 'La a ' + v + ' Hz' : v + ' Hz') + '. Tutto il mondo si accorda su questa nota.');
+  }
+  const NOTE = ['Do', 'Do♯', 'Re', 'Re♯', 'Mi', 'Fa', 'Fa♯', 'Sol', 'Sol♯', 'La', 'La♯', 'Si'];
+  function noteName(f) { const n = Math.round(12 * Math.log2(f / 440)) + 57; const cents = Math.round((12 * Math.log2(f / 440) + 57 - n) * 100); return NOTE[((n % 12) + 12) % 12] + (cents ? (cents > 0 ? ' +' : ' ') + cents + ' cent' : ''); }
+  { const sec = document.querySelector('.vessel[data-group="diapason"]'); if (sec) { const p = document.createElement('p'); p.className = 'diap-read'; p.id = 'diapRead'; sec.insertBefore(p, sec.querySelector('.vnote')); } }
+  function updateDiap() {
+    const el = $('diapRead'); if (!el) return;
+    const f = ATH.rootHz(live.radix), v = state.choice.diapason;
+    el.textContent = 'Nota fondamentale adesso: ' + f.toFixed(1).replace('.', ',') + ' Hz · ' + noteName(f) + (v === 'libero' ? ' · accordatura libera: la nota scivola con la manopola Radix' : v === '440' || v === '432' ? ' · agganciata ai semitoni del La ' + v : ' · agganciata a ' + v + ' Hz, spostato di ottave');
+  }
 
   // —— schede
   const tabsEl = $('tabs');
@@ -5192,6 +5572,7 @@ window.ATH = window.ATH || {};
   // —— il cammino tra i luoghi
   const home = {};                       // i valori tuoi, prima che un luogo li cambiasse
   let traveling = false, passageT = -1, passDir = 0, dwell = 0, libraTween = null, hushTween = null, autoT = 0, autoNext = 80;
+  let clueN = 0, clueT = 0, nightDone = false, nightT = -1, peaceK = 0, paxK = 0, swingOn = false;
   let screamed = false, eroded = 0, flatDone = false, woke = false, doubtT = 0, faceNow = 0, ascendNow = 0;
   let hushNow = 0, helping = null, rescueAmt = 0, urged = false, tombIdx = 0, tombT = 0, darkNow = 0, glowNow = 0;
   const GP = id => ATH.getPlace(id);
@@ -5223,7 +5604,9 @@ window.ATH = window.ATH || {};
     Object.keys(set).forEach(k => { if (!(k in home)) home[k] = state.base[k]; to[k] = set[k]; });
     moveTo(to, quick ? 2.5 : 6);
     if (pl.libra !== undefined) libraTween = { from: state.libra, to: pl.libra, t: 0, dur: quick ? 2.5 : 6 };
-    hushTween = { from: hushNow, to: pl.hush || 0, t: 0, dur: quick ? 2.5 : 5 };
+    // il rumore arriva di colpo, la quiete arriva piano
+    hushTween = { from: hushNow, to: pl.hush || 0, t: 0, dur: quick ? 2.5 : ((pl.hush || 0) > hushNow ? 14 : 2.2) };
+    ATH.currentWhispers = pl.whisperWords || null; clueN = 0; clueT = 0; nightDone = false; nightT = -1;
     if (pl.modus) { state.choice.modus = pl.modus; ui.choices.modus.set(pl.modus); }
     state.sw.spira = !!pl.spira; ui.seals.spira.set(state.sw.spira);
     if (memoria && Math.random() < 0.4) memoria.newMemory();
@@ -5369,6 +5752,30 @@ window.ATH = window.ATH || {};
   }
   function placeMechanics(dt) {
     const pl = GP(state.scene); if (!pl || !engine.ready || traveling) { faceNow *= 0.98; return; }
+    // la casa che fa rumore, poi tace
+    swingOn = !!pl.swing;
+    if (pl.swing && !hushTween) hushNow = 0.5 + 0.48 * Math.sin(Math.PI * 2 * dwell / pl.swing - Math.PI / 2);
+    // la pace: restando, tutto si spegne piano
+    peaceK = pl.peace ? smooth(0, 1, dwell / pl.peace) : 0;
+    // i dettagli e le domande, uno alla volta
+    if (pl.clues) {
+      clueT += dt;
+      if (clueN < pl.clues.length && (clueN === 0 ? clueT > 3 : clueT > 8)) {
+        clueT = 0; clueN++;
+        $('plAllora').textContent = pl.clues.slice(Math.max(0, clueN - 2), clueN).join(' ');
+      }
+    }
+    // l'incubo: un'ondata, poi il silenzio e il cuore
+    if (pl.nightmare && !nightDone && dwell > pl.nightmare) {
+      nightDone = true; nightT = 0;
+      engine.strike(1); engine.strike(0.8);
+      if (memoria) memoria.burst(memoria.lv.m_sussurri, engine.ctx.currentTime + 0.05, 1.2, 1.5, 300, 0);
+    }
+    if (nightT >= 0) {
+      nightT += dt;
+      if (nightT < 3.5) { hushNow = 0; setLibra(0.05); }
+      else if (nightT < 4) { hushNow = 1; setLibra(0.9); state.base.pulsus = 0.85; toast('Ti svegli di colpo. Era un sogno. Respira.'); nightT = 99; }
+    }
     // le parole perdono le lettere
     if (pl.erode) {
       const k = Math.min(0.97, dwell / pl.erode);
@@ -5486,7 +5893,7 @@ window.ATH = window.ATH || {};
   const el = (tag, attrs, parent) => { const e = document.createElementNS(SVGNS, tag); Object.keys(attrs).forEach(k => e.setAttribute(k, attrs[k])); if (parent) parent.appendChild(e); return e; };
   function drawMap(keepScroll) {
     const svg = $('mapSvg'); svg.innerHTML = '';
-    const BAND = { 0: 900 }, bandTop = {};
+    const BAND = { 0: 1150, '-1': 420, 1: 330 }, bandTop = {};
     let yy = 10;
     ATH.LEVELS.forEach(l => { bandTop[l.n] = yy; yy += (BAND[l.n] || 230); });
     svg.setAttribute('viewBox', `0 0 1000 ${yy + 10}`);
@@ -5573,7 +5980,13 @@ window.ATH = window.ATH || {};
     b.innerHTML = `<span aria-hidden="true">${ph.glyph}</span><span class="sr">${ph.name}</span>`;
     b.addEventListener('click', () => {
       const cur = Math.floor(state.opus) % 4, delta = (i - cur + 4) % 4;
-      if (delta) state.opus = Math.floor(state.opus) + delta - 1 + 0.84;
+      if (delta || state.opus - Math.floor(state.opus) > 0.8) {
+        // si va subito alla fase scelta, con una dissolvenza di qualche secondo
+        jump = { w: w.slice(), pal: { bg: pal.bg.slice(), accent: pal.accent.slice(), second: pal.second.slice() }, k: 1 };
+        state.opus = Math.floor(state.opus) + delta + 0.001;
+        if (delta === 0) state.opus = Math.floor(state.opus) + 0.001;
+        phBtns.forEach((x, j) => x.setAttribute('aria-current', j === i ? 'step' : 'false'));
+      }
       pulse(0.1);
     });
     li.appendChild(b); phaseList.appendChild(li);
@@ -5583,7 +5996,7 @@ window.ATH = window.ATH || {};
   const pal = { bg: ATH.PHASES[0].bg.slice(), accent: ATH.PHASES[0].accent.slice(), second: ATH.PHASES[0].second.slice() };
   const qpal = { bg: ATH.QUIES_PAL.bg.slice(), accent: ATH.QUIES_PAL.accent.slice(), second: ATH.QUIES_PAL.second.slice() };
   const out = { bg: [0, 0, 0], accent: [0, 0, 0], second: [0, 0, 0] };
-  let w = [1, 0, 0, 0], phIdx = 0;
+  let w = [1, 0, 0, 0], phIdx = 0, jump = null;
   function phaseStep(dt) {
     if (state.sw.rota && !state.sw.lapis) state.opus += dt / 170 * (0.55 + I.agit * 2.6 + I.presence * 0.25 + I.coag * 0.5);
     phIdx = Math.floor(state.opus) % 4;
@@ -5592,6 +6005,13 @@ window.ATH = window.ATH || {};
     w = [0, 0, 0, 0]; w[phIdx] = 1 - bl; w[nx] += bl;
     const A = ATH.PHASES[phIdx], B = ATH.PHASES[nx];
     ['bg', 'accent', 'second'].forEach(k => { for (let j = 0; j < 3; j++) pal[k][j] = lerp(A[k][j], B[k][j], bl); });
+    if (jump) {
+      jump.k = Math.max(0, jump.k - dt / 3.5);
+      const k = smooth(0, 1, jump.k);
+      for (let i = 0; i < 4; i++) w[i] = lerp(w[i], jump.w[i], k);
+      ['bg', 'accent', 'second'].forEach(c => { for (let j = 0; j < 3; j++) pal[c][j] = lerp(pal[c][j], jump.pal[c][j], k); });
+      if (jump.k <= 0) jump = null;
+    }
   }
   function bias(id) {
     let v = 0;
@@ -5614,7 +6034,7 @@ window.ATH = window.ATH || {};
     const q = l < 0.5 ? l * (1 + s) : l + s - l * s, p = 2 * l - q;
     return [f(p, q, h + 1 / 3) * 255, f(p, q, h) * 255, f(p, q, h - 1 / 3) * 255];
   }
-  const MOTIFS = ['womb', 'face', 'scents', 'doubt', 'purify', 'stars', 'snow', 'haze', 'motes', 'field', 'beam', 'ceiling', 'glass', 'monitor', 'fever', 'sun', 'meet', 'train', 'lights', 'ruin', 'well', 'rose', 'nebula', 'throne', 'city', 'cityFlip', 'windows', 'stairs', 'candles', 'tombs', 'forest', 'whispers', 'void', 'tears', 'cracks', 'river', 'underwater'];
+  const MOTIFS = ['clutter', 'wallpaper', 'toycar', 'loculi', 'cameo', 'hand', 'womb', 'face', 'scents', 'doubt', 'purify', 'stars', 'snow', 'haze', 'motes', 'field', 'beam', 'ceiling', 'glass', 'monitor', 'fever', 'sun', 'meet', 'train', 'lights', 'ruin', 'well', 'rose', 'nebula', 'throne', 'city', 'cityFlip', 'windows', 'stairs', 'candles', 'tombs', 'forest', 'whispers', 'void', 'tears', 'cracks', 'river', 'underwater'];
   let hueShift = 0, qVis = 0; const motif = {}; MOTIFS.forEach(m => motif[m] = 0);
 
   // —— registrazione
@@ -5829,9 +6249,19 @@ window.ATH = window.ATH || {};
       live[p.id] = clamp01(state.base[p.id] + n * sp * p.drift * 1.7 + bias(p.id) + gesture(p.id) + (p.id === 'metamorphosis' ? autoMeta : 0) + (ALLORA[p.id] || 0) * state.allora);
     });
     { const pl = GP(state.scene); if (pl && pl.stay) live.lumen = clamp01(live.lumen + Math.min(0.3, dwell / 200)); }
-    const hush = Math.max(hushNow, state.base.silentium);
+    paxK = clamp01(paxK + (state.sw.pax ? dt / 90 : -dt / 20));
+    const pk = Math.max(peaceK, smooth(0, 1, paxK));
+    if (pk > 0.001) {
+      // la pace: si calmano il fuoco, le voci e il nastro; si aprono il velo, il coro, la carezza
+      ['tempestas', 'crepitus', 'cinis', 'calcinatio', 'plica', 'contritio', 'plumbum', 'm_sussurri', 'm_acufene', 'm_ronzio', 'm_tubature', 'nastro'].forEach(id => { live[id] *= 1 - pk * 0.9; });
+      live.oblio *= 1 - pk * 0.6;
+      live.lumen = clamp01(live.lumen + pk * 0.3); live.velum = clamp01(live.velum + pk * 0.3);
+      live.chorus = clamp01(live.chorus + pk * 0.25); live.aether = clamp01(live.aether + pk * 0.2);
+      live.m_carezza = Math.max(live.m_carezza, pk * 0.3); live.m_scacciapensieri = Math.max(live.m_scacciapensieri, pk * 0.18);
+    }
+    const hush = Math.max(hushNow, state.base.silentium, pk);
 
-    engine.apply(live, state.sw, { px: I.px * I.presence, libra: state.libra, breath: breathMul, hush }, dt);
+    engine.apply(live, state.sw, { px: I.px * I.presence, libra: Math.max(state.libra, pk * 0.97), breath: breathMul, hush }, dt);
     if (engine.ready) {
       const rootHz = ATH.rootHz(live.radix);
       quies.apply(live, state.sw, state.choice, dt, rootHz);
@@ -5895,6 +6325,7 @@ window.ATH = window.ATH || {};
           document.body.dataset.phase = ph.id;
         }
         root.style.setProperty('--opus', (state.opus - Math.floor(state.opus)).toFixed(3));
+        if (curTab === 'quies') updateDiap();
         if (recorder.recording) recTime.textContent = fmtTime(recorder.frames / engine.ctx.sampleRate);
       }
     }

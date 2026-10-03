@@ -22,7 +22,7 @@ Le manopole hanno nomi di operazioni alchemiche: *Calcinatio*, *Putrefactio*, *S
 
 Quattro fasi dell'Opera si succedono da sole: **Nigredo**, l'opera al nero; **Albedo**, l'opera al bianco; **Citrinitas**, l'opera al giallo; **Rubedo**, l'opera al rosso. Con loro cambiano il suono e la luce.
 
-Una bilancia va da *Strepitus*, il rumore della fornace, a *Quies*, la quiete: veli di accordi lenti, coppe tibetane, un coro lontano, il respiro che rallenta.
+Una bilancia va da *Strepitus*, il rumore della fornace, a *Quies*, la quiete: veli di accordi lenti, coppe tibetane, un coro lontano, il respiro che rallenta. Il rumore arriva di colpo; la quiete arriva piano. E c'è un sigillo, *Pax*, che spegne tutto lentamente, fino alla pace.
 
 ---
 
@@ -36,21 +36,21 @@ La città ha otto livelli, da prima della nascita a dopo la morte.
 Dall’altra parte, dove non pesa più niente e si sentono, lontanissime, voci che conosci. E la rinascita, da cui si torna giù, all’inizio di tutto.
 
 **Empireo** — sopra ogni cosa.
-La rosa di luce, cerchi dentro cerchi. Il mare di stelle, dove non c'è più sopra né sotto. E un trono, più in alto di ogni dolore, dove non ti tocca più niente e non ti tocca più nessuno.
+La rosa di luce, cerchi dentro cerchi. Il mare di stelle, dove non c'è più sopra né sotto. E un trono, più in alto di ogni dolore, dove non ti tocca più niente e non ti tocca più nessuno. E la pace: quella che si trova di rado, ma che si spera sempre.
 
 **I tetti** — dove la città finisce nel cielo.
-Le tegole ancora tiepide, le finestre che si accendono una alla volta. La cima del campanile, con le campane che entrano nelle ossa. Una città capovolta che pende dal cielo.
+Le tegole ancora tiepide, le finestre che si accendono una alla volta. La cima del campanile, con le campane che entrano nelle ossa. Una città capovolta che pende dal cielo. Il silenzio dei pensieri.
 
 **Le torri** — i piani alti dei ricordi.
-Una scala a chiocciola senza fine, e dietro ogni porta un anno della tua vita. Cento finestre accese su vite che non sono la tua. Una biblioteca di nomi dimenticati. Una voce che canticchia accanto al letto. L’ospedale di notte, dove da una porta si nasce e da un’altra si muore: la nascita, il primo grido; l’ultimo respiro, e il silenzio tra un respiro e l’altro. Le scale dell’orfanotrofio, salite con una sola luce, il dormitorio, e in cima l’ultimo piano, dove la luce entra come acqua e lava via tutto.
+Una scala a chiocciola senza fine, e dietro ogni porta un anno della tua vita. Cento finestre accese su vite che non sono la tua. Una biblioteca di nomi dimenticati. Una voce che canticchia accanto al letto. La mano del nonno. La vita che non hai avuto, oltre un muro. L’ospedale di notte, dove da una porta si nasce e da un’altra si muore: la nascita, il primo grido; l’ultimo respiro, e il silenzio tra un respiro e l’altro. Le scale dell’orfanotrofio, salite con una sola luce, il dormitorio, e in cima l’ultimo piano, dove la luce entra come acqua e lava via tutto.
 
 **La terra** — dove si cammina.
-Sotto le stelle, la notte di San Lorenzo, il mare d'infanzia, un faro. Una strada di campagna, l'estate dai nonni, la domenica al paese, la fiera. Una casa abbandonata, la soffitta, un orfanotrofio, una cappella sconsacrata, il cimitero, la chiesa di notte. Il centro di tutto e la periferia. La pioggia sul tetto, la prima neve, una stazione deserta, il treno di notte, un bosco dove il sentiero si perde, un ospedale abbandonato da attraversare con una torcia.
-E il lutto: il giorno del funerale, la stanza di chi non c’è più, le fotografie di gente di cui non ricordi il nome. I profumi di una volta, che salgono come vapore: il pane caldo, la cera d’api, la colonia del nonno. Dopo la festa, quando tutti sono andati via.
+La casa vuota, che a tratti fa rumore e a tratti tace, con le sue stanze: il ripostiglio delle cose ammassate da anni, il vecchio letto dei nonni, la stanza della moquette e della carta da parati che si stacca, una macchinina rossa sola su una mensola. Sotto le stelle, la notte di San Lorenzo, il mare d'infanzia, un faro. Una strada di campagna, l'estate dai nonni, la domenica al paese, la fiera. Una casa abbandonata, la soffitta, un orfanotrofio, una cappella sconsacrata, il cimitero, la chiesa di notte. Il centro di tutto e la periferia. La pioggia sul tetto, la prima neve, una stazione deserta, il treno di notte, un bosco dove il sentiero si perde, un ospedale abbandonato da attraversare con una torcia.
+E il lutto: il giorno del funerale, la stanza di chi non c’è più, le fotografie di gente di cui non ricordi il nome, il muro dei loculi venticinque anni dopo, la madre che non hai mai visto e conosci solo dalla fotografia sulla lapide, la città lontana dove c’è un padre visto due o tre volte. Le occasioni perdute. Accettare. I profumi di una volta, che salgono come vapore: il pane caldo, la cera d’api, la colonia del nonno. Dopo la festa, quando tutti sono andati via.
 E gli stati dell'animo: prima di dormire, l'attesa, l'amore non corrisposto, stare male, la veglia, la fuga, il dubbio, il risveglio, la felicità, l'incontro, l'alba.
 
 **Il sottosuolo** — quello che non si dice.
-Le cripte, il pozzo, il pavimento gelido dove stendersi e non pensare più. Le voci nella testa, la paura del buio, il pianto. Chiudersi in una stanza a urlare. Essere il dolore di qualcuno. Rinnegare. Il dolore. I volti che non ricordi più, e la voce che non ricordi più.
+L’incubo che ti sveglia di notte, il giudizio di chi ti ha cresciuto, il vuoto, la rabbia. Le cripte, il pozzo, il pavimento gelido dove stendersi e non pensare più. Le voci nella testa, la paura del buio, il pianto. Chiudersi in una stanza a urlare. Essere il dolore di qualcuno. Rinnegare. Il dolore. I volti che non ricordi più, e la voce che non ricordi più.
 
 **L'abisso** — dove si dimentica.
 Il fiume dell'oblio, il mondo sommerso, il mondo senza suono. Dimenticarsi.

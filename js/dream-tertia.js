@@ -32,25 +32,33 @@ window.ATH = window.ATH || {};
       }
     }
 
-    // il volto che si dissolve
+    // fotografie antiche: sagome senza volto che si dissolvono (niente sorrisi)
     const fc = mf('face');
     if (fc > 0.02) {
-      const fade = Math.min(1, S.faceFade || 0), jit = 2 + fade * 40, al = fc * (0.55 - fade * 0.45);
-      const fx = cx, fy = cy - R0 * 0.1, fw = R0 * 0.75, fh = R0 * 1.0;
+      const fade = Math.min(1, S.faceFade || 0), jit = 1 + fade * 26, al = fc * (0.6 - fade * 0.45);
       const J = () => (Math.random() - 0.5) * jit;
-      b.strokeStyle = `rgba(${A},1)`; b.lineWidth = 1.2;
-      for (let pass = 0; pass < 3; pass++) {
-        b.globalAlpha = al * (pass ? 0.35 : 0.8);
-        b.beginPath();
-        for (let i = 0; i <= 40; i++) { const a = i / 40 * TAU, x = fx + Math.cos(a) * fw + J(), y = fy + Math.sin(a) * fh * (a > 0 && a < Math.PI ? 1 : 0.95) + J(); i ? b.lineTo(x, y) : b.moveTo(x, y); }
-        b.stroke();
-        if (fade < 0.92) {
-          [-1, 1].forEach(sd => { b.beginPath(); b.ellipse(fx + sd * fw * 0.38 + J(), fy - fh * 0.12 + J(), fw * 0.14, fh * 0.05, 0, 0, TAU); b.stroke(); });
-          b.beginPath(); b.moveTo(fx + J(), fy - fh * 0.05); b.lineTo(fx - fw * 0.06 + J(), fy + fh * 0.25 + J()); b.lineTo(fx + fw * 0.06 + J(), fy + fh * 0.28); b.stroke();
-          b.beginPath(); b.moveTo(fx - fw * 0.3 + J(), fy + fh * 0.48 + J()); b.quadraticCurveTo(fx + J(), fy + fh * 0.56 + J(), fx + fw * 0.3 + J(), fy + fh * 0.48 + J()); b.stroke();
+      const frames = [[-0.62, -0.08, -0.06], [0, 0.04, 0.02], [0.6, -0.12, 0.05]];
+      frames.forEach(([ox, oy, rot], k) => {
+        const w = R0 * 0.62, h = R0 * 0.8, x = cx + ox * R0 * 1.6, y = cy + oy * R0;
+        b.save(); b.translate(x, y); b.rotate(rot + Math.sin(t * 0.1 + k) * 0.01);
+        b.globalCompositeOperation = 'source-over';
+        b.globalAlpha = al * 0.55; b.fillStyle = `rgb(${S.rgbBg})`; b.fillRect(-w / 2, -h / 2, w, h);
+        b.globalCompositeOperation = 'lighter';
+        b.globalAlpha = al * 0.5; b.strokeStyle = `rgba(${A},1)`; b.lineWidth = 1; b.strokeRect(-w / 2, -h / 2, w, h);
+        b.strokeRect(-w / 2 + 6, -h / 2 + 6, w - 12, h - 18);
+        // una o due sagome: testa e spalle, nessun lineamento
+        // figure intere in piedi, piccole, come nelle fotografie di una volta
+        const n = k === 1 ? 3 : k === 0 ? 2 : 1;
+        for (let m = 0; m < n; m++) {
+          const sx = (n === 1 ? 0 : (m / (n - 1) - 0.5) * 0.5) * w + J(), hh = h * (m === n - 1 && n === 3 ? 0.42 : 0.56);
+          const top = h * 0.32 - hh;
+          b.globalAlpha = al * (0.2 + 0.1 * (1 - fade)); b.fillStyle = `rgba(${A},1)`;
+          b.beginPath(); b.arc(sx, top + hh * 0.1, hh * 0.085, 0, TAU); b.fill();
+          b.beginPath(); b.moveTo(sx - hh * 0.12, top + hh * 0.22); b.lineTo(sx + hh * 0.12, top + hh * 0.22); b.lineTo(sx + hh * 0.09, top + hh); b.lineTo(sx - hh * 0.09, top + hh); b.closePath(); b.fill();
         }
-      }
-      if (fade > 0.4) { b.globalAlpha = fc * (fade - 0.4) * 0.3; b.drawImage(this.spr('b', B), fx - fw * 1.4, fy - fh * 1.3, fw * 2.8, fh * 2.6); }
+        if (fade > 0.3) { b.globalAlpha = fc * (fade - 0.3) * 0.25; b.drawImage(this.spr('b', B), -w, -h, w * 2, h * 2); }
+        b.restore();
+      });
     }
 
     // i profumi di una volta: parole che salgono come vapore

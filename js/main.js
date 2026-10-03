@@ -47,7 +47,7 @@ window.ATH = window.ATH || {};
       if (engine.ready && on && id === 'fulmen') engine.strike(0.5);
       persist();
     },
-    choice: (id, v) => { state.choice[id] = v; if (id === 'diapason') ATH.diapason = v; pulse(0.08); persist(); },
+    choice: (id, v) => { state.choice[id] = v; if (id === 'diapason') { ATH.diapason = v; fork(v); } pulse(0.08); persist(); },
     scene: id => recall(id),
     action: id => {
       if (id === 'newMemory') {
@@ -56,6 +56,25 @@ window.ATH = window.ATH || {};
       }
     }
   });
+
+  // —— il diapason: un tono puro alla frequenza scelta, e la nota su cui è accordato il mondo
+  function fork(v) {
+    if (!engine.ready || v === 'libero') return;
+    const c = engine.ctx, t = c.currentTime + 0.02, f = +v;
+    const o = c.createOscillator(), o2 = c.createOscillator(), g = c.createGain();
+    o.frequency.value = f; o2.frequency.value = f * 2.0; const g2 = c.createGain(); g2.gain.value = 0.06;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.09, t + 0.01); g.gain.setTargetAtTime(0, t + 0.05, 1.4);
+    o.connect(g); o2.connect(g2); g2.connect(g); g.connect(engine.masterSum); o.start(t); o2.start(t); o.stop(t + 7); o2.stop(t + 7);
+    toast('Diapason: ' + (v === '440' || v === '432' ? 'La a ' + v + ' Hz' : v + ' Hz') + '. Tutto il mondo si accorda su questa nota.');
+  }
+  const NOTE = ['Do', 'Do♯', 'Re', 'Re♯', 'Mi', 'Fa', 'Fa♯', 'Sol', 'Sol♯', 'La', 'La♯', 'Si'];
+  function noteName(f) { const n = Math.round(12 * Math.log2(f / 440)) + 57; const cents = Math.round((12 * Math.log2(f / 440) + 57 - n) * 100); return NOTE[((n % 12) + 12) % 12] + (cents ? (cents > 0 ? ' +' : ' ') + cents + ' cent' : ''); }
+  { const sec = document.querySelector('.vessel[data-group="diapason"]'); if (sec) { const p = document.createElement('p'); p.className = 'diap-read'; p.id = 'diapRead'; sec.insertBefore(p, sec.querySelector('.vnote')); } }
+  function updateDiap() {
+    const el = $('diapRead'); if (!el) return;
+    const f = ATH.rootHz(live.radix), v = state.choice.diapason;
+    el.textContent = 'Nota fondamentale adesso: ' + f.toFixed(1).replace('.', ',') + ' Hz · ' + noteName(f) + (v === 'libero' ? ' · accordatura libera: la nota scivola con la manopola Radix' : v === '440' || v === '432' ? ' · agganciata ai semitoni del La ' + v : ' · agganciata a ' + v + ' Hz, spostato di ottave');
+  }
 
   // —— schede
   const tabsEl = $('tabs');
@@ -206,6 +225,7 @@ window.ATH = window.ATH || {};
   // —— il cammino tra i luoghi
   const home = {};                       // i valori tuoi, prima che un luogo li cambiasse
   let traveling = false, passageT = -1, passDir = 0, dwell = 0, libraTween = null, hushTween = null, autoT = 0, autoNext = 80;
+  let clueN = 0, clueT = 0, nightDone = false, nightT = -1, peaceK = 0, paxK = 0, swingOn = false;
   let screamed = false, eroded = 0, flatDone = false, woke = false, doubtT = 0, faceNow = 0, ascendNow = 0;
   let hushNow = 0, helping = null, rescueAmt = 0, urged = false, tombIdx = 0, tombT = 0, darkNow = 0, glowNow = 0;
   const GP = id => ATH.getPlace(id);
@@ -237,7 +257,9 @@ window.ATH = window.ATH || {};
     Object.keys(set).forEach(k => { if (!(k in home)) home[k] = state.base[k]; to[k] = set[k]; });
     moveTo(to, quick ? 2.5 : 6);
     if (pl.libra !== undefined) libraTween = { from: state.libra, to: pl.libra, t: 0, dur: quick ? 2.5 : 6 };
-    hushTween = { from: hushNow, to: pl.hush || 0, t: 0, dur: quick ? 2.5 : 5 };
+    // il rumore arriva di colpo, la quiete arriva piano
+    hushTween = { from: hushNow, to: pl.hush || 0, t: 0, dur: quick ? 2.5 : ((pl.hush || 0) > hushNow ? 14 : 2.2) };
+    ATH.currentWhispers = pl.whisperWords || null; clueN = 0; clueT = 0; nightDone = false; nightT = -1;
     if (pl.modus) { state.choice.modus = pl.modus; ui.choices.modus.set(pl.modus); }
     state.sw.spira = !!pl.spira; ui.seals.spira.set(state.sw.spira);
     if (memoria && Math.random() < 0.4) memoria.newMemory();
@@ -383,6 +405,30 @@ window.ATH = window.ATH || {};
   }
   function placeMechanics(dt) {
     const pl = GP(state.scene); if (!pl || !engine.ready || traveling) { faceNow *= 0.98; return; }
+    // la casa che fa rumore, poi tace
+    swingOn = !!pl.swing;
+    if (pl.swing && !hushTween) hushNow = 0.5 + 0.48 * Math.sin(Math.PI * 2 * dwell / pl.swing - Math.PI / 2);
+    // la pace: restando, tutto si spegne piano
+    peaceK = pl.peace ? smooth(0, 1, dwell / pl.peace) : 0;
+    // i dettagli e le domande, uno alla volta
+    if (pl.clues) {
+      clueT += dt;
+      if (clueN < pl.clues.length && (clueN === 0 ? clueT > 3 : clueT > 8)) {
+        clueT = 0; clueN++;
+        $('plAllora').textContent = pl.clues.slice(Math.max(0, clueN - 2), clueN).join(' ');
+      }
+    }
+    // l'incubo: un'ondata, poi il silenzio e il cuore
+    if (pl.nightmare && !nightDone && dwell > pl.nightmare) {
+      nightDone = true; nightT = 0;
+      engine.strike(1); engine.strike(0.8);
+      if (memoria) memoria.burst(memoria.lv.m_sussurri, engine.ctx.currentTime + 0.05, 1.2, 1.5, 300, 0);
+    }
+    if (nightT >= 0) {
+      nightT += dt;
+      if (nightT < 3.5) { hushNow = 0; setLibra(0.05); }
+      else if (nightT < 4) { hushNow = 1; setLibra(0.9); state.base.pulsus = 0.85; toast('Ti svegli di colpo. Era un sogno. Respira.'); nightT = 99; }
+    }
     // le parole perdono le lettere
     if (pl.erode) {
       const k = Math.min(0.97, dwell / pl.erode);
@@ -500,7 +546,7 @@ window.ATH = window.ATH || {};
   const el = (tag, attrs, parent) => { const e = document.createElementNS(SVGNS, tag); Object.keys(attrs).forEach(k => e.setAttribute(k, attrs[k])); if (parent) parent.appendChild(e); return e; };
   function drawMap(keepScroll) {
     const svg = $('mapSvg'); svg.innerHTML = '';
-    const BAND = { 0: 900 }, bandTop = {};
+    const BAND = { 0: 1150, '-1': 420, 1: 330 }, bandTop = {};
     let yy = 10;
     ATH.LEVELS.forEach(l => { bandTop[l.n] = yy; yy += (BAND[l.n] || 230); });
     svg.setAttribute('viewBox', `0 0 1000 ${yy + 10}`);
@@ -587,7 +633,13 @@ window.ATH = window.ATH || {};
     b.innerHTML = `<span aria-hidden="true">${ph.glyph}</span><span class="sr">${ph.name}</span>`;
     b.addEventListener('click', () => {
       const cur = Math.floor(state.opus) % 4, delta = (i - cur + 4) % 4;
-      if (delta) state.opus = Math.floor(state.opus) + delta - 1 + 0.84;
+      if (delta || state.opus - Math.floor(state.opus) > 0.8) {
+        // si va subito alla fase scelta, con una dissolvenza di qualche secondo
+        jump = { w: w.slice(), pal: { bg: pal.bg.slice(), accent: pal.accent.slice(), second: pal.second.slice() }, k: 1 };
+        state.opus = Math.floor(state.opus) + delta + 0.001;
+        if (delta === 0) state.opus = Math.floor(state.opus) + 0.001;
+        phBtns.forEach((x, j) => x.setAttribute('aria-current', j === i ? 'step' : 'false'));
+      }
       pulse(0.1);
     });
     li.appendChild(b); phaseList.appendChild(li);
@@ -597,7 +649,7 @@ window.ATH = window.ATH || {};
   const pal = { bg: ATH.PHASES[0].bg.slice(), accent: ATH.PHASES[0].accent.slice(), second: ATH.PHASES[0].second.slice() };
   const qpal = { bg: ATH.QUIES_PAL.bg.slice(), accent: ATH.QUIES_PAL.accent.slice(), second: ATH.QUIES_PAL.second.slice() };
   const out = { bg: [0, 0, 0], accent: [0, 0, 0], second: [0, 0, 0] };
-  let w = [1, 0, 0, 0], phIdx = 0;
+  let w = [1, 0, 0, 0], phIdx = 0, jump = null;
   function phaseStep(dt) {
     if (state.sw.rota && !state.sw.lapis) state.opus += dt / 170 * (0.55 + I.agit * 2.6 + I.presence * 0.25 + I.coag * 0.5);
     phIdx = Math.floor(state.opus) % 4;
@@ -606,6 +658,13 @@ window.ATH = window.ATH || {};
     w = [0, 0, 0, 0]; w[phIdx] = 1 - bl; w[nx] += bl;
     const A = ATH.PHASES[phIdx], B = ATH.PHASES[nx];
     ['bg', 'accent', 'second'].forEach(k => { for (let j = 0; j < 3; j++) pal[k][j] = lerp(A[k][j], B[k][j], bl); });
+    if (jump) {
+      jump.k = Math.max(0, jump.k - dt / 3.5);
+      const k = smooth(0, 1, jump.k);
+      for (let i = 0; i < 4; i++) w[i] = lerp(w[i], jump.w[i], k);
+      ['bg', 'accent', 'second'].forEach(c => { for (let j = 0; j < 3; j++) pal[c][j] = lerp(pal[c][j], jump.pal[c][j], k); });
+      if (jump.k <= 0) jump = null;
+    }
   }
   function bias(id) {
     let v = 0;
@@ -628,7 +687,7 @@ window.ATH = window.ATH || {};
     const q = l < 0.5 ? l * (1 + s) : l + s - l * s, p = 2 * l - q;
     return [f(p, q, h + 1 / 3) * 255, f(p, q, h) * 255, f(p, q, h - 1 / 3) * 255];
   }
-  const MOTIFS = ['womb', 'face', 'scents', 'doubt', 'purify', 'stars', 'snow', 'haze', 'motes', 'field', 'beam', 'ceiling', 'glass', 'monitor', 'fever', 'sun', 'meet', 'train', 'lights', 'ruin', 'well', 'rose', 'nebula', 'throne', 'city', 'cityFlip', 'windows', 'stairs', 'candles', 'tombs', 'forest', 'whispers', 'void', 'tears', 'cracks', 'river', 'underwater'];
+  const MOTIFS = ['clutter', 'wallpaper', 'toycar', 'loculi', 'cameo', 'hand', 'womb', 'face', 'scents', 'doubt', 'purify', 'stars', 'snow', 'haze', 'motes', 'field', 'beam', 'ceiling', 'glass', 'monitor', 'fever', 'sun', 'meet', 'train', 'lights', 'ruin', 'well', 'rose', 'nebula', 'throne', 'city', 'cityFlip', 'windows', 'stairs', 'candles', 'tombs', 'forest', 'whispers', 'void', 'tears', 'cracks', 'river', 'underwater'];
   let hueShift = 0, qVis = 0; const motif = {}; MOTIFS.forEach(m => motif[m] = 0);
 
   // —— registrazione
@@ -843,9 +902,19 @@ window.ATH = window.ATH || {};
       live[p.id] = clamp01(state.base[p.id] + n * sp * p.drift * 1.7 + bias(p.id) + gesture(p.id) + (p.id === 'metamorphosis' ? autoMeta : 0) + (ALLORA[p.id] || 0) * state.allora);
     });
     { const pl = GP(state.scene); if (pl && pl.stay) live.lumen = clamp01(live.lumen + Math.min(0.3, dwell / 200)); }
-    const hush = Math.max(hushNow, state.base.silentium);
+    paxK = clamp01(paxK + (state.sw.pax ? dt / 90 : -dt / 20));
+    const pk = Math.max(peaceK, smooth(0, 1, paxK));
+    if (pk > 0.001) {
+      // la pace: si calmano il fuoco, le voci e il nastro; si aprono il velo, il coro, la carezza
+      ['tempestas', 'crepitus', 'cinis', 'calcinatio', 'plica', 'contritio', 'plumbum', 'm_sussurri', 'm_acufene', 'm_ronzio', 'm_tubature', 'nastro'].forEach(id => { live[id] *= 1 - pk * 0.9; });
+      live.oblio *= 1 - pk * 0.6;
+      live.lumen = clamp01(live.lumen + pk * 0.3); live.velum = clamp01(live.velum + pk * 0.3);
+      live.chorus = clamp01(live.chorus + pk * 0.25); live.aether = clamp01(live.aether + pk * 0.2);
+      live.m_carezza = Math.max(live.m_carezza, pk * 0.3); live.m_scacciapensieri = Math.max(live.m_scacciapensieri, pk * 0.18);
+    }
+    const hush = Math.max(hushNow, state.base.silentium, pk);
 
-    engine.apply(live, state.sw, { px: I.px * I.presence, libra: state.libra, breath: breathMul, hush }, dt);
+    engine.apply(live, state.sw, { px: I.px * I.presence, libra: Math.max(state.libra, pk * 0.97), breath: breathMul, hush }, dt);
     if (engine.ready) {
       const rootHz = ATH.rootHz(live.radix);
       quies.apply(live, state.sw, state.choice, dt, rootHz);
@@ -909,6 +978,7 @@ window.ATH = window.ATH || {};
           document.body.dataset.phase = ph.id;
         }
         root.style.setProperty('--opus', (state.opus - Math.floor(state.opus)).toFixed(3));
+        if (curTab === 'quies') updateDiap();
         if (recorder.recording) recTime.textContent = fmtTime(recorder.frames / engine.ctx.sampleRate);
       }
     }

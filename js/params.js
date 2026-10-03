@@ -110,6 +110,7 @@ window.ATH = window.ATH || {};
     { id: 'm_goccia', group: 'natura', name: 'Gocce', glyph: '◦', gloss: 'gocce che cadono in una stanza vuota', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_bolle', group: 'natura', name: 'Bolle', glyph: '∘', gloss: 'sott’acqua', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_tuono', group: 'natura', name: 'Tuono', glyph: 'ϟ', gloss: 'un temporale lontano', def: 0, drift: 0.05, fmt: pct },
+    { id: 'm_scacciapensieri', group: 'natura', name: 'Scacciapensieri', glyph: '⁂', gloss: 'campanelli a vento sotto un portico', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_carillon', group: 'domus', name: 'Carillon', glyph: '✦', gloss: 'il carillon della cameretta', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_piano', group: 'domus', name: 'Pianoforte', glyph: '♩', gloss: 'un pianoforte in un’altra stanza', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_camino', group: 'domus', name: 'Camino', glyph: '✺', gloss: 'la legna che brucia', def: 0, drift: 0.05, fmt: pct },
@@ -123,6 +124,7 @@ window.ATH = window.ATH || {};
     { id: 'm_candele', group: 'domus', name: 'Candele', glyph: 'ı', gloss: 'fiammelle che respirano', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_organo', group: 'domus', name: 'Organo', glyph: '⌂', gloss: 'un organo in una chiesa vuota', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_stoviglie', group: 'domus', name: 'Stoviglie', glyph: '◡', gloss: 'piatti, bicchieri, una cucina di un’altra epoca', def: 0, drift: 0.05, fmt: pct },
+    { id: 'm_tubature', group: 'domus', name: 'Tubature', glyph: '⌇', gloss: 'i tubi di una casa vecchia, di notte', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_voci', group: 'homines', name: 'Voci lontane', glyph: '❝', gloss: 'voci di cortile, senza parole', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_bambini', group: 'homines', name: 'Bambini', glyph: '☺', gloss: 'bambini che giocano e ridono', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_passi', group: 'homines', name: 'Passi', glyph: '⁚', gloss: 'passi di qualcuno che passa, o i tuoi', def: 0, drift: 0.05, fmt: pct },
@@ -138,6 +140,7 @@ window.ATH = window.ATH || {};
     { id: 'm_monitor', group: 'corpus', name: 'Monitor', glyph: '⌇', gloss: 'il monitor accanto al letto', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_pianto', group: 'corpus', name: 'Pianto', glyph: '◟', gloss: 'un pianto soffocato dietro una porta', def: 0, drift: 0.05, fmt: pct },
     { id: 'm_vagito', group: 'corpus', name: 'Vagito', glyph: '◠', gloss: 'il primo pianto di qualcuno appena nato', def: 0, drift: 0.05, fmt: pct },
+    { id: 'm_carezza', group: 'corpus', name: 'Carezza', glyph: '∾', gloss: 'un suono di vetro che accarezza', def: 0, drift: 0.05, fmt: pct },
     { id: 'pulsus', group: 'corpus', name: 'Pulsus', glyph: '⌁', gloss: 'quanto batte forte il cuore', def: 0.25, drift: 0.03, fmt: v => Math.round(48 + v * 80) + ' bpm' },
 
     { id: 'memoria', group: 'oblivio', name: 'Memoria', glyph: '◈', gloss: 'quanto forte torna il ricordo', def: 0.7, drift: 0, fmt: db },
@@ -167,6 +170,7 @@ window.ATH = window.ATH || {};
     { id: 'lapis', group: 'sigilla', name: 'Lapis', glyph: '◆', gloss: 'la pietra: tutto smette di vagare', def: false },
     { id: 'rota', group: 'sigilla', name: 'Rota', glyph: '☸', gloss: 'la ruota delle fasi gira', def: true },
 
+    { id: 'pax', group: 'somnus', name: 'Pax', glyph: '☮', gloss: 'tutto si spegne piano, fino alla pace', def: false },
     { id: 'spira', group: 'somnus', name: 'Spira', glyph: '◯', gloss: 'il suono respira lentamente e ti guida', def: false },
     { id: 'stasis', group: 'lumen', name: 'Stasis', glyph: '═', gloss: 'l’accordo resta fermo', def: false },
     { id: 'mutatio', group: 'oblivio', name: 'Vaga', glyph: '⟲', gloss: 'cammini da solo da un luogo all’altro', def: false },

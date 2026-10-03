@@ -96,7 +96,7 @@ window.ATH = window.ATH || {};
         w.fs.forEach((b, k) => b.frequency.setTargetAtTime(vw[k] * rnd(1, 1.2), st, 0.02));
         w.env.gain.setTargetAtTime(rnd(0.5, 0.9), st, 0.015); w.env.gain.setTargetAtTime(0.01, st + len * 0.6, 0.03);
         w.next = st + len + rnd(0.02, 0.1);
-        if (Math.random() < 0.04) this.e.emit('mem', { kind: 'whisper', word: pick(WHISPER), pan: w.pan, at: st });
+        if (Math.random() < (ATH.currentWhispers ? 0.14 : 0.04)) this.e.emit('mem', { kind: 'whisper', word: pick(ATH.currentWhispers || WHISPER), pan: w.pan, at: st });
       } else if (!w.talking) w.env.gain.setTargetAtTime(0, now, 0.1);
     });
 

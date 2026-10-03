@@ -686,3 +686,4 @@ body:not(.lit) .deck, body:not(.lit) .actions, body:not(.lit) .hint { opacity: 0
 @media (max-width: 760px) {
   .aetas { flex: 1 1 100%; order: 5; padding: 2px 2px 0; }
 }
+.diap-read { margin: 12px 0 0; font: 12px/1.4 var(--f-mono); color: var(--accent); letter-spacing: .02em; }
