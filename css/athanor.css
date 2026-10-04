@@ -687,3 +687,81 @@ body:not(.lit) .deck, body:not(.lit) .actions, body:not(.lit) .hint { opacity: 0
   .aetas { flex: 1 1 100%; order: 5; padding: 2px 2px 0; }
 }
 .diap-read { margin: 12px 0 0; font: 12px/1.4 var(--f-mono); color: var(--accent); letter-spacing: .02em; }
+
+/* —— opus VIII: la pianta a quartieri —— */
+.map-inner { width: min(1500px, 100%); }
+.map-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.map-tools { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.map-tools .btn { min-width: 2.4em; }
+.map-wrap { overflow: auto; -webkit-overflow-scrolling: touch; }
+#mapSvg { width: auto; min-width: 0; max-width: none; height: auto; }
+@media (max-width: 760px) { #mapSvg { min-width: 0; } }
+.m-district { fill: var(--accent); opacity: .72; font: 13px var(--f-display); letter-spacing: .16em; text-anchor: middle; text-transform: uppercase; paint-order: stroke; stroke: var(--bg); stroke-width: 5px; }
+.m-edge.m-via { stroke: var(--ink-dim); stroke-width: 2.2; opacity: .55; }
+.m-edge.m-lane { stroke-width: 1.3; opacity: .5; }
+.m-edge.m-stair { stroke-width: 1.4; stroke-dasharray: 4 5; opacity: .45; }
+.m-edge.near { stroke: var(--accent); opacity: .9; }
+.m-label.side { text-anchor: start; font-size: 14px; }
+.m-node.hub .m-label { font-style: normal; font-size: 15px; }
+.m-node.hub .m-dot { stroke-width: 2; }
+.m-lvlabels text { paint-order: stroke; stroke: var(--bg); stroke-width: 6px; stroke-linejoin: round; }
+.m-gen { fill: var(--accent); font: 20px var(--f-body); opacity: .8; }
+@media (max-width: 760px) { .map-tools .btn { padding: 6px 10px; } .m-district { font-size: 15px; } }
+@media (max-width: 760px) {
+  .map-note { display: none; }
+  .map-inner h2#mapTitle { font-size: 1.15rem; }
+  .map-count { font-size: 11px; }
+  .map-legend { font-size: 13px; }
+}
+
+/* —— opus IX: la mappa come una mappa —— */
+.map-frame { position: relative; display: flex; flex-direction: column; min-height: 0; }
+.map-wrap { scroll-behavior: auto; contain: content; }
+.map-levels { position: absolute; left: 0; top: 0; bottom: 0; width: 230px; overflow: hidden; pointer-events: none; }
+.ml-inner { position: absolute; left: 0; top: 0; right: 0; will-change: transform; }
+.ml { position: absolute; left: 0; padding: 4px 26px 6px 12px; background: linear-gradient(90deg, rgba(var(--bg-rgb), .92) 60%, rgba(var(--bg-rgb), 0)); }
+.ml b { display: block; font: 400 15px var(--f-display); letter-spacing: .14em; color: var(--accent); }
+.ml i { display: block; font: italic 12px var(--f-body); color: var(--ink-faint); }
+.m-band { fill: rgba(255, 255, 255, 0.012); }
+.m-band.odd { fill: rgba(255, 255, 255, 0.026); }
+.m-land { fill: rgba(var(--accent-rgb), .035); stroke: rgba(var(--accent-rgb), .07); stroke-width: 1; stroke-dasharray: 2 6; }
+.m-land.land-sea, .m-land.land-water, .m-land.land-deep { fill: rgba(120, 170, 220, .05); stroke: rgba(120, 170, 220, .12); }
+.m-land.land-trees, .m-land.land-field, .m-land.land-mount { fill: rgba(140, 190, 130, .04); stroke: rgba(140, 190, 130, .1); }
+.m-land.land-tomb, .m-land.land-ruin, .m-land.land-under { fill: rgba(200, 190, 180, .03); }
+.m-land.land-sky { fill: rgba(200, 200, 255, .03); stroke: rgba(200, 200, 255, .08); }
+.m-land.land-void { fill: none; stroke: rgba(var(--accent-rgb), .06); }
+.m-deco { fill: none; stroke: var(--ink-faint); stroke-width: 1.1; opacity: .32; stroke-linecap: round; stroke-linejoin: round; }
+.m-deco.land-sea, .m-deco.land-water, .m-deco.land-deep { stroke: rgb(130, 180, 220); }
+.m-deco.land-trees, .m-deco.land-field, .m-deco.land-mount { stroke: rgb(140, 190, 130); }
+.m-deco.land-sky { stroke: rgb(210, 210, 255); }
+.m-edge { stroke-linecap: round; }
+.m-edge.m-via { stroke: var(--ink-dim); stroke-width: 3; opacity: .42; }
+.m-edge.m-lane { stroke-width: 1.6; opacity: .5; stroke-dasharray: none; }
+.m-edge.m-stair { stroke-width: 1.5; stroke-dasharray: 2 6; opacity: .5; }
+@media (max-width: 760px) { .map-frame { flex: 1; } .map-levels { width: 170px; } .ml b { font-size: 13px; } }
+@media (max-width: 760px) { .map-levels { width: 140px; } .ml { padding: 2px 18px 4px 8px; } .ml b { font-size: 11px; } .ml i { font-size: 10px; } }
+
+/* —— opus X: strati, porte, domande —— */
+.m-band.mind { fill: rgba(190, 160, 230, 0.035); }
+.m-level { fill: var(--accent); font: 17px var(--f-display); letter-spacing: .14em; }
+.m-level.rep { opacity: .45; font-size: 14px; }
+.m-lgloss { fill: var(--ink-faint); font: italic 13px var(--f-body); }
+.m-door { fill: var(--accent); opacity: .7; font: italic 11.5px var(--f-body); text-anchor: start; paint-order: stroke; stroke: var(--bg); stroke-width: 3px; }
+.m-door.hubp { text-anchor: middle; }
+.m-node.secret .m-dot { stroke: rgb(200, 180, 255); fill: rgba(200, 180, 255, .25); }
+.m-node.mind .m-label { fill: rgb(214, 204, 236); }
+.m-land.land-mind, .m-land.land-dream { fill: rgba(190, 160, 230, .05); stroke: rgba(190, 160, 230, .14); }
+.m-deco.land-mind, .m-deco.land-dream { stroke: rgb(200, 180, 240); }
+.m-edge.m-row { stroke-width: 1.6; opacity: .45; }
+.m-edge.m-short { stroke-width: 1.2; opacity: .35; stroke-dasharray: 1 5; }
+.m-edge.m-portal { stroke-width: 1.4; stroke-dasharray: 2 6; }
+.soglia.mind .arrow { color: rgb(210, 190, 255); }
+.ask { margin: 10px 0 4px; max-width: 34rem; }
+.ask-q { font: italic 1.08rem var(--f-body); color: var(--ink); margin: 0 0 8px; }
+.ask-a { display: flex; flex-wrap: wrap; gap: 6px; }
+.ask-b { font: italic .95rem var(--f-body); text-transform: none; letter-spacing: 0; padding: 6px 12px; }
+.ask-say { font: italic 1rem var(--f-body); color: var(--accent); margin: 0; }
+@media (max-width: 760px) { .ask-q { font-size: 1rem; } .ask-b { font-size: .9rem; padding: 5px 10px; } }
+.m-band, .m-land, .m-deco, .m-district, .m-level, .m-lgloss, .m-edge, .m-door { pointer-events: none; }
+.m-edge.m-portal { fill: none; }
+.place .ask, .place .ask * { pointer-events: auto; }

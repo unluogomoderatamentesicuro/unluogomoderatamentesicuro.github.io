@@ -44,8 +44,15 @@ window.ATH = window.ATH || {};
 
     spr(name, rgb) {
       const key = name + rgb;
-      if (!this.sprites[key]) { this.sprites[key] = sprite(rgb); if (Object.keys(this.sprites).length > 60) this.sprites = { [key]: this.sprites[key] }; }
-      return this.sprites[key];
+      // una piccola memoria delle luci: si dimentica la meno usata, non tutte insieme
+      let sp = this.sprites[key];
+      if (!sp) {
+        sp = this.sprites[key] = sprite(rgb);
+        this.sprOrder = this.sprOrder || [];
+        this.sprOrder.push(key);
+        if (this.sprOrder.length > 180) delete this.sprites[this.sprOrder.shift()];
+      }
+      return sp;
     }
 
     event(e) {

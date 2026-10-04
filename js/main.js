@@ -15,7 +15,7 @@ window.ATH = window.ATH || {};
   const visuals = new ATH.Visuals($('crucible'));
   let quies = null, memoria = null;
 
-  const state = { base: {}, sw: {}, choice: {}, libra: 0.3, opus: 0, scene: ATH.START || 'soglia', allora: 0, visited: [], trail: [], seen: [], found: [] };
+  const state = { base: {}, sw: {}, choice: {}, libra: 0.3, opus: 0, scene: ATH.START || 'soglia', allora: 0, visited: [], trail: [], seen: [], found: [], flags: {}, answers: {}, mood: {} };
   ATH.PARAMS.forEach(p => state.base[p.id] = p.def);
   ATH.SWITCHES.forEach(s => state.sw[s.id] = s.def);
   ATH.CHOICES.forEach(c => state.choice[c.id] = c.def);
@@ -37,17 +37,20 @@ window.ATH = window.ATH || {};
   let cryptaTimer = null;
   const ui = ATH.buildPanel($('panel'), {
     knob: (id, v) => {
-      state.base[id] = v;
+      state.base[id] = v; touch(id);
       if (id === 'crypta') { clearTimeout(cryptaTimer); cryptaTimer = setTimeout(() => engine.ready && engine.setCryptaSize(v), 600); }
       pulse(0.06); persist();
     },
     seal: (id, on) => {
-      state.sw[id] = on; pulse(0.12);
+      state.sw[id] = on; pulse(0.12); wakeTab(SW_TAB[id]); touched['sw:' + id] = clock;
       if (id === 'mutatio') syncWander();
+      const SEAL_SAY = { pax: ['La pace scende, piano, in mezzo minuto.', 'La pace si ritira.'], stasis: ['L’accordo della quiete resta fermo.', 'L’accordo torna a cambiare.'], fixa: ['La melodia del ricordo non cambierà più.', 'La melodia del ricordo torna a trasformarsi.'], lapis: ['La pietra: le manopole smettono di vagare da sole.', 'Le manopole tornano a vagare.'], spira: ['Il suono respira: si gonfia e si svuota.', 'Il respiro si ferma.'], rota: ['La ruota delle fasi gira da sola.', 'La ruota si ferma.'] };
+      if (SEAL_SAY[id]) toast(SEAL_SAY[id][on ? 0 : 1]);
+      if (id === 'stasis' && !on && quies) quies.chordT = 1e3;
       if (engine.ready && on && id === 'fulmen') engine.strike(0.5);
       persist();
     },
-    choice: (id, v) => { state.choice[id] = v; if (id === 'diapason') { ATH.diapason = v; fork(v); } pulse(0.08); persist(); },
+    choice: (id, v) => { state.choice[id] = v; touched['ch:' + id] = clock; if (id === 'diapason') { ATH.diapason = v; fork(v); } pulse(0.08); persist(); },
     scene: id => recall(id),
     action: id => {
       if (id === 'newMemory') {
@@ -100,11 +103,11 @@ window.ATH = window.ATH || {};
 
   // —— bilancia
   const libraEl = $('libra');
-  libraEl.addEventListener('input', () => { state.libra = libraEl.value / 1000; pulse(0.05); persist(); });
+  libraEl.addEventListener('input', () => { state.libra = libraEl.value / 1000; libraTween = null; libraHeld = clock; pulse(0.05); persist(); });
   function setLibra(v) { state.libra = clamp01(v); libraEl.value = Math.round(state.libra * 1000); }
 
   function formula() {
-    return { athanor: 6, base: Object.assign({}, state.base), sw: Object.assign({}, state.sw), choice: Object.assign({}, state.choice), libra: +state.libra.toFixed(3), place: state.scene, allora: +state.allora.toFixed(3), seen: state.seen.slice(), found: state.found.slice(), lumini: (state.lumini || []).slice(), genCount: state.genCount || 0, opus: +state.opus.toFixed(3) };
+    return { athanor: 6, base: Object.assign({}, state.base), sw: Object.assign({}, state.sw), choice: Object.assign({}, state.choice), libra: +state.libra.toFixed(3), place: state.scene, allora: +state.allora.toFixed(3), seen: state.seen.slice(), found: state.found.slice(), lumini: (state.lumini || []).slice(), genCount: state.genCount || 0, flags: Object.assign({}, state.flags), answers: Object.assign({}, state.answers), mood: Object.assign({}, state.mood), opus: +state.opus.toFixed(3) };
   }
   // auto = ricordi del browser: si conservano le scoperte e i lumini, ma il cammino ricomincia dalla soglia
   function applyFormula(f, auto) {
@@ -115,6 +118,7 @@ window.ATH = window.ATH || {};
     if (Array.isArray(f.found)) state.found = f.found.filter(id => ATH.PLACE[id]);
     if (Array.isArray(f.lumini)) state.lumini = f.lumini.filter(x => typeof x === 'string').slice(0, 24);
     if (isFinite(+f.genCount)) state.genCount = +f.genCount;
+    ['flags', 'answers', 'mood'].forEach(k => { if (f[k] && typeof f[k] === 'object') state[k] = Object.assign({}, f[k]); });
     if (auto) { updateAtlas(); return true; }
     if (f.base) ATH.PARAMS.forEach(p => { const v = +f.base[p.id]; if (f.base[p.id] !== undefined && isFinite(v)) { state.base[p.id] = clamp01(v); ui.knobs[p.id].set(state.base[p.id]); n++; } });
     if (f.sw) ATH.SWITCHES.forEach(s => { if (typeof f.sw[s.id] === 'boolean') { state.sw[s.id] = f.sw[s.id]; ui.seals[s.id].set(f.sw[s.id]); n++; } });
@@ -190,9 +194,50 @@ window.ATH = window.ATH || {};
   }
 
   // —— movimenti lenti (transmutazioni e ricordi che arrivano)
-  let tween = null;
+  let tween = null, clock = 0;
   function moveTo(to, dur) {
+    // ciò che hai toccato da poco resta tuo: i luoghi non lo spostano
+    Object.keys(to).forEach(k => { if (clock - (touched[k] || -1e9) < HOLD) delete to[k]; });
     tween = { from: Object.assign({}, state.base), to, t: 0, dur };
+  }
+  // —— le tue mani hanno la precedenza: ciò che giri si sente sempre
+  const HOLD = 120;                                   // per due minuti un luogo non cambia la manopola che hai girato
+  const touched = {}, wake = { fornax: 0, quies: 0, memoria: 0, visio: 0 }, wakeT = { fornax: -1e9, quies: -1e9, memoria: -1e9, visio: -1e9 };
+  const SW_TAB = {}; ATH.SWITCHES.forEach(s2 => { const g = GBYID[s2.group]; SW_TAB[s2.id] = g ? g.tab : 'fornax'; });
+  let wokeToast = 0;
+  function wakeTab(tab) { if (tab && wake[tab] !== undefined) wakeT[tab] = clock; }
+  function touch(id) {
+    touched[id] = clock;
+    if (tween && id in tween.to) { delete tween.to[id]; }
+    if (id in home) delete home[id];
+    const p = PBYID[id]; if (!p) return;
+    const tab = GBYID[p.group].tab;
+    if (p.group === 'somnus' && id === 'silentium') return;   // il silenzio non sveglia la fornace
+    wakeTab(tab);
+    audition(id);
+  }
+  // alcune manopole agiscono piano, o solo quando qualcosa suona: allora fanno sentire subito cosa cambiano
+  const audT = {};
+  function audition(id) {
+    if (!engine.ready || clock - (audT[id] || -9) < 0.6) return;
+    audT[id] = clock;
+    const root = ATH.rootHz(live.radix);
+    let base = root; while (base < 110) base *= 2;
+    const scale = ATH.SCALES[state.choice.modus] || ATH.SCALES.pentatonico;
+    if (id === 'aurora' && quies) quies.chordT = 1e3;
+    if ((id === 'patera' || id === 'resonantia' || id === 'altitudo') && quies) {
+      const oct = Math.pow(2, 1 + Math.min(2, Math.floor(state.base.altitudo * 3)));
+      quies.bowl(base * oct * ATH.ratioAt(scale, Math.floor(Math.random() * scale.length)) / 2, state.base.resonantia, Math.random() * 1.2 - 0.6);
+    }
+    if (id === 'radix' || id === 'aurum') engine.bell(root * 4, Math.random() * 1.2 - 0.6, 0.5);
+    if (id === 'tempus' || id === 'ouroboros') engine.strike(0.35);
+  }
+  const recent = id => { const d = clock - (touched[id] === undefined ? -1e9 : touched[id]); return d < 40 ? 1 : d < 90 ? 1 - (d - 40) / 50 : 0; };
+  function wakeStep(dt) {
+    Object.keys(wake).forEach(k => {
+      const d = clock - wakeT[k], tgt = d < 20 ? 1 : d < 50 ? 1 - (d - 20) / 30 : 0;
+      wake[k] += (tgt - wake[k]) * Math.min(1, dt * (tgt > wake[k] ? 1.4 : 0.6));
+    });
   }
   function transmute() {
     const to = {};
@@ -224,6 +269,7 @@ window.ATH = window.ATH || {};
 
   // —— il cammino tra i luoghi
   const home = {};                       // i valori tuoi, prima che un luogo li cambiasse
+  let libraHeld = -1e9, pressNow = 0, pressFreed = false;
   let traveling = false, passageT = -1, passDir = 0, dwell = 0, libraTween = null, hushTween = null, autoT = 0, autoNext = 80;
   let clueN = 0, clueT = 0, nightDone = false, nightT = -1, peaceK = 0, paxK = 0, swingOn = false;
   let screamed = false, eroded = 0, flatDone = false, woke = false, doubtT = 0, faceNow = 0, ascendNow = 0;
@@ -241,7 +287,7 @@ window.ATH = window.ATH || {};
     const from = GP(state.scene);
     const dl = from ? Math.sign((pl.level || 0) - (from.level || 0)) : 0;
     const dur = dl ? 4.4 : 3.4;
-    traveling = !quick; passageT = quick ? -1 : 0; passDir = quick ? 0 : dl; dwell = 0; urged = false; helping = null; eroded = 0; flatDone = false; woke = false;
+    pressFreed = false; traveling = !quick; passageT = quick ? -1 : 0; passDir = quick ? 0 : dl; dwell = 0; urged = false; helping = null; eroded = 0; flatDone = false; woke = false;
     if (memoria) { if (memoria.screaming) memoria.scream(false); memoria.flat(false); if (memoria.mon && memoria.mon.next > 1e9) memoria.mon.next = 0; }
     $('journey').classList.add('leaving');
     if (memoria && !quick) {
@@ -256,12 +302,13 @@ window.ATH = window.ATH || {};
     Object.keys(home).forEach(k => { if (!(k in set)) { to[k] = home[k]; delete home[k]; } });
     Object.keys(set).forEach(k => { if (!(k in home)) home[k] = state.base[k]; to[k] = set[k]; });
     moveTo(to, quick ? 2.5 : 6);
-    if (pl.libra !== undefined) libraTween = { from: state.libra, to: pl.libra, t: 0, dur: quick ? 2.5 : 6 };
+    if (pl.libra !== undefined && clock - libraHeld > HOLD) libraTween = { from: state.libra, to: pl.libra, t: 0, dur: quick ? 2.5 : 6 };
     // il rumore arriva di colpo, la quiete arriva piano
     hushTween = { from: hushNow, to: pl.hush || 0, t: 0, dur: quick ? 2.5 : ((pl.hush || 0) > hushNow ? 14 : 2.2) };
     ATH.currentWhispers = pl.whisperWords || null; clueN = 0; clueT = 0; nightDone = false; nightT = -1;
-    if (pl.modus) { state.choice.modus = pl.modus; ui.choices.modus.set(pl.modus); }
-    state.sw.spira = !!pl.spira; ui.seals.spira.set(state.sw.spira);
+    const mine = k => clock - (touched[k] === undefined ? -1e9 : touched[k]) < HOLD * 2;
+    if (pl.modus && !mine('ch:modus')) { state.choice.modus = pl.modus; ui.choices.modus.set(pl.modus); }
+    if (!mine('sw:spira')) { state.sw.spira = !!pl.spira; ui.seals.spira.set(state.sw.spira); }
     if (memoria && Math.random() < 0.4) memoria.newMemory();
     state.scene = id;
     if (state.trail[state.trail.length - 1] !== id) state.trail.push(id);
@@ -274,6 +321,8 @@ window.ATH = window.ATH || {};
     const hid = pl.exits.filter(e => typeof e !== 'string' && !isKnown(e.id));
     if (hid.length && Math.random() < 0.12) reveal(hid[Math.floor(Math.random() * hid.length)].id, true);
     if (pl.forget && !quick) setTimeout(() => forget(pl.forget), 4000);
+    checkSecrets(id, true);
+    if (pl.newMelody && memoria) memoria.newMemory();
     autoT = 0;
     setTimeout(() => { renderPlace(); $('journey').classList.remove('leaving'); }, quick ? 60 : 1700 + (dl ? 600 : 0));
     setTimeout(() => { traveling = false; }, quick ? 0 : dur * 1000);
@@ -305,8 +354,60 @@ window.ATH = window.ATH || {};
     if (state.found.indexOf(id) >= 0) return;
     state.found.push(id);
     const p = GP(id);
-    toast((quiet ? 'Ti sembra di ricordare un passaggio: ' : 'Si apre un passaggio che non c’era: ') + p.name);
+    const CAPS = ['Qualcosa che avevi dimenticato torna a galla: ', 'Ti sembra di ricordare un posto che prima non c’era: ', 'Forse è un sogno. Forse no: ', 'Una porta che non avevi mai visto: '];
+    toast(p.secret ? CAPS[Math.floor(Math.random() * CAPS.length)] + p.name : (quiet ? 'Ti sembra di ricordare un passaggio: ' : 'Si apre un passaggio che non c’era: ') + p.name);
     renderSoglie(id); updateAtlas(); persist();
+  }
+  // —— le capsule del tempo: luoghi nascosti che compaiono a modo loro
+  const CAPSULES = ATH.PLACES.filter(p => p.secret && p.hidden);
+  const needsOk = c => { const n = c.secret.needs; if (!n) return true; return (Array.isArray(n) ? n : [n]).every(k => state.flags[k] || state.seen.indexOf(k) >= 0); };
+  function checkSecrets(id, arriving) {
+    CAPSULES.forEach(c => {
+      if (isKnown(c.id) || !needsOk(c) || c.secret.at.indexOf(id) < 0) return;
+      if (arriving && c.secret.chance && Math.random() < c.secret.chance) setTimeout(() => { if (state.scene === id) reveal(c.id); }, 5000 + Math.random() * 9000);
+    });
+    // e a volte, senza nessun motivo
+    if (arriving && Math.random() < 0.035) {
+      const pool = CAPSULES.filter(c => !isKnown(c.id) && needsOk(c));
+      if (pool.length) { const c = pool[Math.floor(Math.random() * pool.length)]; setTimeout(() => reveal(c.id), 8000 + Math.random() * 10000); }
+    }
+  }
+  function lingerSecrets() {
+    CAPSULES.forEach(c => { if (!isKnown(c.id) && c.secret.linger && needsOk(c) && c.secret.at.indexOf(state.scene) >= 0 && dwell > c.secret.linger) reveal(c.id); });
+  }
+  // —— i luoghi che fanno domande
+  let askT = null;
+  function renderAsk(pl) {
+    clearTimeout(askT);
+    const box = $('plAsk'); box.innerHTML = ''; box.hidden = !pl.ask;
+    if (!pl.ask) return;
+    const qs = pl.ask;
+    let i = qs.findIndex((q, k) => state.answers[pl.id + ':' + k] === undefined);
+    const again = i < 0;
+    if (again) i = Math.floor(Math.random() * qs.length);
+    const q = qs[i], key = pl.id + ':' + i;
+    const p = document.createElement('p'); p.className = 'ask-q'; p.textContent = q.q; box.appendChild(p);
+    const row = document.createElement('div'); row.className = 'ask-a';
+    q.a.forEach((a, k) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'btn ask-b'; b.textContent = a.t;
+      b.addEventListener('pointerdown', e => e.stopPropagation());
+      b.addEventListener('click', () => {
+        const prev = state.answers[key];
+        state.answers[key] = k;
+        if (a.f) state.flags[a.f] = (state.flags[a.f] || 0) + 1;
+        if (a.mus) Object.keys(a.mus).forEach(m => { state.mood[m] = Math.max(-0.15, Math.min(0.15, (state.mood[m] || 0) + a.mus[m])); });
+        // la stessa domanda, un'altra volta: non sempre la stessa risposta
+        let say = a.say;
+        if (again && prev !== undefined) say = prev === k ? (Math.random() < 0.5 ? 'L’altra volta avevi detto lo stesso. Ne sei ancora sicuro?' : say) : 'L’altra volta avevi risposto un’altra cosa. Quale delle due è vera?';
+        box.innerHTML = ''; const r = document.createElement('p'); r.className = 'ask-say'; r.textContent = say; box.appendChild(r);
+        pulse(0.1); persist();
+        if (memoria && Math.random() < 0.5) memoria.newMemory();
+        checkSecrets(pl.id, false);
+        if (qs.findIndex((qq, kk) => state.answers[pl.id + ':' + kk] === undefined) >= 0) askT = setTimeout(() => { if (state.scene === pl.id) renderAsk(pl); }, 7000);
+      });
+      row.appendChild(b);
+    });
+    box.appendChild(row);
   }
   function renderPlace() {
     const pl = GP(state.scene); if (!pl) return;
@@ -317,6 +418,7 @@ window.ATH = window.ATH || {};
     $('plOra').textContent = pl.ora + (pl.lostText ? ' ' + pl.lostText : '');
     $('plAllora').textContent = pl.allora;
     $('lumini').hidden = !pl.candles;
+    renderAsk(pl);
     renderSoglie();
   }
   function renderSoglie(fresh) {
@@ -331,11 +433,12 @@ window.ATH = window.ATH || {};
       const b = document.createElement('button');
       const seen = p.gen || state.seen.indexOf(id) >= 0;
       b.type = 'button'; b.className = 'soglia' + (!seen ? ' new' : '') + (id === fresh ? ' fresh' : '') + (p.gen ? ' altrove' : '');
-      const arrow = p.gen ? '⋯' : up > 0 ? '⇧' : up < 0 ? '⇩' : compass(dx, dy);
+      const toMind = !!p.mind !== !!pl.mind, arrow = p.gen ? '⋯' : up > 0 ? '⇧' : up < 0 ? '⇩' : toMind ? '◌' : compass(dx, dy);
+      if (toMind) b.classList.add('mind');
       if (up) b.classList.add('vertical');
       const label = p.gen && !pl.gen ? 'Più in là' : p.name;
       b.innerHTML = `<span class="arrow" aria-hidden="true">${arrow}</span><span class="sname">${label}</span>`;
-      b.title = p.gen ? 'Un posto che nessuno ha mai visto' : up > 0 ? 'Sali: ' + ATH.levelName(p.level) : up < 0 ? 'Scendi: ' + ATH.levelName(p.level) : (seen ? p.ora : 'Non ci sei ancora stato');
+      b.title = toMind ? (p.mind ? 'Dentro la testa: ' + p.name : 'Si torna fuori: ' + p.name) : p.gen ? 'Un posto che nessuno ha mai visto' : up > 0 ? 'Sali: ' + ATH.levelName(p.level) : up < 0 ? 'Scendi: ' + ATH.levelName(p.level) : (seen ? p.ora : 'Non ci sei ancora stato');
       b.addEventListener('click', () => travel(id));
       b.addEventListener('pointerdown', e => e.stopPropagation());
       box.appendChild(b);
@@ -544,19 +647,19 @@ window.ATH = window.ATH || {};
   const SVGNS = 'http://www.w3.org/2000/svg';
   let mapSel = null;
   const el = (tag, attrs, parent) => { const e = document.createElementNS(SVGNS, tag); Object.keys(attrs).forEach(k => e.setAttribute(k, attrs[k])); if (parent) parent.appendChild(e); return e; };
+  let mapZ = window.innerWidth < 760 ? 0.52 : 0.82;
+  function wrapName(n) {
+    if (n.length <= 17) return [n];
+    const w = n.split(' '); let a = '', k = 0;
+    while (k < w.length && (a + ' ' + w[k]).trim().length <= Math.max(10, Math.ceil(n.length / 2) + 2)) { a = (a + ' ' + w[k]).trim(); k++; }
+    return [a, w.slice(k).join(' ')].filter(Boolean);
+  }
   function drawMap(keepScroll) {
     const svg = $('mapSvg'); svg.innerHTML = '';
-    const BAND = { 0: 1150, '-1': 420, 1: 330 }, bandTop = {};
-    let yy = 10;
-    ATH.LEVELS.forEach(l => { bandTop[l.n] = yy; yy += (BAND[l.n] || 230); });
-    svg.setAttribute('viewBox', `0 0 1000 ${yy + 10}`);
-    const X = p => 175 + p.x * 740, Y = p => { const h = BAND[p.level] || 230; return bandTop[p.level] + 34 + p.y * (h - 76); };
-    ATH.LEVELS.forEach(l => {
-      const h = BAND[l.n] || 230;
-      el('rect', { x: 0, y: bandTop[l.n], width: 1000, height: h - 6, class: 'm-band' + (l.n % 2 ? ' odd' : '') }, svg);
-      const t = el('text', { x: 18, y: bandTop[l.n] + 30, class: 'm-level' }, svg); t.textContent = l.name;
-      const g = el('text', { x: 18, y: bandTop[l.n] + 50, class: 'm-lgloss' }, svg); g.textContent = l.gloss;
-    });
+    const PL = ATH.PLAN, W = PL.W, H = PL.H, f = n => n.toFixed(1);
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.style.width = Math.round(W * mapZ) + 'px'; svg.style.height = Math.round(H * mapZ) + 'px';
+    const gBands = el('g', {}, svg);
     const cur = GP(state.scene), adj = cur && !cur.gen ? visibleExits(cur) : [];
     const sel = mapSel && ATH.PLACE[mapSel] ? mapSel : null;
     const selPath = sel ? findPath(state.scene, sel) : null;
@@ -565,51 +668,127 @@ window.ATH = window.ATH || {};
     if (selPath) { let a = state.scene; selPath.forEach(b => { pathKey.add([a, b].sort().join('|')); a = b; }); }
     const trailKey = new Set();
     for (let i = 1; i < state.trail.length; i++) trailKey.add([state.trail[i - 1], state.trail[i]].sort().join('|'));
-    const gEdges = el('g', {}, svg), gTrail = el('g', {}, svg), gNodes = el('g', {}, svg);
-    const drawn = {};
-    ATH.PLACES.forEach(p => {
-      if (!isKnown(p.id)) return;
-      visibleExits(p).forEach(id => {
-        const q = ATH.PLACE[id]; if (!q) return;
-        const key = [p.id, q.id].sort().join('|'); if (drawn[key]) return; drawn[key] = 1;
-        const x1 = X(p), y1 = Y(p), x2 = X(q), y2 = Y(q);
-        const near = p.id === state.scene || q.id === state.scene;
-        const cls = 'm-edge' + (p.level !== q.level ? ' vert' : '') + (near ? ' near' : '') + (pathKey.has(key) ? ' path' : '') + (trailKey.has(key) ? ' trail' : '');
-        let d;
-        if (p.level !== q.level) { const my = (y1 + y2) / 2; d = `M${x1} ${y1} C${x1} ${my} ${x2} ${my} ${x2} ${y2}`; }
-        else d = `M${x1} ${y1} L${x2} ${y2}`;
-        el('path', { d, class: cls }, trailKey.has(key) || pathKey.has(key) ? gTrail : gEdges);
-      });
+    const known = new Set(ATH.PLACES.filter(p => isKnown(p.id)).map(p => p.id));
+    // gli strati: ognuno col suo nome, scritto in una striscia tutta sua (non si sovrappone a niente)
+    PL.bands.forEach((b, k) => {
+      const y0 = PL.bandTop[b.id], h = PL.bandH[b.id];
+      el('rect', { x: 0, y: y0, width: W, height: h - 6, class: 'm-band' + (k % 2 ? ' odd' : '') + (b.id === 'M' ? ' mind' : '') }, gBands);
+      for (let x = 24; x < W - 200; x += 760) {
+        const t = el('text', { x, y: y0 + 26, class: 'm-level' + (x > 24 ? ' rep' : '') }, gBands); t.textContent = b.name;
+        const g = el('text', { x: x + b.name.length * 12.5 + 16, y: y0 + 26, class: 'm-lgloss' }, gBands); g.textContent = b.gloss;
+      }
+    });
+    const gDist = el('g', {}, svg), gEdges = el('g', {}, svg), gTrail = el('g', {}, svg), gNodes = el('g', {}, svg);
+    // i quartieri: una macchia di terra, e qualche segno del paesaggio
+    const boxes = [];
+    ATH.PLACES.forEach(p => { if (!known.has(p.id) || p.mx === undefined) return; boxes.push(p.isHub ? [p.mx - 80, p.my - 64, p.mx + 80, p.my + 34] : [p.mx - 14, p.my - 24, p.mx + 150, p.my + 34]); });
+    const free = (x, y) => !boxes.some(b => x > b[0] - 8 && x < b[2] + 8 && y > b[1] - 8 && y < b[3] + 8);
+    const GLY = {
+      tree: 'M0 -9 L6 3 L-6 3 Z M0 3 V7', pine: 'M0 -10 L5 -2 L2 -2 L6 5 L-6 5 L-2 -2 L-5 -2 Z', wave: 'M-8 0 Q-4 -4 0 0 T8 0', grass: 'M-4 3 L-5 -3 M0 3 V-5 M4 3 L5 -3',
+      cross: 'M0 -8 V7 M-4 -3 H4', house: 'M-6 6 V-1 L0 -7 L6 -1 V6 Z', star: 'M0 -4 V4 M-4 0 H4', peak: 'M-9 5 L-2 -7 L2 -1 L5 -5 L10 5', reed: 'M-3 5 V-6 M0 5 V-9 M3 5 V-5',
+      ruin: 'M-7 6 V-4 H-3 V1 H1 V-6 H5 V6', dot: 'M0 0 h0.1', drop: 'M0 -5 Q4 1 0 4 Q-4 1 0 -5 Z', arch: 'M-6 6 V-1 Q0 -9 6 -1 V6',
+      eye: 'M-7 0 Q0 -6 7 0 Q0 6 -7 0 Z M0 -1.5 V1.5', spiral: 'M0 0 Q3 -3 5 0 Q5 5 0 6 Q-6 5 -6 0 Q-5 -7 2 -8', moon: 'M2 -6 A6 6 0 1 0 2 6 A4.5 4.5 0 1 1 2 -6 Z'
+    };
+    const LAND = { sea: ['wave', 'wave', 'drop'], field: ['grass', 'grass', 'tree'], water: ['wave', 'reed', 'drop'], trees: ['pine', 'tree', 'pine'], town: ['house', 'arch', 'house'],
+      house: ['house', 'grass'], ruin: ['ruin', 'grass'], tomb: ['cross', 'cross', 'tree'], city: ['house', 'house', 'ruin'], void: ['grass', 'dot', 'dot'], sky: ['star', 'star', 'dot'],
+      mount: ['peak', 'pine', 'peak'], under: ['drop', 'dot', 'arch'], deep: ['wave', 'drop', 'dot'], mind: ['eye', 'spiral', 'dot'], dream: ['moon', 'star', 'spiral'] };
+    let seed = 7; const rr = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+    PL.districts.forEach(d => {
+      const h = ATH.PLACE[d.hub]; if (!h || !known.has(h.id)) return;
+      const pts = d.ids.filter(id => known.has(id)).map(id => ATH.PLACE[id]);
+      let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+      pts.forEach(p => { x0 = Math.min(x0, p.mx); x1 = Math.max(x1, p.mx + (p.isHub ? 0 : 120)); y0 = Math.min(y0, p.my); y1 = Math.max(y1, p.my); });
+      x0 -= 40; x1 += 24; y0 -= 54; y1 += 36;
+      el('rect', { x: x0, y: y0, width: x1 - x0, height: y1 - y0, rx: 46, class: 'm-land land-' + d.land }, gBands);
+      const kinds = LAND[d.land] || ['dot'];
+      for (let i = 0, n = 0; i < 40 && n < 6; i++) {
+        const x = x0 + 14 + rr() * (x1 - x0 - 28), y = y0 + 14 + rr() * (y1 - y0 - 28);
+        if (!free(x, y)) continue;
+        n++; boxes.push([x - 10, y - 10, x + 10, y + 10]);
+        el('path', { d: GLY[kinds[Math.floor(rr() * kinds.length)]], transform: `translate(${x.toFixed(0)},${y.toFixed(0)}) scale(${(0.8 + rr() * 0.5).toFixed(2)})`, class: 'm-deco land-' + d.land }, gBands);
+      }
+      const up = d.lv > 0, nl = wrapName(h.name).length;
+      const t = el('text', { x: h.mx, y: up ? h.my + 24 + nl * 16 + 4 : h.my - 22 - nl * 16, class: 'm-district' }, gDist); t.textContent = d.name;
+    });
+    // le strade (le porte non si disegnano come fili: si segnano accanto ai luoghi)
+    const portals = {};
+    PL.roads.forEach(r => {
+      const p = ATH.PLACE[r.a], q = ATH.PLACE[r.b]; if (!p || !q || !known.has(p.id) || !known.has(q.id)) return;
+      const key = [p.id, q.id].sort().join('|');
+      if (r.kind === 'portal') {
+        (portals[p.id] = portals[p.id] || []).push(q); (portals[q.id] = portals[q.id] || []).push(p);
+        if (!pathKey.has(key)) return;            // solo se fa parte della strada scelta, la porta si mostra come filo
+      }
+      const near = p.id === state.scene || q.id === state.scene;
+      const cls = 'm-edge m-' + r.kind + (near ? ' near' : '') + (pathKey.has(key) ? ' path' : '') + (trailKey.has(key) ? ' trail' : '');
+      let d;
+      if (r.kind === 'via') {
+        const a = p.mx < q.mx ? p : q, b = a === p ? q : p, dx = b.mx - a.mx, sgn = (a.level || 0) > 0 ? 1 : -1, w = sgn * (8 + ((a.mx * 7) % 9));
+        d = `M${f(a.mx)} ${f(a.my)} C${f(a.mx + dx * 0.35)} ${f(a.my + w)} ${f(b.mx - dx * 0.35)} ${f(b.my + w)} ${f(b.mx)} ${f(b.my)}`;
+      } else if (r.kind === 'short') {
+        const a = p.mx < q.mx ? p : q, b = a === p ? q : p, low = Math.max(a.my, b.my) + 34;
+        d = `M${f(a.mx)} ${f(a.my)} C${f(a.mx + 20)} ${f(low)} ${f(b.mx - 20)} ${f(low)} ${f(b.mx)} ${f(b.my)}`;
+      } else {
+        const dy = q.my - p.my;
+        d = `M${f(p.mx)} ${f(p.my)} C${f(p.mx)} ${f(p.my + dy * 0.55)} ${f(q.mx)} ${f(q.my - dy * 0.45)} ${f(q.mx)} ${f(q.my)}`;
+      }
+      el('path', { d, class: cls }, trailKey.has(key) || pathKey.has(key) ? gTrail : gEdges);
     });
     let hereNode = null;
     ATH.PLACES.forEach(p => {
-      if (!isKnown(p.id)) return;
+      if (!known.has(p.id) || p.mx === undefined) return;
       const here = p.id === state.scene, today = state.visited.indexOf(p.id) >= 0, near = adj.indexOf(p.id) >= 0;
       const g = el('g', {
-        class: 'm-node' + (here ? ' here' : '') + (today ? ' today' : '') + (near ? ' near' : '') + (p.kind === 'stato' ? ' stato' : '') + (sel === p.id ? ' sel' : '') + (onPath.has(p.id) ? ' onpath' : '') + (state.seen.indexOf(p.id) < 0 ? ' never' : ''),
-        transform: `translate(${X(p)},${Y(p)})`, tabindex: here ? '-1' : '0', role: 'button',
-        'aria-label': p.name + (here ? ' (sei qui)' : near ? ' (a un passo)' : '')
+        class: 'm-node' + (p.isHub ? ' hub' : '') + (here ? ' here' : '') + (today ? ' today' : '') + (near ? ' near' : '') + (p.kind === 'stato' ? ' stato' : '') + (sel === p.id ? ' sel' : '') + (onPath.has(p.id) ? ' onpath' : '') + (state.seen.indexOf(p.id) < 0 ? ' never' : '') + (p.secret ? ' secret' : '') + (p.mind ? ' mind' : ''),
+        transform: `translate(${p.mx},${p.my})`, tabindex: here ? '-1' : '0', role: 'button',
+        'aria-label': p.name + ' · ' + (p.district || '') + (here ? ' (sei qui)' : near ? ' (a un passo)' : '')
       }, gNodes);
-      el('circle', { class: 'm-hit', r: 24 }, g);
+      el('circle', { class: 'm-hit', r: 26 }, g);
       if (here) el('circle', { class: 'm-halo', r: 20 }, g);
-      el('circle', { class: 'm-dot', r: here ? 9 : today ? 6 : 7 }, g);
-      const tx = el('text', { class: 'm-label', y: p.y > 0.88 ? -15 : 24 }, g); tx.textContent = p.name;
+      el('circle', { class: 'm-dot', r: here ? 9 : p.isHub ? 8 : 6.5 }, g);
+      const lines = wrapName(p.name);
+      const up = (p.level || 0) > 0;
+      let tx;
+      if (p.isHub) tx = el('text', { class: 'm-label', x: 0, y: up ? 24 : -16 - (lines.length - 1) * 16 }, g);
+      else tx = el('text', { class: 'm-label side', x: 13, y: 5 - (lines.length - 1) * 8 }, g);
+      lines.forEach((ln, k) => { const ts = el('tspan', { x: p.isHub ? 0 : 13, dy: k ? 16 : 0 }, tx); ts.textContent = ln; });
+      // le porte di questo luogo
+      const ps = portals[p.id];
+      if (ps && ps.length) {
+        const sym = q => (q.level || 0) > (p.level || 0) ? '⇧' : (q.level || 0) < (p.level || 0) ? '⇩' : '◌';
+        const txt = ps.slice(0, 2).map(q => sym(q) + ' ' + q.name).join('  ') + (ps.length > 2 ? '  +' + (ps.length - 2) : '');
+        const pt = p.isHub ? el('text', { class: 'm-door hubp', x: 0, y: up ? -14 : 22 }, g) : el('text', { class: 'm-door', x: 13, y: 5 + (lines.length - 1) * 8 + 15 }, g);
+        pt.textContent = txt;
+      }
+      if (p.exits.some(e => isGen(ATH.exitId(e)))) { const gt = el('text', { class: 'm-gen', x: -14, y: 5, 'text-anchor': 'end' }, g); gt.textContent = '⋯'; }
       if (here) hereNode = g;
       const pick = () => { if (here) return; mapSel = p.id; drawMap(true); };
       g.addEventListener('click', pick);
       g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
     });
+    const wrap = $('mapWrap');
     // l'indicazione in basso
     const bar = $('mapGo');
     if (sel && sel !== state.scene) {
       bar.hidden = false;
-      $('mapGoText').textContent = selPath ? GP(sel).name + ' · ' + (selPath.length === 1 ? 'a un passo da qui' : selPath.length + ' passaggi') : GP(sel).name + ' · da qui non sai ancora come arrivarci';
+      const sp = GP(sel);
+      $('mapGoText').textContent = selPath ? sp.name + ' · ' + sp.district + ' · ' + (selPath.length === 1 ? 'a un passo da qui' : selPath.length + ' passaggi') : sp.name + ' · da qui non sai ancora come arrivarci';
       $('mapGoBtn').disabled = !selPath;
     } else bar.hidden = true;
-    const known = ATH.PLACES.filter(p => isKnown(p.id)).length;
-    $('mapCount').textContent = `Trovati ${state.seen.length} di ${ATH.PLACES.length} · oggi ${state.visited.length}` + (ATH.PLACES.length - known ? ` · ${ATH.PLACES.length - known} non li ricordi ancora` : '') + (state.genCount ? ` · ${state.genCount} stanze senza nome` : '') + (cur && cur.gen ? ' · ora sei nell’Altrove, fuori dalla mappa' : '');
-    if (!keepScroll) setTimeout(() => { if (hereNode) { const wrap = $('mapWrap'), r = hereNode.getBoundingClientRect(), w = wrap.getBoundingClientRect(); wrap.scrollTop += r.top - w.top - w.height / 2; wrap.scrollLeft += r.left - w.left - w.width / 2; } }, 30);
+    const nKnown = known.size;
+    $('mapCount').textContent = `Trovati ${state.seen.length} di ${ATH.PLACES.length} · oggi ${state.visited.length}` + (ATH.PLACES.length - nKnown ? ` · ${ATH.PLACES.length - nKnown} ancora nascosti` : '') + (state.genCount ? ` · ${state.genCount} stanze senza nome` : '') + (cur && cur.gen ? ' · ora sei nell’Altrove, fuori dalla mappa' : '');
+    if (!keepScroll) setTimeout(() => { if (hereNode) { const r = hereNode.getBoundingClientRect(), w = wrap.getBoundingClientRect(); wrap.scrollTop += r.top - w.top - w.height / 2; wrap.scrollLeft += r.left - w.left - w.width / 2; } }, 30);
   }
+  function zoomMap(k) {
+    const wrap = $('mapWrap'), w = wrap.getBoundingClientRect();
+    const cxp = (wrap.scrollLeft + w.width / 2) / mapZ, cyp = (wrap.scrollTop + w.height / 2) / mapZ;
+    mapZ = Math.max(0.35, Math.min(1.4, mapZ * k));
+    drawMap(true);
+    wrap.scrollLeft = cxp * mapZ - w.width / 2; wrap.scrollTop = cyp * mapZ - w.height / 2;
+  }
+  $('mapZoomIn').addEventListener('click', () => zoomMap(1.25));
+  $('mapZoomOut').addEventListener('click', () => zoomMap(0.8));
+  $('mapHere').addEventListener('click', () => drawMap(false));
   $('mapGoBtn').addEventListener('click', () => { const id = mapSel; mapSel = null; closeMap(); routeTo(id); });
   function openMap() { mapSel = null; drawMap(); $('mapov').hidden = false; $('btnMapClose').focus(); }
   function closeMap() { $('mapov').hidden = true; }
@@ -687,7 +866,7 @@ window.ATH = window.ATH || {};
     const q = l < 0.5 ? l * (1 + s) : l + s - l * s, p = 2 * l - q;
     return [f(p, q, h + 1 / 3) * 255, f(p, q, h) * 255, f(p, q, h - 1 / 3) * 255];
   }
-  const MOTIFS = ['clutter', 'wallpaper', 'toycar', 'loculi', 'cameo', 'hand', 'womb', 'face', 'scents', 'doubt', 'purify', 'stars', 'snow', 'haze', 'motes', 'field', 'beam', 'ceiling', 'glass', 'monitor', 'fever', 'sun', 'meet', 'train', 'lights', 'ruin', 'well', 'rose', 'nebula', 'throne', 'city', 'cityFlip', 'windows', 'stairs', 'candles', 'tombs', 'forest', 'whispers', 'void', 'tears', 'cracks', 'river', 'underwater'];
+  const MOTIFS = ['clutter', 'wallpaper', 'toycar', 'loculi', 'cameo', 'hand', 'womb', 'face', 'scents', 'doubt', 'purify', 'stars', 'snow', 'haze', 'motes', 'field', 'beam', 'ceiling', 'glass', 'monitor', 'fever', 'sun', 'meet', 'train', 'lights', 'ruin', 'well', 'rose', 'nebula', 'throne', 'city', 'cityFlip', 'windows', 'stairs', 'candles', 'tombs', 'forest', 'whispers', 'void', 'tears', 'cracks', 'river', 'underwater', 'nook', 'corridor', 'swing', 'trees', 'lake', 'fireflies', 'fog', 'veil', 'vetrate', 'arcade', 'machine', 'film', 'cradle', 'mountain', 'deep', 'rainfall', 'wisps', 'path', 'sprout', 'ice', 'door', 'crowd', 'dream'];
   let hueShift = 0, qVis = 0; const motif = {}; MOTIFS.forEach(m => motif[m] = 0);
 
   // —— registrazione
@@ -772,6 +951,8 @@ window.ATH = window.ATH || {};
   try { const raw = localStorage.getItem(STORE) || localStorage.getItem('athanor.formula.v4'); if (raw) applyFormula(JSON.parse(raw), true); } catch (e) { /* niente memoria */ }
 
   // —— accensione
+  // sonda per le prove automatiche (non cambia nulla)
+  ATH._probe = { state, live, ui, travel: (id) => travel(id, true), engine, wake, touched, motif };
   $('btnStart').addEventListener('click', async () => {
     const btn = $('btnStart');
     btn.disabled = true; btn.textContent = 'Il fuoco prende…';
@@ -807,7 +988,7 @@ window.ATH = window.ATH || {};
   setTimeout(measure, 50);
 
   // —— ciclo
-  let last = performance.now(), frameN = 0, cssT = 0, curPh = -1, clock = 0, filtKey = '';
+  let last = performance.now(), frameN = 0, cssT = 0, curPh = -1, filtKey = '';
   const root = document.documentElement, canvas = $('crucible');
   function step(now, draw) {
     const dt = Math.min(0.1, Math.max(0.001, (now - last) / 1000));
@@ -840,6 +1021,7 @@ window.ATH = window.ATH || {};
       const pl = GP(state.scene);
       if (pl) {
         pl.exits.forEach(e => { if (typeof e !== 'string' && !isKnown(e.id) && dwell > e.linger) reveal(e.id); });
+        lingerSecrets();
         // restare: le strade svaniscono
         if (pl.stay) $('soglie').style.setProperty('--fade', Math.max(0.12, 1 - dwell / 90).toFixed(2));
         // a volte bisogna scappare
@@ -886,7 +1068,7 @@ window.ATH = window.ATH || {};
     phaseStep(dt);
 
     // respiro
-    const breathOn = state.sw.spira;
+    const breathOn = state.sw.spira || recent('profunditas') > 0 || recent('respiratio') > 0;
     const rate = (4 + state.base.respiratio * 4) / 60;
     const breath01 = 0.5 - 0.5 * Math.cos(clock * Math.PI * 2 * rate);
     const breathMul = breathOn ? 1 - state.base.profunditas * 0.75 * (1 - breath01) : 1;
@@ -899,22 +1081,50 @@ window.ATH = window.ATH || {};
       const s = seeds[p.id];
       if (!p.drift || (locked && p.id === 'radix')) { live[p.id] = state.base[p.id]; return; }
       const n = Math.sin(tt * s[0] + s[3]) * 0.5 + Math.sin(tt * s[1] + s[4]) * 0.3 + Math.sin(tt * s[2] + s[5]) * 0.2;
-      live[p.id] = clamp01(state.base[p.id] + n * sp * p.drift * 1.7 + bias(p.id) + gesture(p.id) + (p.id === 'metamorphosis' ? autoMeta : 0) + (ALLORA[p.id] || 0) * state.allora);
+      live[p.id] = clamp01(state.base[p.id] + n * sp * p.drift * 1.7 * (1 - recent(p.id) * 0.8) + bias(p.id) + gesture(p.id) + (p.id === 'metamorphosis' ? autoMeta : 0) + (ALLORA[p.id] || 0) * state.allora);
     });
-    { const pl = GP(state.scene); if (pl && pl.stay) live.lumen = clamp01(live.lumen + Math.min(0.3, dwell / 200)); }
-    paxK = clamp01(paxK + (state.sw.pax ? dt / 90 : -dt / 20));
+    { const pl = GP(state.scene); if (pl && pl.stay) live.lumen = clamp01(live.lumen + Math.min(0.3, dwell / 200));
+      // in certi luoghi, tirando verso Allora, torna il rumore di quando erano vivi
+      if (pl && pl.alloraLevels && state.allora > 0.01) Object.keys(pl.alloraLevels).forEach(id => { live[id] = clamp01(live[id] + pl.alloraLevels[id] * state.allora); }); }
+    paxK = clamp01(paxK + (state.sw.pax ? dt / 24 : -dt / 10));
     const pk = Math.max(peaceK, smooth(0, 1, paxK));
     if (pk > 0.001) {
       // la pace: si calmano il fuoco, le voci e il nastro; si aprono il velo, il coro, la carezza
-      ['tempestas', 'crepitus', 'cinis', 'calcinatio', 'plica', 'contritio', 'plumbum', 'm_sussurri', 'm_acufene', 'm_ronzio', 'm_tubature', 'nastro'].forEach(id => { live[id] *= 1 - pk * 0.9; });
-      live.oblio *= 1 - pk * 0.6;
+      ['tempestas', 'crepitus', 'cinis', 'calcinatio', 'plica', 'contritio', 'plumbum', 'm_sussurri', 'm_acufene', 'm_ronzio', 'm_tubature', 'nastro'].forEach(id => { live[id] *= 1 - pk * 0.9 * (1 - recent(id)); });
+      live.oblio *= 1 - pk * 0.6 * (1 - recent('oblio'));
       live.lumen = clamp01(live.lumen + pk * 0.3); live.velum = clamp01(live.velum + pk * 0.3);
       live.chorus = clamp01(live.chorus + pk * 0.25); live.aether = clamp01(live.aether + pk * 0.2);
       live.m_carezza = Math.max(live.m_carezza, pk * 0.3); live.m_scacciapensieri = Math.max(live.m_scacciapensieri, pk * 0.18);
     }
-    const hush = Math.max(hushNow, state.base.silentium, pk);
+    // la folla, gli sguardi: più resti, più il luogo ti stringe; poi, se resti ancora, si allenta
+    { const pl = GP(state.scene); let tgt = 0;
+      if (pl && pl.press && !traveling) { const k = dwell / pl.press; tgt = k < 1 ? smooth(0, 1, k) : k < 1.6 ? 1 : Math.max(0, 1 - (k - 1.6) * 1.2);
+        if (k >= 1.6 && !pressFreed) { pressFreed = true; $('plAllora').textContent = 'Nessuno ti stava guardando. Nessuno si ricorderà di quella frase. Solo tu.'; } }
+      pressNow += (tgt - pressNow) * Math.min(1, dt * 0.6);
+      if (pressNow > 0.005) {
+        const k = pressNow;
+        live.m_voci = clamp01(live.m_voci + k * 0.4); live.m_sussurri = clamp01(live.m_sussurri + k * 0.35); live.m_acufene = clamp01(live.m_acufene + k * 0.3);
+        live.m_cuore = clamp01(live.m_cuore + k * 0.35); live.pulsus = clamp01(Math.max(live.pulsus, 0.45 + k * 0.4));
+        live.distantia = clamp01(live.distantia - k * 0.3); live.lumen = clamp01(live.lumen - k * 0.2); live.nastro = clamp01(live.nastro + k * 0.25);
+        live.solutio = clamp01(live.solutio - k * 0.15);
+      }
+    }
+    // quello che hai risposto alle domande resta, piano, dentro la musica
+    Object.keys(state.mood).forEach(m => { if (live[m] !== undefined) live[m] = clamp01(live[m] + state.mood[m]); });
+    // se tocchi la fornace, la fornace si sveglia anche nei luoghi quieti
+    wakeStep(dt);
+    const wF = wake.fornax, wQ = wake.quies, wM = wake.memoria;
+    const hush = Math.max(hushNow, pk, state.base.silentium);
+    const libraAll = Math.max(state.libra, pk * 0.97);
+    const libraQ = Math.max(libraAll, wQ * 0.5);
+    if (wM > 0.01) live.memoria = Math.max(live.memoria, wM * 0.62);
+    // il battito si sente solo se c'è un cuore; il nastro e l'oblio solo se c'è un ricordo che suona
+    { const rp = recent('pulsus'); if (rp > 0) live.m_cuore = Math.max(live.m_cuore, rp * 0.3); }
+    { const rk = Math.max(recent('oblio'), recent('nastro'), recent('distantia'), recent('metamorphosis'), recent('memoria'));
+      if (rk > 0) { let e = 0; ATH.MEM_IDS.forEach(m => e = Math.max(e, live[m])); if (e < 0.12) { live.m_carillon = Math.max(live.m_carillon, rk * 0.3); live.m_fruscio = Math.max(live.m_fruscio, rk * 0.2); } } }
+    if (wF > 0.6 && (hushNow > 0.5 || libraAll > 0.8 || pk > 0.5) && clock - wokeToast > 90) { wokeToast = clock; toast('La fornace si riaccende piano, sotto le tue mani.'); }
 
-    engine.apply(live, state.sw, { px: I.px * I.presence, libra: Math.max(state.libra, pk * 0.97), breath: breathMul, hush }, dt);
+    engine.apply(live, state.sw, { px: I.px * I.presence, libra: libraAll, libraQ, wakeF: state.base.silentium > 0.5 ? 0 : wF, breath: breathMul, hush }, dt);
     if (engine.ready) {
       const rootHz = ATH.rootHz(live.radix);
       quies.apply(live, state.sw, state.choice, dt, rootHz);
@@ -954,7 +1164,7 @@ window.ATH = window.ATH || {};
         phaseGlyph: ATH.PHASES[phIdx].glyph, q: qVis, motif,
         wave: memoria ? memoria.waveVal : 0, voiceAct: memoria ? memoria.voiceAct : 0,
         breathOn, breath01, passage: passageT >= 0 ? Math.sin(Math.PI * Math.min(1, passageT / (passDir ? 4.4 : 3.4))) : 0, passDir,
-        levelN: sc ? sc.level || 0 : 0, lumini: state.lumini, tombIdx, tombName, rescue: rescueAmt, faceFade: faceNow, ascend: ascendNow, dark: darkNow * (1 - ascendNow * 0.8), darkMode: lm, candleGlow: glowNow * darkNow
+        levelN: sc ? sc.level || 0 : 0, lumini: state.lumini, tombIdx, tombName, rescue: rescueAmt, faceFade: faceNow, ascend: ascendNow, dark: darkNow * (1 - ascendNow * 0.8), darkMode: lm, candleGlow: glowNow * darkNow, press: pressNow
       });
       cssT += dt;
       if (cssT > 0.15) {
@@ -983,7 +1193,9 @@ window.ATH = window.ATH || {};
       }
     }
   }
-  function loop(now) { requestAnimationFrame(loop); try { step(now, true); } catch (err) { if (window.console) console.error(err); } }
+  // con la mappa aperta il crogiolo si ridisegna più di rado: lo scorrimento resta fluido
+  let skipN = 0;
+  function loop(now) { requestAnimationFrame(loop); const mapOpen = !$('mapov').hidden; try { step(now, !mapOpen || (++skipN % 6 === 0)); } catch (err) { if (window.console) console.error(err); } }
   requestAnimationFrame(loop);
   setInterval(() => { if (document.hidden) step(performance.now(), false); }, 200);
 

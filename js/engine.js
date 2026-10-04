@@ -364,7 +364,9 @@ window.ATH = window.ATH || {};
       this.setAl('decim', 1 + L.contritio * L.contritio * 48);
       const libra = X.libra === undefined ? 0 : X.libra;
       const hush = X.hush || 0;
-      const fur = Math.min(1, (1 - libra) * 2) * (1 - hush * 0.94), qui = Math.min(1, libra * 2);
+      const libQ = X.libraQ === undefined ? libra : X.libraQ;
+      // incrocio morbido: a metà bilancia la fornace è già più bassa e la quiete già presente
+      const fur = Math.max(Math.min(1, (1 - libra) * 1.4) * (1 - hush * 0.94), (X.wakeF || 0) * 0.42), qui = Math.min(1, libQ * 1.5);
       this.T(this.furnace.gain, fur, 0.2);
       this.T(this.quietOut.gain, qui * 0.95 * (X.breath === undefined ? 1 : X.breath), 0.25);
       this.T(this.halo.gain, 0.15 + (L.aether || 0) * 0.9, 0.2);
@@ -375,9 +377,9 @@ window.ATH = window.ATH || {};
 
       const cut = ATH.cutoffHz(L.solutio);
       this.T(this.lp.frequency, cut, 0.08);
-      this.T(this.lp.Q, 0.5 + L.draco * L.draco * 22, 0.08);
+      this.T(this.lp.Q, 0.5 + L.draco * L.draco * 11, 0.12);
       this.T(this.bp.frequency, clamp(cut, 60, 12000), 0.08);
-      this.T(this.bp.Q, 0.8 + L.draco * 16, 0.08);
+      this.T(this.bp.Q, 0.8 + L.draco * 8, 0.12);
       this.T(this.gLP.gain, S.solve ? 0 : 1, 0.15);
       this.T(this.gBP.gain, S.solve ? 2.6 : 0, 0.15);
 
