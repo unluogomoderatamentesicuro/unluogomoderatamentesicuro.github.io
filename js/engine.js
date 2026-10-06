@@ -366,12 +366,14 @@ window.ATH = window.ATH || {};
       const hush = X.hush || 0;
       const libQ = X.libraQ === undefined ? libra : X.libraQ;
       // incrocio morbido: a metà bilancia la fornace è già più bassa e la quiete già presente
-      const fur = Math.max(Math.min(1, (1 - libra) * 1.4) * (1 - hush * 0.94), (X.wakeF || 0) * 0.42), qui = Math.min(1, libQ * 1.5);
+      // il rumore è una parte del viaggio, non il fondo: sale dove serve, sparisce quando serve;
+      // la quiete eterea non se ne va mai del tutto
+      const fur = Math.max(Math.min(1, (1 - libra) * 1.3) * (1 - hush * 0.96) * 0.82, (X.wakeF || 0) * 0.38), qui = Math.min(1, 0.3 + libQ * 1.25);
       this.T(this.furnace.gain, fur, 0.2);
       this.T(this.quietOut.gain, qui * 0.95 * (X.breath === undefined ? 1 : X.breath), 0.25);
       this.T(this.halo.gain, 0.15 + (L.aether || 0) * 0.9, 0.2);
       this.T(this.quietEcho.gain, (L.ouroboros || 0) * 0.25, 0.2);
-      this.setAl('dust', L.crepitus * fur);
+      this.setAl('dust', L.crepitus * L.crepitus * fur * 0.6);
       this.setAl('gate', S.mortificatio ? 0.45 + L.tempestas * 0.55 : 0);
       this.setAl('chaos', L.tempestas);
 

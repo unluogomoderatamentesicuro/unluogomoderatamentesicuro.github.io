@@ -42,10 +42,11 @@ window.ATH = window.ATH || {};
     ['L1', 6, 'La rinascita', 'germoglio', [['ricominciare', 'finestra_aperta'], ['perdono', 'prima_volta', 'respiro_lungo']], 'field'],
     ['T0', 0, 'Il mare', 'mare', [['stelle', 'lorenzo', 'faro'], ['porto', 'molo', 'spiaggia_inverno', 'mare_aperto']], 'sea'],
     ['T0', 1, 'La campagna', 'campagna', [['strade_nebbia', 'grano', 'neve', 'felicita'], ['vigna', 'uliveto', 'treno_merci', 'giardino']], 'field'],
-    ['T0', 2, 'Il fiume', 'ruscello', [['ponte', 'mulino', 'cascata'], ['canneto', 'lago_ghiacciato']], 'water'],
+    ['T0', 2, 'Il fiume', 'ruscello', [['ponte', 'mulino', 'cascata'], ['canneto', 'lago_ghiacciato', 'tuffi']], 'water'],
     ['T0', 3, 'Il bosco', 'bosco', [['fuga', 'conca', 'bosco_profondo', 'palude', 'lago'], ['porta_bosco']], 'trees'],
     ['T0', 4, 'Il borgo', 'borgo', [['mura', 'fontana'], ['orologio_fermo', 'campana_sola', 'casa_luce']], 'town'],
     ['T0', 5, 'Il paese', 'domenica', [['incontro', 'parco_giochi', 'festa_finita'], ['fiera']], 'town'],
+    ['T0', 7, 'La casa al mare', 'casa_mare_inverno', [['persiane'], ['notte_finestra', 'sole_sveglia']], 'sea'],
     ['T0', 6, 'Il nulla', 'campo_nulla', [['strada_nulla', 'pensilina', 'palo_luce'], ['cammino_notte', 'deserto_sale', 'orizzonte']], 'void'],
     ['T1', 0, 'La casa vuota', 'casa_vuota', [['moquette', 'ripostiglio', 'macchinina'], ['stanza_vuota', 'occasioni', 'fotografie']], 'house'],
     ['T1', 1, 'I nonni', 'giorni_nonni', [['estate', 'cucina', 'sottoscala'], ['nonno_malato', 'letto_nonni', 'casa_venduta']], 'house'],
@@ -53,13 +54,17 @@ window.ATH = window.ATH || {};
     ['T1', 3, 'La soglia', 'soglia', [['giugno', 'dubbio'], ['salvezza']], 'field'],
     ['T1', 4, 'Le voci della notte', 'voci_notte', [['radio_notte', 'lettera_mai', 'ultima_telefonata']], 'town'],
     ['T1', 5, 'La casa abbandonata', 'casa', [['soffitta', 'casa_velo'], ['stanza', 'stanza_specchi']], 'ruin'],
-    ['T1', 6, 'Le feste', 'sedia_vuota', [['compleanno_solo', 'cane_vecchio']], 'house'],
+    ['T1', 6, 'Le feste', 'sedia_vuota', [['compleanno_solo', 'cane_vecchio'], ['natale_bambino', 'letterina', 'uovo_pasqua', 'giorni_uguali']], 'house'],
+    ['T1', 8, 'Il cuore', 'domenica_sera', [['nostalgia', 'rimpianto', 'vergogna', 'paura_perdere'], ['gratitudine', 'tenerezza', 'stupore', 'sollievo', 'calma_dopo']], 'mind'],
+    ['T1', 7, 'La casa lasciata', 'casa_fretta', [['spartito', 'seduta'], ['casa_vandali']], 'ruin'],
     ['T2', 0, 'L’orfanotrofio', 'orfanotrofio', [['cortile', 'refettorio', 'aula', 'lavatoio'], ['parlatorio', 'infermeria', 'cappella']], 'house'],
     ['T2', 1, 'Il manicomio', 'manicomio', [['manicomio_abb', 'ospedale_abb'], ['pronto_soccorso', 'ospizio']], 'ruin'],
     ['T2', 2, 'La chiesa', 'chiesa', [['cappella_funebre', 'funerale']], 'tomb'],
     ['T2', 3, 'Il cimitero', 'cimitero', [['massimo', 'monumentale', 'fuochi_fatui'], ['venticinque', 'madre']], 'tomb'],
     ['T2', 4, 'La città', 'centro', [['citta_vecchia', 'crocevia'], ['sala_giochi', 'cabina']], 'city'],
     ['T2', 5, 'La stazione', 'stazione', [['attesa', 'amore', 'addio'], ['periferia', 'treno_notte', 'binario_morto', 'citta_lontana']], 'city'],
+    ['T2', 8, 'I posti di passaggio', 'autogrill', [['lavanderia', 'edicola'], ['cinema_paese']], 'city'],
+    ['T2', 7, 'La strada', 'giorgio_moto', [['obitorio']], 'city'],
     ['T2', 6, 'Le rovine', 'citta_abbandonata', [['fabbrica', 'reparto'], ['studio_cine', 'set_film', 'sala_proiezione']], 'ruin'],
     ['M', 0, 'La folla', 'folla', [['festa_folla', 'palco']], 'mind'],
     ['M', 1, 'L’impostore', 'ufficio', [['esame', 'riunione'], ['complimento', 'sportello']], 'mind'],
@@ -67,6 +72,7 @@ window.ATH = window.ATH || {};
     ['M', 3, 'Il sogno', 'dormiveglia', [['madre_sogno', 'casa_mai', 'voce_telefono'], ['bambino_sconosciuto', 'festa_mai', 'padre_treno']], 'dream'],
     ['M', 4, 'Le cose ritrovate', 'cassetto', [['oggetto_perduto', 'quaderno', 'giocattolo'], ['spiaggia_foto', 'canzone']], 'dream'],
     ['M', 5, 'I ritorni', 'sala_ritorni', [['amico_perso', 'nonno_orto', 'massimo_partita']], 'dream'],
+    ['M', 7, 'L’immaginato', 'teatro_vuoto', [['corridoio_compleanni', 'pioggia_casa', 'ascensore', 'stanza_rovescia'], ['paese_bambini', 'neve_agosto', 'figlio_grande', 'biblioteca_lettere']], 'dream'],
     ['M', 6, 'La testa', 'fuori_posto', [['impazzito', 'sbagliato_tutto'], ['pensieri_neri']], 'mind'],
     ['U1', 0, 'La grotta', 'grotta', [], 'under'],
     ['U1', 1, 'La cantina', 'cantina', [], 'under'],
@@ -94,7 +100,11 @@ window.ATH = window.ATH || {};
     ['folla', 'centro'], ['festa_folla', 'festa_finita'], ['palco', 'sala_proiezione'], ['ufficio', 'stazione'], ['riunione', 'pronto_soccorso'],
     ['stanza_domande', 'dubbio'], ['specchio_parla', 'stanza_specchi'], ['confessionale', 'chiesa'], ['bivio', 'strada_nulla'], ['bivio', 'crocevia'],
     ['dormiveglia', 'letto'], ['dormiveglia', 'insonnia'], ['cassetto', 'ripostiglio'], ['sala_ritorni', 'cimitero'], ['fuori_posto', 'insonnia'],
-    ['impazzito', 'voci'], ['sbagliato_tutto', 'occasioni'], ['pensieri_neri', 'pensieri'], ['pensieri_neri', 'respiro_lungo']
+    ['impazzito', 'voci'], ['sbagliato_tutto', 'occasioni'], ['pensieri_neri', 'pensieri'], ['pensieri_neri', 'respiro_lungo'],
+    ['obitorio', 'ultimo_respiro'], ['casa_mare_inverno', 'spiaggia_inverno'], ['uovo_pasqua', 'letto_nonni'], ['letterina', 'figlio'], ['seduta', 'voci'],
+    ['spartito', 'canzone'], ['teatro_vuoto', 'studio_cine'], ['neve_agosto', 'neve'], ['paese_bambini', 'parco_giochi'], ['figlio_grande', 'figlio'],
+    ['biblioteca_lettere', 'lettera_mai'], ['stanza_rovescia', 'capovolta'], ['pioggia_casa', 'pioggia'], ['ascensore', 'ufficio'], ['notte_finestra', 'letto'],
+    ['casa_vandali', 'casa'], ['giorgio_moto', 'strade_nebbia'], ['corridoio_compleanni', 'compleanno_solo'], ['giorgio_moto', 'fuochi_fatui'], ['nostalgia', 'canzone'], ['paura_perdere', 'figlio'], ['stupore', 'stelle'], ['calma_dopo', 'alba'], ['vergogna', 'folla'], ['autogrill', 'treno_notte'], ['edicola', 'paese_bambini'], ['cinema_paese', 'sala_proiezione'], ['tuffi', 'estate'], ['domenica_sera', 'giorni_uguali']
   ];
 
   // quanto bisogna restare per scoprire un luogo nascosto
@@ -107,7 +117,7 @@ window.ATH = window.ATH || {};
 
   // —— geometria
   const SW = 166, RH = 64, PAD = 92;
-  const cols = 7;
+  const cols = 9;
   const colW = new Array(cols).fill(1);
   D.forEach(d => { colW[d[1]] = Math.max(colW[d[1]], Math.max(1, d[4].length)); });
   const colX = []; let cx = 40;
@@ -140,7 +150,7 @@ window.ATH = window.ATH || {};
   });
   ATH.PLACES.forEach(p => {
     const w = where[p.id];
-    if (!w) { console.warn('pianta: senza quartiere', p.id); return; }
+    if (!w) { if (!p.offmap) console.warn('pianta: senza quartiere', p.id); return; }
     const B = BANDS[bi(w.band)];
     if (B.lv !== (p.level || 0)) console.warn('pianta: livello diverso', p.id, B.lv, p.level);
     p.mx = w.mx; p.my = w.my; p.district = w.d; p.isHub = !!w.hub; p.band = w.band;
@@ -182,6 +192,15 @@ window.ATH = window.ATH || {};
     const ds = D.filter(d => d[0] === B.id && d[4].length).sort((p, q) => p[1] - q[1]);
     for (let i = 1; i < ds.length; i++) if (ds[i][1] - ds[i - 1][1] === 1) link(tailOf(ds[i - 1], 'R'), tailOf(ds[i], 'L'), 'short');
   });
+  // i ponti a metà strada: ogni tanto, tra due quartieri vicini, un passaggio di traverso
+  BANDS.filter(B => B.lv <= 0).forEach(B => {
+    const ds = D.filter(d => d[0] === B.id && d[4].length).sort((p, q) => p[1] - q[1]);
+    for (let i = 1; i < ds.length; i++) {
+      if (ds[i][1] - ds[i - 1][1] !== 1) continue;
+      const L = ds[i - 1][4][ds[i - 1][4].length - 1], R = ds[i][4][0];
+      if (L.length >= 3 && R.length >= 3 && ![L[0], L[1], R[0], R[1]].some(id => ATH.PLACE[id].hidden)) link(L[1], R[1], 'bridge');
+    }
+  });
   // le porte
   PORTALS.forEach(([a, b]) => link(a, b, 'portal'));
   // le capsule del tempo: porte nascoste verso i luoghi dove si possono trovare
@@ -189,7 +208,7 @@ window.ATH = window.ATH || {};
   // e le porte verso l'Altrove
   ATH.PLACES.forEach(p => (GEN[p.id] || []).forEach(g => p.exits.push(g)));
 
-  ATH.PLAN = { W, H, SW, RH, bands: BANDS, bandTop, bandH, colX, colW, districts: D.map(d => ({ band: d[0], lv: BANDS[bi(d[0])].lv, col: d[1], name: d[2], hub: d[3], land: d[5], ids: [d[3]].concat(...d[4]) })), roads: ROADS };
+  ATH.PLAN = { W, H, SW, RH, bands: BANDS, bandTop, bandH, colX, colW, districts: D.map(d => ({ band: d[0], lv: BANDS[bi(d[0])].lv, col: d[1], name: d[2], hub: d[3], land: d[5], spines: d[4], ids: [d[3]].concat(...d[4]) })), roads: ROADS };
 
   ATH.START = 'soglia';
   ATH.SCENES = ATH.PLACES.slice().sort((a, b) => b.level - a.level);

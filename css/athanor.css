@@ -765,3 +765,99 @@ body:not(.lit) .deck, body:not(.lit) .actions, body:not(.lit) .hint { opacity: 0
 .m-band, .m-land, .m-deco, .m-district, .m-level, .m-lgloss, .m-edge, .m-door { pointer-events: none; }
 .m-edge.m-portal { fill: none; }
 .place .ask, .place .ask * { pointer-events: auto; }
+
+/* —— opus XI: il nascondiglio —— */
+#btnHide[aria-pressed="true"] { border-color: rgba(255, 200, 150, .6); color: rgb(255, 214, 170); }
+.soglia.safe-out .arrow { color: rgb(255, 210, 160); }
+@media (max-width: 760px) { .jbar { flex-wrap: wrap; row-gap: 6px; } }
+
+/* —— opus XII: l'atlante —— */
+.map-inner { width: min(1560px, 100%); }
+.atlas-nav { display: flex; align-items: center; gap: 6px; }
+.atlas-tabs { display: flex; gap: 4px; overflow-x: auto; flex: 1; scrollbar-width: none; }
+.atlas-tabs::-webkit-scrollbar { display: none; }
+.atab { flex: 0 0 auto; background: transparent; border: 1px solid var(--line); color: var(--ink-dim); padding: 6px 12px; font: italic 14px var(--f-body); cursor: pointer; display: flex; gap: 8px; align-items: baseline; }
+.atab .rn { font: 11px var(--f-display); letter-spacing: .12em; color: var(--accent); opacity: .8; }
+.atab.on { border-color: #c9b48e; color: #2b1d10; background: #e6d9bd; }
+.atab.on .rn { color: #8a2b1d; }
+.atab.here::after { content: '•'; color: #c0392b; margin-left: 2px; }
+.apage { min-width: 2.2em; font-size: 18px; padding: 2px 8px; }
+.map-wrap { background: #1a140e; }
+#mapSvg { display: block; margin: 0 auto; }
+.a-frame { fill: none; stroke: #3a2a1a; stroke-width: 2.4; }
+.a-frame.thin { stroke-width: 1; }
+.a-orn circle, .a-orn path { fill: none; stroke: #3a2a1a; stroke-width: 1.4; }
+.a-orn circle { fill: #e6d9bd; }
+.a-flour { fill: none; stroke: #3a2a1a; stroke-width: 1.4; stroke-linecap: round; }
+.a-tav { fill: #8a2b1d; font: 18px "IM Fell English SC", Georgia, serif; letter-spacing: .3em; text-anchor: middle; }
+.a-title { fill: #2b1d10; font: italic 52px "IM Fell English", Georgia, serif; text-anchor: middle; }
+.a-sub { fill: #5a4630; font: italic 20px "IM Fell English", Georgia, serif; text-anchor: middle; }
+.a-legend { fill: rgba(240, 230, 205, .7); stroke: #3a2a1a; stroke-width: 1.2; }
+.a-legt { fill: #2b1d10; font: italic 17px "IM Fell English", Georgia, serif; }
+.a-legt.c { text-anchor: middle; font: 15px "IM Fell English SC", Georgia, serif; }
+.a-legl { fill: #3a2a1a; font: italic 13px "IM Fell English", Georgia, serif; }
+.a-rose circle { fill: none; stroke: #3a2a1a; stroke-width: 1.2; }
+.a-rose .thin { fill: none; stroke: #3a2a1a; stroke-width: .8; }
+.a-rose .fill { fill: rgba(58, 42, 26, .55); stroke: #3a2a1a; stroke-width: .8; }
+.a-section { fill: #5a2a1a; font: 22px "IM Fell English SC", Georgia, serif; letter-spacing: .2em; text-anchor: middle; }
+.a-region { fill: rgba(58, 42, 26, .55); font: 25px "IM Fell English SC", Georgia, serif; letter-spacing: .28em; text-anchor: middle; text-transform: uppercase; }
+.a-deco { fill: none; stroke: rgba(58, 42, 26, .42); stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
+.a-road { fill: none; stroke: #3a2a1a; stroke-linecap: round; }
+.a-road.a-lane { stroke-width: 1.5; stroke-dasharray: 5 5; opacity: .75; }
+.a-road.a-via { stroke-width: 2.4; opacity: .55; }
+.a-road.a-row, .a-road.a-short, .a-road.a-bridge { stroke-width: 1.2; stroke-dasharray: 1.5 6; opacity: .6; }
+.a-road.trail { stroke: #5a3d1e; opacity: 1; stroke-width: 2.6; stroke-dasharray: none; }
+.a-road.path { stroke: #8a2b1d; opacity: 1; stroke-width: 3.6; stroke-dasharray: 10 6; animation: walkdash 1.2s linear infinite; }
+.a-hit { fill: transparent; }
+.a-node { cursor: pointer; }
+.a-node.here { cursor: default; }
+.a-sym { stroke: #2b1d10; stroke-width: 1.4; }
+.a-sym.seen { fill: #2b1d10; }
+.a-sym.never { fill: #e6d9bd; }
+.a-sym.secret { fill: #6b4a8a; stroke: #3a2050; }
+.a-here-ring { fill: none; stroke: #8a2b1d; stroke-width: 2; animation: halo 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.a-here-dot { fill: #b0301e; stroke: #5a1a10; stroke-width: 1.2; }
+.a-label { fill: #2b1d10; font: italic 20px "IM Fell English", Georgia, serif; text-anchor: start; paint-order: stroke; stroke: rgba(230, 217, 189, .85); stroke-width: 4px; stroke-linejoin: round; }
+.a-label.hub { font: 22px "IM Fell English SC", Georgia, serif; text-anchor: middle; letter-spacing: .04em; }
+.a-node.never .a-label { fill: #6b5a44; }
+.a-node.near .a-label { fill: #000; font-weight: 700; }
+.a-node.near .a-sym { stroke: #8a2b1d; stroke-width: 2.4; }
+.a-node.sel .a-label, .a-node.onpath .a-label { fill: #8a2b1d; }
+.a-node.sel .a-sym { stroke: #8a2b1d; stroke-width: 3; }
+.a-node:hover .a-sym, .a-node:focus-visible .a-sym { stroke: #8a2b1d; stroke-width: 2.6; }
+.a-node:focus { outline: none; }
+.a-door { fill: #8a2b1d; opacity: .85; font: italic 13px "IM Fell English", Georgia, serif; text-anchor: start; paint-order: stroke; stroke: rgba(230, 217, 189, .85); stroke-width: 3px; }
+.a-door.c { text-anchor: middle; }
+.a-region, .a-deco, .a-road, .a-door, .a-section, .a-frame, .a-flour, .a-legend { pointer-events: none; }
+@media (max-width: 760px) { .atab { padding: 5px 9px; font-size: 13px; } .atab .tn { display: inline; } .map-note { display: none; } }
+
+/* —— opus XIII: la mappa scura, ripensata —— */
+.map-wrap { background: transparent; scroll-behavior: auto; }
+.atab { border-color: var(--line); color: var(--ink-dim); background: transparent; }
+.atab .rn { color: var(--accent); }
+.atab.on { border-color: var(--accent); color: var(--ink); background: rgba(var(--accent-rgb), .12); }
+.atab.on .rn { color: var(--accent); }
+.atab.here::after { content: '•'; color: var(--accent); margin-left: 2px; }
+.m-band { fill: rgba(255, 255, 255, 0.012); }
+.m-band.odd { fill: rgba(255, 255, 255, 0.03); }
+.m-band.mind { fill: rgba(190, 160, 230, 0.04); }
+.m-stratum { fill: var(--accent); font: 34px var(--f-display); letter-spacing: .18em; text-anchor: middle; }
+.m-stratum-g { fill: var(--ink-faint); font: italic 19px var(--f-body); text-anchor: middle; }
+.m-orn { fill: none; stroke: var(--accent); stroke-opacity: .35; stroke-width: 1.2; }
+.m-orn.thin { stroke-opacity: .15; }
+.m-orn-dot { fill: var(--accent); opacity: .5; }
+.m-substratum { fill: var(--accent); opacity: .8; font: 19px var(--f-display); letter-spacing: .16em; }
+.m-region { fill: var(--ink-faint); font: 19px var(--f-display); letter-spacing: .3em; text-anchor: middle; text-transform: uppercase; opacity: .9; }
+.m-deco { fill: none; stroke: var(--ink-faint); stroke-width: 1.2; opacity: .3; stroke-linecap: round; stroke-linejoin: round; }
+.m-dot { stroke-width: 1.8; }
+.m-label { font-size: 19px; }
+.m-label.side { text-anchor: start; font-size: 19px; }
+.m-label.hubl { text-anchor: middle; font: 21px var(--f-display); letter-spacing: .04em; fill: var(--ink); }
+.m-door { font-size: 14px; opacity: .8; }
+.m-edge.m-via { stroke: var(--ink-dim); stroke-width: 2.6; opacity: .5; stroke-dasharray: none; }
+.m-edge.m-lane { stroke: var(--ink-dim); stroke-width: 1.5; opacity: .45; stroke-dasharray: none; }
+.m-edge.m-row { stroke: var(--ink-dim); stroke-width: 1.4; opacity: .38; stroke-dasharray: 2 5; }
+.m-edge.m-short { stroke: var(--ink-dim); stroke-width: 1.2; opacity: .32; stroke-dasharray: 1 5; }
+.m-edge.near { stroke: var(--accent); opacity: .9; }
+.m-stratum, .m-stratum-g, .m-orn, .m-orn-dot, .m-substratum, .m-region, .m-deco { pointer-events: none; }
+@media (max-width: 760px) { .map-legend { display: none; } }

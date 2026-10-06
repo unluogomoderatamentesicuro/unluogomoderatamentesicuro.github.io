@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=IM+Fell+English:ital@0;1&family=Fragment+Mono&display=swap">
-<link rel="stylesheet" href="css/athanor.css?v=10">
+<link rel="stylesheet" href="css/athanor.css?v=13">
 </head>
 <body data-phase="nigredo">
 <!--ATHANOR:BODY-->
@@ -58,6 +58,7 @@
         <button type="button" class="btn jbtn" id="btnMap" title="La mappa dei luoghi trovati">Mappa</button>
         <button type="button" class="btn jbtn jbtn-knobs" id="btnKnobs" aria-pressed="false">Manopole</button>
         <button type="button" class="btn jbtn" id="btnWander" aria-pressed="false" title="Lasciati portare da un luogo all’altro">Vaga</button>
+        <button type="button" class="btn jbtn" id="btnHide" aria-pressed="false" title="Un posto caldo e silenzioso, sotto le coperte, dove nessuno ti chiede niente">Nasconditi</button>
         <div class="aetas" title="Dal presente al ricordo">
           <label for="allora">Ora</label>
           <input type="range" id="allora" min="0" max="1000" value="0" aria-label="Dal presente (Ora) al ricordo (Allora)">
@@ -96,7 +97,7 @@
 
 <div class="gate" id="gate">
   <div class="gate-inner">
-    <p class="eyebrow">un luogo moderatamente sicuro · opus X</p>
+    <p class="eyebrow">un luogo moderatamente sicuro · opus XIII</p>
     <h2 class="gate-title">Athanor</h2>
     <p class="gate-lede">Una città verticale di ricordi, dal grembo, prima di nascere, fino a ciò che viene dopo l’ultimo respiro. In alto la rosa di luce, in basso il fiume dove si dimentica; in mezzo il mare d’infanzia, le stelle, le case abbandonate, il cimitero, la chiesa di notte, la stanza prima di dormire, l’attesa, la paura del buio, il pianto, l’alba. Oltre l’ultima strada c’è l’Altrove, che non finisce mai: lì ci si può perdere davvero.</p>
     <ul class="gate-notes">
@@ -104,7 +105,7 @@
       <li>Le soglie in basso portano altrove. Le frecce seguono la mappa; ⇧ sali, ⇩ scendi, ⋯ verso ciò che nessuno ha mai visto. <em>Ora · Allora</em> sposta tra ciò che accade e ciò che è accaduto.</li>
       <li>Si parte sempre dalla soglia. La città è divisa in quartieri: nella <em>Mappa</em> tocchi un luogo lontano e ci cammini, attraversando quelli in mezzo.</li>
       <li>Quello che giri con le tue mani ha sempre la precedenza: anche nei luoghi più quieti, se tocchi la fornace, la fornace si riaccende.</li>
-      <li>Se ti perdi, puoi chiedere aiuto. Qualcuno, forse, verrà.</li>
+      <li>Se ti perdi, puoi chiedere aiuto. Qualcuno, forse, verrà. E quando non hai più voglia di girare, <em>Nasconditi</em>: c’è un posto caldo, sotto le coperte, dove nessuno ti chiede niente.</li>
       <li>Muovi, tocca, gira le manopole anche a caso: il fuoco ascolta pure ciò che non intendi fare.</li>
       <li>Premi <em>Registra</em> e alla fine salva la sessione come file audio.</li>
     </ul>
@@ -117,14 +118,13 @@
   <div class="map-inner" role="dialog" aria-modal="true" aria-labelledby="mapTitle">
     <header class="map-head">
       <div><h2 id="mapTitle">Mappa dei ricordi</h2><p class="map-count" id="mapCount"></p>
-        <ul class="map-legend" aria-label="Legenda">
-          <li><i class="lg-here"></i>sei qui</li><li><i class="lg-trail"></i>il cammino di oggi</li><li><i class="lg-near"></i>a un passo</li><li><i class="lg-known"></i>conosciuti</li><li><i class="lg-never"></i>mai visitati</li>
-        </ul></div>
+        <ul class="map-legend" aria-label="Legenda"><li><i class="lg-here"></i>sei qui</li><li><i class="lg-trail"></i>il cammino di oggi</li><li><i class="lg-near"></i>a un passo</li><li><i class="lg-known"></i>conosciuti</li><li><i class="lg-never"></i>mai visitati</li></ul></div>
       <span class="map-tools"><button type="button" class="btn" id="mapZoomOut" aria-label="Allontana">−</button><button type="button" class="btn" id="mapZoomIn" aria-label="Avvicina">+</button><button type="button" class="btn" id="mapHere">Dove sono</button><button type="button" class="btn" id="btnMapClose">Chiudi</button></span>
     </header>
-    <div class="map-frame"><div class="map-wrap" id="mapWrap"><svg id="mapSvg" viewBox="0 0 1000 700" role="img" aria-label="Luoghi trovati e soglie tra loro"></svg></div></div>
+    <nav class="atlas-nav" aria-label="Strati della mappa"><button type="button" class="btn apage" id="mapPrev" aria-label="Strato sopra">↑</button><div class="atlas-tabs" id="atlasTabs"></div><button type="button" class="btn apage" id="mapNext" aria-label="Strato sotto">↓</button></nav>
+    <div class="map-frame"><div class="map-wrap" id="mapWrap"><svg id="mapSvg" viewBox="0 0 1000 700" role="img" aria-label="Luoghi trovati e strade tra loro"></svg></div></div>
     <div class="map-go" id="mapGo" hidden><span id="mapGoText"></span><button type="button" class="btn btn-go" id="mapGoBtn">Cammina fin lì</button></div>
-    <p class="map-note">Il mondo è fatto di strati: i cieli, le torri, la terra in tre fasce, la mente, il sottosuolo. In ogni strato una strada maestra unisce i quartieri; dai quartieri partono i sentieri, e i sentieri si toccano anche in fondo. Accanto ad alcuni luoghi c’è una porta: ⇧ sale, ⇩ scende, ◌ entra nella mente. Tocca un luogo per vedere la strada, poi cammina fin lì. Molti luoghi sono nascosti: compaiono restando, rispondendo, o senza un perché.</p>
+    <p class="map-note">La mappa scende dai cieli al grembo, uno strato sotto l’altro: in alto i nomi degli strati ti portano subito dove vuoi. Ogni contrada ha una piazza e sentieri che scendono; le piazze vicine sono unite da strade, e i sentieri si toccano anche in fondo. Accanto ad alcuni luoghi è scritta una porta: ⇧ sale, ⇩ scende, ◌ entra nella mente, ↑ ↓ porta allo strato vicino della terra. Tocca un luogo per vedere la strada, poi cammina fin lì.</p>
   </div>
 </div>
 
@@ -132,36 +132,40 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="js/params.js?v=10"></script>
-<script src="js/loca.js?v=10"></script>
-<script src="js/loca-plus.js?v=10"></script>
-<script src="js/loca-tertia.js?v=10"></script>
-<script src="js/loca-quarta.js?v=10"></script>
-<script src="js/loca-quinta.js?v=10"></script>
-<script src="js/loca-sesta.js?v=10"></script>
-<script src="js/loca-settima.js?v=10"></script>
-<script src="js/loca-layout.js?v=10"></script>
-<script src="js/worklets.js?v=10"></script>
-<script src="js/engine.js?v=10"></script>
-<script src="js/quies.js?v=10"></script>
-<script src="js/memoria.js?v=10"></script>
-<script src="js/memoria-plus.js?v=10"></script>
-<script src="js/memoria-extra.js?v=10"></script>
-<script src="js/memoria-quarta.js?v=10"></script>
-<script src="js/memoria-quinta.js?v=10"></script>
-<script src="js/memoria-sesta.js?v=10"></script>
-<script src="js/memoria-settima.js?v=10"></script>
-<script src="js/dream.js?v=10"></script>
-<script src="js/dream-plus.js?v=10"></script>
-<script src="js/dream-tertia.js?v=10"></script>
-<script src="js/dream-quarta.js?v=10"></script>
-<script src="js/dream-quinta.js?v=10"></script>
-<script src="js/dream-sesta.js?v=10"></script>
-<script src="js/dream-settima.js?v=10"></script>
-<script src="js/visuals.js?v=10"></script>
-<script src="js/ui.js?v=10"></script>
-<script src="js/recorder.js?v=10"></script>
-<script src="js/main.js?v=10"></script>
+<script src="js/params.js?v=13"></script>
+<script src="js/loca.js?v=13"></script>
+<script src="js/loca-plus.js?v=13"></script>
+<script src="js/loca-tertia.js?v=13"></script>
+<script src="js/loca-quarta.js?v=13"></script>
+<script src="js/loca-quinta.js?v=13"></script>
+<script src="js/loca-sesta.js?v=13"></script>
+<script src="js/loca-settima.js?v=13"></script>
+<script src="js/loca-ottava.js?v=13"></script>
+<script src="js/loca-nona.js?v=13"></script>
+<script src="js/loca-layout.js?v=13"></script>
+<script src="js/atlas.js?v=13"></script>
+<script src="js/worklets.js?v=13"></script>
+<script src="js/engine.js?v=13"></script>
+<script src="js/quies.js?v=13"></script>
+<script src="js/memoria.js?v=13"></script>
+<script src="js/memoria-plus.js?v=13"></script>
+<script src="js/memoria-extra.js?v=13"></script>
+<script src="js/memoria-quarta.js?v=13"></script>
+<script src="js/memoria-quinta.js?v=13"></script>
+<script src="js/memoria-sesta.js?v=13"></script>
+<script src="js/memoria-settima.js?v=13"></script>
+<script src="js/dream.js?v=13"></script>
+<script src="js/dream-plus.js?v=13"></script>
+<script src="js/dream-tertia.js?v=13"></script>
+<script src="js/dream-quarta.js?v=13"></script>
+<script src="js/dream-quinta.js?v=13"></script>
+<script src="js/dream-sesta.js?v=13"></script>
+<script src="js/dream-settima.js?v=13"></script>
+<script src="js/dream-ottava.js?v=13"></script>
+<script src="js/visuals.js?v=13"></script>
+<script src="js/ui.js?v=13"></script>
+<script src="js/recorder.js?v=13"></script>
+<script src="js/main.js?v=13"></script>
 <!--/ATHANOR:BODY-->
 </body>
 </html>

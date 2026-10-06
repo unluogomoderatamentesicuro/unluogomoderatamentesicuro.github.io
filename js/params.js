@@ -61,14 +61,14 @@ window.ATH = window.ATH || {};
     { id: 'sal', group: 'materia', name: 'Sal', glyph: '⊖', gloss: 'il corpo dell’onda', def: 0.35, drift: 0.25, fmt: pct },
     { id: 'sulphur', group: 'materia', name: 'Sulphur', glyph: '♃', gloss: 'il fuoco dentro la voce', def: 0.12, drift: 0.22, fmt: pct },
     { id: 'putrefactio', group: 'materia', name: 'Putrefactio', glyph: '⊗', gloss: 'il colore del marcio', def: 0.22, drift: 0.25, fmt: v => v < 0.33 ? 'bruno' : v < 0.66 ? 'rosa' : 'bianco' },
-    { id: 'cinis', group: 'materia', name: 'Cinis', glyph: '∴', gloss: 'la cenere', def: 0.38, drift: 0.2, fmt: pct },
+    { id: 'cinis', group: 'materia', name: 'Cinis', glyph: '∴', gloss: 'la cenere', def: 0.3, drift: 0.14, fmt: pct },
     { id: 'saturnus', group: 'materia', name: 'Saturnus', glyph: '♄', gloss: 'campane di piombo', def: 0.22, drift: 0.2, fmt: v => (v * v * 3).toFixed(1) + '/s' },
 
     { id: 'calcinatio', group: 'operationes', name: 'Calcinatio', glyph: '△', gloss: 'ridurre in polvere col fuoco', def: 0.25, drift: 0.18, fmt: v => '×' + Math.round(1 + v * v * 40) },
     { id: 'plumbum', group: 'operationes', name: 'Plumbum', glyph: '♁', gloss: 'appesantire il metallo', def: 0.08, drift: 0.15, fmt: v => Math.round(16 - v * 14) + ' bit' },
     { id: 'contritio', group: 'operationes', name: 'Contritio', glyph: '⁂', gloss: 'frantumare il tempo', def: 0.05, drift: 0.15, fmt: v => '÷' + Math.floor(1 + v * v * 48) },
     { id: 'plica', group: 'operationes', name: 'Plica', glyph: '∿', gloss: 'piegare l’onda su sé stessa', def: 0.14, drift: 0.25, fmt: pct },
-    { id: 'crepitus', group: 'operationes', name: 'Crepitus', glyph: '⁘', gloss: 'lo scoppiettio', def: 0.3, drift: 0.25, fmt: pct },
+    { id: 'crepitus', group: 'operationes', name: 'Crepitus', glyph: '⁘', gloss: 'lo scoppiettio', def: 0.14, drift: 0.1, fmt: pct },
     { id: 'coniunctio', group: 'operationes', name: 'Coniunctio', glyph: '☌', gloss: 'le nozze chimiche', def: 0.1, drift: 0.25, fmt: pct },
 
     { id: 'solutio', group: 'vas', name: 'Solutio', glyph: '▽', gloss: 'sciogliere, aprire', def: 0.5, drift: 0.16, fmt: v => hz(ATH.cutoffHz(v)) },
@@ -247,7 +247,7 @@ window.ATH = window.ATH || {};
     {
       id: 'albedo', name: 'Albedo', glyph: '☽', gloss: 'l’opera al bianco',
       bg: [13, 15, 17], accent: [214, 224, 230], second: [118, 140, 152],
-      bias: { putrefactio: 0.32, sublimatio: 0.26, calcinatio: -0.18, solutio: 0.1, sal: -0.15, crepitus: 0.08, ouroboros: 0.08, aether: 0.15, velum: 0.12, chorus: 0.1 }
+      bias: { putrefactio: 0.32, sublimatio: 0.26, calcinatio: -0.18, solutio: 0.1, sal: -0.15, crepitus: 0.02, ouroboros: 0.08, aether: 0.15, velum: 0.12, chorus: 0.1 }
     },
     {
       id: 'citrinitas', name: 'Citrinitas', glyph: '☿', gloss: 'l’opera al giallo',

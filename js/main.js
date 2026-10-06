@@ -174,8 +174,8 @@ window.ATH = window.ATH || {};
       case 'solutio': return (I.px - 0.5) * 0.36 * pr;
       case 'plica': return (0.5 - I.py) * 0.16 * pr + a * 0.08;
       case 'coniunctio': return (I.py - 0.5) * 0.14 * pr;
-      case 'cinis': return a * 0.32;
-      case 'crepitus': return a * 0.42;
+      case 'cinis': return a * 0.16;
+      case 'crepitus': return a * 0.12;
       case 'calcinatio': return a * 0.14 + c * 0.1;
       case 'mercurius': return a * 0.2;
       case 'draco': return c * 0.45;
@@ -285,6 +285,7 @@ window.ATH = window.ATH || {};
     if (!pl || (traveling && !quick)) return;
     if (!byRoute && route) stopRoute(true);
     const from = GP(state.scene);
+    { const hb = document.getElementById('btnHide'); if (hb) { const inT = id === 'tana'; hb.setAttribute('aria-pressed', inT ? 'true' : 'false'); hb.textContent = inT ? 'Esci' : 'Nasconditi'; } }
     const dl = from ? Math.sign((pl.level || 0) - (from.level || 0)) : 0;
     const dur = dl ? 4.4 : 3.4;
     pressFreed = false; traveling = !quick; passageT = quick ? -1 : 0; passDir = quick ? 0 : dl; dwell = 0; urged = false; helping = null; eroded = 0; flatDone = false; woke = false;
@@ -381,10 +382,11 @@ window.ATH = window.ATH || {};
     clearTimeout(askT);
     const box = $('plAsk'); box.innerHTML = ''; box.hidden = !pl.ask;
     if (!pl.ask) return;
+    const okQ = q => (!q.if || state.flags[q.if]) && (!q.ifnot || !state.flags[q.ifnot]);
     const qs = pl.ask;
-    let i = qs.findIndex((q, k) => state.answers[pl.id + ':' + k] === undefined);
+    let i = qs.findIndex((q, k) => okQ(q) && state.answers[pl.id + ':' + k] === undefined);
     const again = i < 0;
-    if (again) i = Math.floor(Math.random() * qs.length);
+    if (again) { const av = qs.map((q, k) => k).filter(k => okQ(qs[k]) && qs[k].ifnot === undefined); if (!av.length) { box.hidden = true; return; } i = av[Math.floor(Math.random() * av.length)]; }
     const q = qs[i], key = pl.id + ':' + i;
     const p = document.createElement('p'); p.className = 'ask-q'; p.textContent = q.q; box.appendChild(p);
     const row = document.createElement('div'); row.className = 'ask-a';
@@ -403,12 +405,28 @@ window.ATH = window.ATH || {};
         pulse(0.1); persist();
         if (memoria && Math.random() < 0.5) memoria.newMemory();
         checkSecrets(pl.id, false);
-        if (qs.findIndex((qq, kk) => state.answers[pl.id + ':' + kk] === undefined) >= 0) askT = setTimeout(() => { if (state.scene === pl.id) renderAsk(pl); }, 7000);
+        if (qs.findIndex((qq, kk) => okQ(qq) && state.answers[pl.id + ':' + kk] === undefined) >= 0) askT = setTimeout(() => { if (state.scene === pl.id) renderAsk(pl); }, 7000);
       });
       row.appendChild(b);
     });
     box.appendChild(row);
   }
+  // —— il nascondiglio: da qualunque posto, quando non hai più voglia di girare
+  let prevScene = null;
+  function enterTana() {
+    if (state.scene === 'tana') { leaveTana(); return; }
+    if (route) stopRoute(true);
+    prevScene = state.scene;
+    if (state.sw.mutatio) { state.sw.mutatio = false; ui.seals.mutatio.set(false); syncWander(); }
+    travel('tana');
+    $('btnHide').setAttribute('aria-pressed', 'true'); $('btnHide').textContent = 'Esci';
+  }
+  function leaveTana() {
+    const back = GP(prevScene) && prevScene !== 'tana' ? prevScene : 'soglia';
+    travel(back);
+    $('btnHide').setAttribute('aria-pressed', 'false'); $('btnHide').textContent = 'Nasconditi';
+  }
+  $('btnHide').addEventListener('click', enterTana);
   function renderPlace() {
     const pl = GP(state.scene); if (!pl) return;
     const total = ATH.PLACES.length, n = state.seen.length;
@@ -443,6 +461,14 @@ window.ATH = window.ATH || {};
       b.addEventListener('pointerdown', e => e.stopPropagation());
       box.appendChild(b);
     });
+    if (pl.safe) {
+      const u = document.createElement('button');
+      u.type = 'button'; u.className = 'soglia safe-out';
+      const back = GP(prevScene) ? GP(prevScene).name : 'La soglia';
+      u.innerHTML = `<span class="arrow" aria-hidden="true">◠</span><span class="sname">Esci piano · ${back}</span>`;
+      u.addEventListener('click', () => leaveTana()); u.addEventListener('pointerdown', e => e.stopPropagation());
+      box.appendChild(u);
+    }
     if (pl.scream) {
       const u = document.createElement('button');
       u.type = 'button'; u.className = 'soglia scream'; u.id = 'btnScream';
@@ -647,127 +673,136 @@ window.ATH = window.ATH || {};
   const SVGNS = 'http://www.w3.org/2000/svg';
   let mapSel = null;
   const el = (tag, attrs, parent) => { const e = document.createElementNS(SVGNS, tag); Object.keys(attrs).forEach(k => e.setAttribute(k, attrs[k])); if (parent) parent.appendChild(e); return e; };
-  let mapZ = window.innerWidth < 760 ? 0.52 : 0.82;
-  function wrapName(n) {
-    if (n.length <= 17) return [n];
+  // —— la mappa: un'unica carta scura, strato sotto strato, che si scorre dall'alto (i cieli) al basso (il grembo)
+  const AT = ATH.ATLAS;
+  let mapZ = 0;
+  function wrapName(n, max) {
+    max = max || 17;
+    if (n.length <= max) return [n];
     const w = n.split(' '); let a = '', k = 0;
     while (k < w.length && (a + ' ' + w[k]).trim().length <= Math.max(10, Math.ceil(n.length / 2) + 2)) { a = (a + ' ' + w[k]).trim(); k++; }
     return [a, w.slice(k).join(' ')].filter(Boolean);
   }
+  const GLY = {
+    tree: 'M0 -9 L6 3 L-6 3 Z M0 3 V7', pine: 'M0 -10 L5 -2 L2 -2 L6 5 L-6 5 L-2 -2 L-5 -2 Z', wave: 'M-10 0 Q-5 -4 0 0 T10 0', grass: 'M-4 3 L-5 -3 M0 3 V-5 M4 3 L5 -3',
+    cross: 'M0 -8 V7 M-4 -3 H4', house: 'M-6 6 V-1 L0 -7 L6 -1 V6 Z', star: 'M0 -4 V4 M-4 0 H4', peak: 'M-10 6 L-2 -7 L2 -1 L5 -5 L11 6', reed: 'M-3 5 V-6 M0 5 V-9 M3 5 V-5',
+    ruin: 'M-7 6 V-4 H-3 V1 H1 V-6 H5 V6', drop: 'M0 -5 Q4 1 0 4 Q-4 1 0 -5 Z', arch: 'M-6 6 V-1 Q0 -9 6 -1 V6', eye: 'M-7 0 Q0 -6 7 0 Q0 6 -7 0 Z M0 -1.5 V1.5',
+    spiral: 'M0 0 Q3 -3 5 0 Q5 5 0 6 Q-6 5 -6 0 Q-5 -7 2 -8', moon: 'M2 -6 A6 6 0 1 0 2 6 A4.5 4.5 0 1 1 2 -6 Z'
+  };
+  const LAND = { sea: ['wave', 'wave', 'drop'], field: ['grass', 'grass', 'tree'], water: ['wave', 'reed', 'drop'], trees: ['pine', 'tree', 'pine'], town: ['house', 'arch', 'house'],
+    house: ['house', 'grass'], ruin: ['ruin', 'grass'], tomb: ['cross', 'cross', 'tree'], city: ['house', 'house', 'ruin'], void: ['grass', 'star'], sky: ['star', 'star', 'moon'],
+    mount: ['peak', 'pine', 'peak'], under: ['drop', 'arch'], deep: ['wave', 'drop'], mind: ['eye', 'spiral'], dream: ['moon', 'star', 'spiral'] };
+  const PALE = { sky: '200,205,255', mount: '170,200,170', field: '170,200,150', trees: '150,190,150', sea: '130,175,220', water: '130,175,220', deep: '110,150,200', mind: '200,180,240', dream: '200,180,240', tomb: '210,200,190', under: '190,170,160' };
+  function renderTabs() {
+    const box = $('atlasTabs'); box.innerHTML = '';
+    const cur = GP(state.scene);
+    AT.pages.forEach((pg, i) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'atab' + (cur && cur.page === i ? ' here' : ''); b.dataset.i = i;
+      b.innerHTML = `<span class="rn">${pg.n}</span><span class="tn">${pg.title}</span>`;
+      b.addEventListener('click', () => $('mapWrap').scrollTo({ top: Math.max(0, pg.top * mapZ - 4), behavior: 'smooth' }));
+      box.appendChild(b);
+    });
+  }
+  function markTab() {
+    const wrap = $('mapWrap'), y = (wrap.scrollTop + wrap.clientHeight * 0.35) / (mapZ || 1);
+    let k = 0; AT.pages.forEach((pg, i) => { if (y >= pg.top) k = i; });
+    $('atlasTabs').querySelectorAll('.atab').forEach((b, i) => b.classList.toggle('on', i === k));
+  }
   function drawMap(keepScroll) {
     const svg = $('mapSvg'); svg.innerHTML = '';
-    const PL = ATH.PLAN, W = PL.W, H = PL.H, f = n => n.toFixed(1);
+    const W = AT.PW, H = AT.H, f = n => n.toFixed(1);
+    const wrap = $('mapWrap'), ww = wrap.clientWidth || window.innerWidth;
+    if (!mapZ) mapZ = ww >= 900 ? Math.min(0.9, (ww - 6) / W) : Math.max((ww - 4) / W, 0.5);
     svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
     svg.style.width = Math.round(W * mapZ) + 'px'; svg.style.height = Math.round(H * mapZ) + 'px';
-    const gBands = el('g', {}, svg);
     const cur = GP(state.scene), adj = cur && !cur.gen ? visibleExits(cur) : [];
     const sel = mapSel && ATH.PLACE[mapSel] ? mapSel : null;
     const selPath = sel ? findPath(state.scene, sel) : null;
     const onPath = new Set(selPath ? [state.scene].concat(selPath) : []);
-    const pathKey = new Set();
+    const pathKey = new Set(), trailKey = new Set();
     if (selPath) { let a = state.scene; selPath.forEach(b => { pathKey.add([a, b].sort().join('|')); a = b; }); }
-    const trailKey = new Set();
     for (let i = 1; i < state.trail.length; i++) trailKey.add([state.trail[i - 1], state.trail[i]].sort().join('|'));
     const known = new Set(ATH.PLACES.filter(p => isKnown(p.id)).map(p => p.id));
-    // gli strati: ognuno col suo nome, scritto in una striscia tutta sua (non si sovrappone a niente)
-    PL.bands.forEach((b, k) => {
-      const y0 = PL.bandTop[b.id], h = PL.bandH[b.id];
-      el('rect', { x: 0, y: y0, width: W, height: h - 6, class: 'm-band' + (k % 2 ? ' odd' : '') + (b.id === 'M' ? ' mind' : '') }, gBands);
-      for (let x = 24; x < W - 200; x += 760) {
-        const t = el('text', { x, y: y0 + 26, class: 'm-level' + (x > 24 ? ' rep' : '') }, gBands); t.textContent = b.name;
-        const g = el('text', { x: x + b.name.length * 12.5 + 16, y: y0 + 26, class: 'm-lgloss' }, gBands); g.textContent = b.gloss;
-      }
+    const gB = el('g', {}, svg), gD = el('g', {}, svg), gE = el('g', {}, svg), gT = el('g', {}, svg), gN = el('g', {}, svg);
+    // gli strati
+    AT.pages.forEach((pg, k) => {
+      el('rect', { x: 0, y: pg.top, width: W, height: pg.h - 4, class: 'm-band' + (k % 2 ? ' odd' : '') + (pg.n === 'VI' ? ' mind' : '') }, gB);
+      const t = el('text', { x: W / 2, y: pg.top + 52, class: 'm-stratum' }, gB); t.textContent = pg.title;
+      const g2 = el('text', { x: W / 2, y: pg.top + 80, class: 'm-stratum-g' }, gB); g2.textContent = pg.sub;
+      const hw = pg.title.length * 9 + 40;
+      el('path', { d: `M${W / 2 - hw - 220} ${pg.top + 46} H${W / 2 - hw} M${W / 2 + hw} ${pg.top + 46} H${W / 2 + hw + 220}`, class: 'm-orn' }, gB);
+      el('circle', { cx: W / 2 - hw - 228, cy: pg.top + 46, r: 3, class: 'm-orn-dot' }, gB); el('circle', { cx: W / 2 + hw + 228, cy: pg.top + 46, r: 3, class: 'm-orn-dot' }, gB);
+      pg.sections.forEach(sc => { const st = el('text', { x: 40, y: sc.y + 30, class: 'm-substratum' }, gB); st.textContent = sc.name + '  ·  ' + sc.gloss; el('path', { d: `M40 ${sc.y + 40} H${W - 40}`, class: 'm-orn thin' }, gB); });
     });
-    const gDist = el('g', {}, svg), gEdges = el('g', {}, svg), gTrail = el('g', {}, svg), gNodes = el('g', {}, svg);
-    // i quartieri: una macchia di terra, e qualche segno del paesaggio
+    // contrade: il nome, e qualche segno del paesaggio nei vuoti (niente contorni)
     const boxes = [];
-    ATH.PLACES.forEach(p => { if (!known.has(p.id) || p.mx === undefined) return; boxes.push(p.isHub ? [p.mx - 80, p.my - 64, p.mx + 80, p.my + 34] : [p.mx - 14, p.my - 24, p.mx + 150, p.my + 34]); });
-    const free = (x, y) => !boxes.some(b => x > b[0] - 8 && x < b[2] + 8 && y > b[1] - 8 && y < b[3] + 8);
-    const GLY = {
-      tree: 'M0 -9 L6 3 L-6 3 Z M0 3 V7', pine: 'M0 -10 L5 -2 L2 -2 L6 5 L-6 5 L-2 -2 L-5 -2 Z', wave: 'M-8 0 Q-4 -4 0 0 T8 0', grass: 'M-4 3 L-5 -3 M0 3 V-5 M4 3 L5 -3',
-      cross: 'M0 -8 V7 M-4 -3 H4', house: 'M-6 6 V-1 L0 -7 L6 -1 V6 Z', star: 'M0 -4 V4 M-4 0 H4', peak: 'M-9 5 L-2 -7 L2 -1 L5 -5 L10 5', reed: 'M-3 5 V-6 M0 5 V-9 M3 5 V-5',
-      ruin: 'M-7 6 V-4 H-3 V1 H1 V-6 H5 V6', dot: 'M0 0 h0.1', drop: 'M0 -5 Q4 1 0 4 Q-4 1 0 -5 Z', arch: 'M-6 6 V-1 Q0 -9 6 -1 V6',
-      eye: 'M-7 0 Q0 -6 7 0 Q0 6 -7 0 Z M0 -1.5 V1.5', spiral: 'M0 0 Q3 -3 5 0 Q5 5 0 6 Q-6 5 -6 0 Q-5 -7 2 -8', moon: 'M2 -6 A6 6 0 1 0 2 6 A4.5 4.5 0 1 1 2 -6 Z'
-    };
-    const LAND = { sea: ['wave', 'wave', 'drop'], field: ['grass', 'grass', 'tree'], water: ['wave', 'reed', 'drop'], trees: ['pine', 'tree', 'pine'], town: ['house', 'arch', 'house'],
-      house: ['house', 'grass'], ruin: ['ruin', 'grass'], tomb: ['cross', 'cross', 'tree'], city: ['house', 'house', 'ruin'], void: ['grass', 'dot', 'dot'], sky: ['star', 'star', 'dot'],
-      mount: ['peak', 'pine', 'peak'], under: ['drop', 'dot', 'arch'], deep: ['wave', 'drop', 'dot'], mind: ['eye', 'spiral', 'dot'], dream: ['moon', 'star', 'spiral'] };
-    let seed = 7; const rr = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
-    PL.districts.forEach(d => {
-      const h = ATH.PLACE[d.hub]; if (!h || !known.has(h.id)) return;
-      const pts = d.ids.filter(id => known.has(id)).map(id => ATH.PLACE[id]);
-      let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
-      pts.forEach(p => { x0 = Math.min(x0, p.mx); x1 = Math.max(x1, p.mx + (p.isHub ? 0 : 120)); y0 = Math.min(y0, p.my); y1 = Math.max(y1, p.my); });
-      x0 -= 40; x1 += 24; y0 -= 54; y1 += 36;
-      el('rect', { x: x0, y: y0, width: x1 - x0, height: y1 - y0, rx: 46, class: 'm-land land-' + d.land }, gBands);
-      const kinds = LAND[d.land] || ['dot'];
-      for (let i = 0, n = 0; i < 40 && n < 6; i++) {
-        const x = x0 + 14 + rr() * (x1 - x0 - 28), y = y0 + 14 + rr() * (y1 - y0 - 28);
-        if (!free(x, y)) continue;
-        n++; boxes.push([x - 10, y - 10, x + 10, y + 10]);
-        el('path', { d: GLY[kinds[Math.floor(rr() * kinds.length)]], transform: `translate(${x.toFixed(0)},${y.toFixed(0)}) scale(${(0.8 + rr() * 0.5).toFixed(2)})`, class: 'm-deco land-' + d.land }, gBands);
+    ATH.PLACES.forEach(p => { if (!known.has(p.id) || p.ax === undefined) return; boxes.push(p.isHub ? [p.ax - 120, p.ay - 62, p.ax + 120, p.ay + 30] : [p.ax - 14, p.ay - 24, p.ax + 186, p.ay + 36]); });
+    AT.pages.forEach(pg => pg.cells.forEach(c => {
+      if (!known.has(c.hub)) return;
+      const nm = el('text', { x: c.x + c.w / 2, y: c.y + 30, class: 'm-region', fill: PALE[c.land] ? `rgba(${PALE[c.land]},.55)` : null }, gD); nm.textContent = c.name;
+      boxes.push([c.x + c.w / 2 - 190, c.y + 8, c.x + c.w / 2 + 190, c.y + 38]);
+      let seed = (c.x * 7 + c.y * 13) | 0; const rr = () => { seed = (seed * 16807 + 11) % 2147483647; return seed / 2147483647; };
+      const kinds = LAND[c.land] || ['grass'];
+      for (let i = 0, n = 0; i < 60 && n < 7; i++) {
+        const x = c.x + 12 + rr() * (c.w - 24), y = c.y + 44 + rr() * (c.h - 50);
+        if (boxes.some(b => x > b[0] - 10 && x < b[2] + 10 && y > b[1] - 12 && y < b[3] + 12)) continue;
+        n++; boxes.push([x - 12, y - 10, x + 12, y + 10]);
+        el('path', { d: GLY[kinds[Math.floor(rr() * kinds.length)]], transform: `translate(${x.toFixed(0)},${y.toFixed(0)}) scale(${(0.9 + rr() * 0.5).toFixed(2)})`, class: 'm-deco', stroke: PALE[c.land] ? `rgb(${PALE[c.land]})` : null }, gD);
       }
-      const up = d.lv > 0, nl = wrapName(h.name).length;
-      const t = el('text', { x: h.mx, y: up ? h.my + 24 + nl * 16 + 4 : h.my - 22 - nl * 16, class: 'm-district' }, gDist); t.textContent = d.name;
-    });
-    // le strade (le porte non si disegnano come fili: si segnano accanto ai luoghi)
-    const portals = {};
-    PL.roads.forEach(r => {
+    }));
+    // porte (verso altri livelli, la mente, o un altro strato della terra)
+    const doors = {};
+    ATH.PLAN.roads.forEach(r => {
       const p = ATH.PLACE[r.a], q = ATH.PLACE[r.b]; if (!p || !q || !known.has(p.id) || !known.has(q.id)) return;
-      const key = [p.id, q.id].sort().join('|');
-      if (r.kind === 'portal') {
-        (portals[p.id] = portals[p.id] || []).push(q); (portals[q.id] = portals[q.id] || []).push(p);
-        if (!pathKey.has(key)) return;            // solo se fa parte della strada scelta, la porta si mostra come filo
-      }
-      const near = p.id === state.scene || q.id === state.scene;
-      const cls = 'm-edge m-' + r.kind + (near ? ' near' : '') + (pathKey.has(key) ? ' path' : '') + (trailKey.has(key) ? ' trail' : '');
+      if (r.kind !== 'portal' && p.page === q.page) return;
+      const sym = (a, b) => (b.level || 0) > (a.level || 0) ? '⇧' : (b.level || 0) < (a.level || 0) ? '⇩' : (!!b.mind !== !!a.mind) ? '◌' : b.ay > a.ay ? '↓' : '↑';
+      (doors[p.id] = doors[p.id] || []).push(sym(p, q) + ' ' + q.name); (doors[q.id] = doors[q.id] || []).push(sym(q, p) + ' ' + p.name);
+    });
+    // le strade
+    ATH.PLAN.roads.forEach(r => {
+      const p = ATH.PLACE[r.a], q = ATH.PLACE[r.b]; if (!p || !q || !known.has(p.id) || !known.has(q.id) || p.ax === undefined || q.ax === undefined) return;
+      const key = [p.id, q.id].sort().join('|'), onp = pathKey.has(key), tr = trailKey.has(key);
+      const cross = r.kind === 'portal' || p.page !== q.page;
+      if (cross && !onp) return;
+      const near = p.id === state.scene || q.id === state.scene, dy = q.ay - p.ay, dx = q.ax - p.ax;
       let d;
-      if (r.kind === 'via') {
-        const a = p.mx < q.mx ? p : q, b = a === p ? q : p, dx = b.mx - a.mx, sgn = (a.level || 0) > 0 ? 1 : -1, w = sgn * (8 + ((a.mx * 7) % 9));
-        d = `M${f(a.mx)} ${f(a.my)} C${f(a.mx + dx * 0.35)} ${f(a.my + w)} ${f(b.mx - dx * 0.35)} ${f(b.my + w)} ${f(b.mx)} ${f(b.my)}`;
-      } else if (r.kind === 'short') {
-        const a = p.mx < q.mx ? p : q, b = a === p ? q : p, low = Math.max(a.my, b.my) + 34;
-        d = `M${f(a.mx)} ${f(a.my)} C${f(a.mx + 20)} ${f(low)} ${f(b.mx - 20)} ${f(low)} ${f(b.mx)} ${f(b.my)}`;
-      } else {
-        const dy = q.my - p.my;
-        d = `M${f(p.mx)} ${f(p.my)} C${f(p.mx)} ${f(p.my + dy * 0.55)} ${f(q.mx)} ${f(q.my - dy * 0.45)} ${f(q.mx)} ${f(q.my)}`;
-      }
-      el('path', { d, class: cls }, trailKey.has(key) || pathKey.has(key) ? gTrail : gEdges);
+      if (r.kind === 'lane' || r.kind === 'row') d = `M${f(p.ax)} ${f(p.ay)} C${f(p.ax)} ${f(p.ay + dy * 0.6)} ${f(q.ax)} ${f(q.ay - dy * 0.4)} ${f(q.ax)} ${f(q.ay)}`;
+      else if (r.kind === 'short') { const low = Math.max(p.ay, q.ay) + 38; d = `M${f(p.ax)} ${f(p.ay)} C${f(p.ax + 10)} ${f(low)} ${f(q.ax - 10)} ${f(low)} ${f(q.ax)} ${f(q.ay)}`; }
+      else if (r.kind === 'via') d = `M${f(p.ax)} ${f(p.ay)} C${f(p.ax + dx * 0.4)} ${f(p.ay - 22)} ${f(q.ax - dx * 0.4)} ${f(q.ay - 22)} ${f(q.ax)} ${f(q.ay)}`;
+      else d = `M${f(p.ax)} ${f(p.ay)} C${f(p.ax + 40)} ${f(p.ay + dy * 0.5)} ${f(q.ax - 40)} ${f(q.ay - dy * 0.5)} ${f(q.ax)} ${f(q.ay)}`;
+      el('path', { d, class: 'm-edge m-' + (cross ? 'portal' : r.kind) + (near ? ' near' : '') + (onp ? ' path' : '') + (tr ? ' trail' : '') }, onp || tr ? gT : gE);
     });
     let hereNode = null;
     ATH.PLACES.forEach(p => {
-      if (!known.has(p.id) || p.mx === undefined) return;
+      if (!known.has(p.id) || p.ax === undefined) return;
       const here = p.id === state.scene, today = state.visited.indexOf(p.id) >= 0, near = adj.indexOf(p.id) >= 0;
       const g = el('g', {
         class: 'm-node' + (p.isHub ? ' hub' : '') + (here ? ' here' : '') + (today ? ' today' : '') + (near ? ' near' : '') + (p.kind === 'stato' ? ' stato' : '') + (sel === p.id ? ' sel' : '') + (onPath.has(p.id) ? ' onpath' : '') + (state.seen.indexOf(p.id) < 0 ? ' never' : '') + (p.secret ? ' secret' : '') + (p.mind ? ' mind' : ''),
-        transform: `translate(${p.mx},${p.my})`, tabindex: here ? '-1' : '0', role: 'button',
-        'aria-label': p.name + ' · ' + (p.district || '') + (here ? ' (sei qui)' : near ? ' (a un passo)' : '')
-      }, gNodes);
+        transform: `translate(${p.ax},${p.ay})`, tabindex: here ? '-1' : '0', role: 'button', 'aria-label': p.name + ' · ' + (p.district || '') + (here ? ' (sei qui)' : near ? ' (a un passo)' : '')
+      }, gN);
       el('circle', { class: 'm-hit', r: 26 }, g);
-      if (here) el('circle', { class: 'm-halo', r: 20 }, g);
-      el('circle', { class: 'm-dot', r: here ? 9 : p.isHub ? 8 : 6.5 }, g);
-      const lines = wrapName(p.name);
-      const up = (p.level || 0) > 0;
+      if (here) el('circle', { class: 'm-halo', r: 22 }, g);
+      el('circle', { class: 'm-dot', r: here ? 10 : p.isHub ? 9 : 7 }, g);
+      const lines = wrapName(p.name, p.isHub ? 24 : 17);
       let tx;
-      if (p.isHub) tx = el('text', { class: 'm-label', x: 0, y: up ? 24 : -16 - (lines.length - 1) * 16 }, g);
-      else tx = el('text', { class: 'm-label side', x: 13, y: 5 - (lines.length - 1) * 8 }, g);
-      lines.forEach((ln, k) => { const ts = el('tspan', { x: p.isHub ? 0 : 13, dy: k ? 16 : 0 }, tx); ts.textContent = ln; });
-      // le porte di questo luogo
-      const ps = portals[p.id];
-      if (ps && ps.length) {
-        const sym = q => (q.level || 0) > (p.level || 0) ? '⇧' : (q.level || 0) < (p.level || 0) ? '⇩' : '◌';
-        const txt = ps.slice(0, 2).map(q => sym(q) + ' ' + q.name).join('  ') + (ps.length > 2 ? '  +' + (ps.length - 2) : '');
-        const pt = p.isHub ? el('text', { class: 'm-door hubp', x: 0, y: up ? -14 : 22 }, g) : el('text', { class: 'm-door', x: 13, y: 5 + (lines.length - 1) * 8 + 15 }, g);
-        pt.textContent = txt;
+      if (p.isHub) tx = el('text', { class: 'm-label hubl', x: 0, y: -20 - (lines.length - 1) * 21 }, g);
+      else tx = el('text', { class: 'm-label side', x: 15, y: 6 - (lines.length - 1) * 10 }, g);
+      lines.forEach((ln, k) => { const ts = el('tspan', { x: p.isHub ? 0 : 15, dy: k ? (p.isHub ? 21 : 20) : 0 }, tx); ts.textContent = ln; });
+      const ds = doors[p.id];
+      if (ds && ds.length) {
+        const dt = el('text', { class: 'm-door' + (p.isHub ? ' hubp' : ''), x: p.isHub ? 0 : 15, y: p.isHub ? 30 : 6 + (lines.length - 1) * 10 + 20 }, g);
+        dt.textContent = ds[0] + (ds.length > 1 ? '  · +' + (ds.length - 1) : '');
+        const tt = el('title', {}, dt); tt.textContent = ds.join('\n');
       }
-      if (p.exits.some(e => isGen(ATH.exitId(e)))) { const gt = el('text', { class: 'm-gen', x: -14, y: 5, 'text-anchor': 'end' }, g); gt.textContent = '⋯'; }
+      if (p.exits.some(e => isGen(ATH.exitId(e)))) { const gt = el('text', { class: 'm-gen', x: -16, y: 6, 'text-anchor': 'end' }, g); gt.textContent = '⋯'; }
       if (here) hereNode = g;
       const pick = () => { if (here) return; mapSel = p.id; drawMap(true); };
       g.addEventListener('click', pick);
       g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
     });
-    const wrap = $('mapWrap');
-    // l'indicazione in basso
+    renderTabs();
+    let tick = false; wrap.onscroll = () => { if (!tick) { tick = true; requestAnimationFrame(() => { tick = false; markTab(); }); } };
+    markTab();
     const bar = $('mapGo');
     if (sel && sel !== state.scene) {
       bar.hidden = false;
@@ -776,21 +811,30 @@ window.ATH = window.ATH || {};
       $('mapGoBtn').disabled = !selPath;
     } else bar.hidden = true;
     const nKnown = known.size;
-    $('mapCount').textContent = `Trovati ${state.seen.length} di ${ATH.PLACES.length} · oggi ${state.visited.length}` + (ATH.PLACES.length - nKnown ? ` · ${ATH.PLACES.length - nKnown} ancora nascosti` : '') + (state.genCount ? ` · ${state.genCount} stanze senza nome` : '') + (cur && cur.gen ? ' · ora sei nell’Altrove, fuori dalla mappa' : '');
-    if (!keepScroll) setTimeout(() => { if (hereNode) { const r = hereNode.getBoundingClientRect(), w = wrap.getBoundingClientRect(); wrap.scrollTop += r.top - w.top - w.height / 2; wrap.scrollLeft += r.left - w.left - w.width / 2; } }, 30);
+    $('mapCount').textContent = `Trovati ${state.seen.length} di ${ATH.PLACES.length} · oggi ${state.visited.length}` + (ATH.PLACES.length - nKnown ? ` · ${ATH.PLACES.length - nKnown} ancora nascosti` : '') + (state.genCount ? ` · ${state.genCount} stanze senza nome` : '') + (cur && cur.gen ? ' · ora sei nell’Altrove, fuori dalla mappa' : '') + (cur && cur.offmap ? ' · ora sei nel nascondiglio' : '');
+    if (!keepScroll) setTimeout(() => { if (hereNode) { const r = hereNode.getBoundingClientRect(), w = wrap.getBoundingClientRect(); wrap.scrollTop += r.top - w.top - w.height / 2; wrap.scrollLeft += r.left - w.left - w.width / 2; markTab(); } }, 30);
   }
   function zoomMap(k) {
     const wrap = $('mapWrap'), w = wrap.getBoundingClientRect();
     const cxp = (wrap.scrollLeft + w.width / 2) / mapZ, cyp = (wrap.scrollTop + w.height / 2) / mapZ;
-    mapZ = Math.max(0.35, Math.min(1.4, mapZ * k));
+    mapZ = Math.max(0.3, Math.min(1.5, mapZ * k));
     drawMap(true);
     wrap.scrollLeft = cxp * mapZ - w.width / 2; wrap.scrollTop = cyp * mapZ - w.height / 2;
   }
-  $('mapZoomIn').addEventListener('click', () => zoomMap(1.25));
-  $('mapZoomOut').addEventListener('click', () => zoomMap(0.8));
+  function turn(d) {
+    const wrap = $('mapWrap'), y = (wrap.scrollTop + wrap.clientHeight * 0.35) / mapZ;
+    let k = 0; AT.pages.forEach((pg, i) => { if (y >= pg.top) k = i; });
+    k = Math.max(0, Math.min(AT.pages.length - 1, k + d));
+    wrap.scrollTo({ top: AT.pages[k].top * mapZ - 4, behavior: 'smooth' });
+  }
+  $('mapZoomIn').addEventListener('click', () => zoomMap(1.2));
+  $('mapZoomOut').addEventListener('click', () => zoomMap(0.83));
+  $('mapPrev').addEventListener('click', () => turn(-1));
+  $('mapNext').addEventListener('click', () => turn(1));
   $('mapHere').addEventListener('click', () => drawMap(false));
+  window.addEventListener('resize', () => { if (!$('mapov').hidden) { mapZ = 0; drawMap(true); } });
   $('mapGoBtn').addEventListener('click', () => { const id = mapSel; mapSel = null; closeMap(); routeTo(id); });
-  function openMap() { mapSel = null; drawMap(); $('mapov').hidden = false; $('btnMapClose').focus(); }
+  function openMap() { mapSel = null; mapZ = 0; $('mapov').hidden = false; drawMap(); $('btnMapClose').focus(); }
   function closeMap() { $('mapov').hidden = true; }
   $('btnMap').addEventListener('click', openMap);
   $('btnMapClose').addEventListener('click', closeMap);
@@ -866,7 +910,7 @@ window.ATH = window.ATH || {};
     const q = l < 0.5 ? l * (1 + s) : l + s - l * s, p = 2 * l - q;
     return [f(p, q, h + 1 / 3) * 255, f(p, q, h) * 255, f(p, q, h - 1 / 3) * 255];
   }
-  const MOTIFS = ['clutter', 'wallpaper', 'toycar', 'loculi', 'cameo', 'hand', 'womb', 'face', 'scents', 'doubt', 'purify', 'stars', 'snow', 'haze', 'motes', 'field', 'beam', 'ceiling', 'glass', 'monitor', 'fever', 'sun', 'meet', 'train', 'lights', 'ruin', 'well', 'rose', 'nebula', 'throne', 'city', 'cityFlip', 'windows', 'stairs', 'candles', 'tombs', 'forest', 'whispers', 'void', 'tears', 'cracks', 'river', 'underwater', 'nook', 'corridor', 'swing', 'trees', 'lake', 'fireflies', 'fog', 'veil', 'vetrate', 'arcade', 'machine', 'film', 'cradle', 'mountain', 'deep', 'rainfall', 'wisps', 'path', 'sprout', 'ice', 'door', 'crowd', 'dream'];
+  const MOTIFS = ['clutter', 'wallpaper', 'toycar', 'loculi', 'cameo', 'hand', 'womb', 'face', 'scents', 'doubt', 'purify', 'stars', 'snow', 'haze', 'motes', 'field', 'beam', 'ceiling', 'glass', 'monitor', 'fever', 'sun', 'meet', 'train', 'lights', 'ruin', 'well', 'rose', 'nebula', 'throne', 'city', 'cityFlip', 'windows', 'stairs', 'candles', 'tombs', 'forest', 'whispers', 'void', 'tears', 'cracks', 'river', 'underwater', 'nook', 'corridor', 'swing', 'trees', 'lake', 'fireflies', 'fog', 'veil', 'vetrate', 'arcade', 'machine', 'film', 'cradle', 'mountain', 'deep', 'rainfall', 'wisps', 'path', 'sprout', 'ice', 'door', 'crowd', 'dream', 'xmas', 'egg', 'board', 'siren', 'blanket'];
   let hueShift = 0, qVis = 0; const motif = {}; MOTIFS.forEach(m => motif[m] = 0);
 
   // —— registrazione
