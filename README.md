@@ -26,7 +26,9 @@ Una bilancia va da *Strepitus*, il rumore della fornace, a *Quies*, la quiete: v
 
 Il rumore della fornace è una parte del viaggio, non il suo fondo: sale nei luoghi della rabbia, della fuga, della paura, e sparisce in quelli della quiete; la quiete eterea, invece, non se ne va mai del tutto, e lo scoppiettio resta un dettaglio, non un fastidio.
 
-Quello che giri con le tue mani ha sempre la precedenza. Nei luoghi più quieti la fornace tace, ma se la tocchi si riaccende, e resta accesa finché ci giochi. Una manopola che hai girato da poco non la sposta nessun luogo, e quelle che agiscono piano, come l'aurora o le coppe, ti fanno sentire subito che cosa cambiano.
+Quello che giri con le tue mani ha sempre la precedenza. Quando la finestra viene coperta da un'altra, o la scheda passa in secondo piano, il suono continua senza scatti: le cose che non suonano si spengono davvero, e il cuore del suono batte per conto suo.
+
+Nei luoghi più quieti la fornace tace, ma se la tocchi si riaccende, e resta accesa finché ci giochi. Una manopola che hai girato da poco non la sposta nessun luogo, e quelle che agiscono piano, come l'aurora o le coppe, ti fanno sentire subito che cosa cambiano.
 
 ---
 
@@ -34,7 +36,7 @@ Quello che giri con le tue mani ha sempre la precedenza. Nei luoghi più quieti 
 
 Ogni viaggio comincia dalla **Soglia**. Da lì le strade portano altrove: si cammina, si sale, si scende, e ogni strada si può ripercorrere all'indietro. Le frecce seguono la mappa, e si sentono i propri passi sulla ghiaia, sulla sabbia, sul legno, sulla neve, sui gradini.
 
-È un viaggio di quasi trecento luoghi, su un'unica mappa scura che si scorre dall'alto in basso, uno strato sotto l'altro: i cieli, le torri, la terra in tre fasce (i campi, le case, la città e i suoi morti), la mente, e ciò che sta sotto. In cima, i nomi degli strati portano subito dove vuoi. In ogni strato le contrade sono disposte in tre colonne: ognuna ha una piazza e sentieri che scendono; le piazze vicine sono unite da strade, le contrade una sopra l'altra da sentieri, e ogni tanto c'è una scorciatoia in fondo. Accanto ad alcuni luoghi è scritta una porta: ⇧ sale, ⇩ scende, ◌ entra nella mente, ↑ ↓ porta allo strato vicino della terra. Le frecce del cammino seguono la mappa: ciò che sulla mappa sta a destra, camminando è a destra. Le contrade sono queste:
+È un viaggio di più di trecento luoghi, su un'unica mappa scura che si scorre dall'alto in basso, uno strato sotto l'altro: i cieli, le torri, la terra in tre fasce (i campi, le case, la città e i suoi morti), la mente, e ciò che sta sotto. In cima, i nomi degli strati portano subito dove vuoi. In ogni strato le contrade sono disposte in tre colonne: ognuna ha una piazza e sentieri che scendono; le piazze vicine sono unite da strade, le contrade una sopra l'altra da sentieri, e ogni tanto c'è una scorciatoia in fondo. Accanto ad alcuni luoghi è scritta una porta: ⇧ sale, ⇩ scende, ◌ entra nella mente, ↑ ↓ porta allo strato vicino della terra. Le frecce del cammino seguono la mappa: ciò che sulla mappa sta a destra, camminando è a destra. Le contrade sono queste:
 
 La città ha otto livelli, da prima della nascita a dopo la morte.
 
@@ -60,6 +62,14 @@ E il nulla: un campo senza fine, una strada che non porta a niente, una fermata 
 **Ciò che è successo, e ciò che forse no.**
 Giorgio: l'autobus che rallenta, la moto sdraiata a bordo strada, le luci blu senza suono, e poi l'obitorio, la sua mano fredda. La prima volta che hai visto la morte. Il Natale di quando eri bambino, che si poteva toccare; i giorni tutti uguali, quando è il calendario a ricordartelo; e la letterina di tuo figlio, dove il Natale torna. L'uovo di Pasqua della bisnonna, più grande di te perché tu eri piccolo. La casa al mare d'inverno, da solo, e le persiane da smontare che non volevi smontare. Dormire a finestra aperta, e il sole del mattino che ti batte addosso. La casa lasciata di fretta, con i piatti ancora sul tavolo, e la casa distrutta dai vandali. Lo spartito per bambini dell'Ottocento: puoi prenderlo, e anni dopo puoi riportarlo. La seduta spiritica da ragazzini, la monetina che si muove da sola.
 E l'immaginato: il teatro dove recitano i tuoi ricordi, il corridoio dei compleanni, la pioggia dentro casa, l'ascensore che non si ferma al tuo piano, la stanza al contrario, il paese dove tutti sono bambini, la neve d'agosto, tuo figlio da grande, le lettere che non ti hanno scritto. Tutto può essere vero, tutto può non esserlo.
+
+**Le estati lunghe, la camera, i banchi.**
+Le lanterne di carta lasciate andare sul fiume, per ciascuno di quelli che non ci sono. Il falò di San Giovanni, con le scintille che si confondono con le stelle. La notte di San Lorenzo, con un solo desiderio. La vendemmia, il temporale sull'aia, lo stagno di giugno pieno di rane e di lucciole, l'alba al porto, la mareggiata guardata da una finestra, la casa sull'albero con il quaderno del club, l'eclissi in cui gli uccelli tacciono. Un pomeriggio che non finisce, nascosto fra le cicale.
+La camera da ragazzo: la cassetta registrata dalla radio con la voce dello speaker sopra la canzone, il walkman di notte, le stelle fosforescenti sul soffitto, il telefono col filo, il diario con il lucchetto. E fra i nastri, a volte, una voce che dice il tuo nome. La scuola: la campanella, l'ultimo banco, l'interrogazione, il cortile con la settimana disegnata col gesso, l'ultimo giorno prima dell'estate, la gita in pullman.
+Il mercato del sabato e la mano che non c'è più. Il pranzo dopo il funerale, la candela di ogni anno, il numero che il dito sa ancora a memoria, un amico che richiama. Le notti con il neonato, i primi passi. L'eco in fondo alla valle.
+
+**Nella testa, e sotto.**
+La voce che ti giudica, e che forse non è la tua. La sala d'attesa dove nessuno ti chiama. La stanza degli orologi, ognuno con la sua ora. Il déjà vu. Il sogno di volare, quello in cui cadi, quello lucido, e il mondo che per un secondo si ferma. Sotto: le radici che si parlano, il traghettatore che porta via un solo ricordo, la sorgente da cui l'acqua ricomincia.
 
 **Il nascondiglio** — quando non hai più voglia di girare.
 Da qualunque posto, *Nasconditi*: un posto sotto le coperte, caldo, silenzioso, con una lucina, la pioggia fuori e le tue cose intorno. Nessuno entra, nessuno ti chiede niente. Quando vuoi, esci piano e torni dov'eri.

@@ -46,7 +46,8 @@ window.ATH = window.ATH || {};
       this.gap.connect(this.far); this.far.connect(e.crypta); this.far.connect(e.caelum);
 
       this.lv = {};
-      ATH.MEM_IDS.forEach(id => { const g = G(0); g.connect(this.in); this.lv[id] = g; });
+      this.sl = {};
+      ATH.MEM_IDS.forEach(id => { const g = G(0); this.lv[id] = g; this.sl[id] = new ATH.Sleep(g, [this.in], false); });
 
       this.buildContinuous();
       this.buildPlus();
@@ -203,7 +204,11 @@ window.ATH = window.ATH || {};
       const T = (p, v, tau) => this.e.T(p, v, tau);
       const lev = id => this.level[id] = L[id];
 
-      ATH.MEM_IDS.forEach(id => T(this.lv[id].gain, Math.pow(L[id], 1.2) * 1.2 * (ATH.MEM_CAL[id] || 1), 0.3));
+      ATH.MEM_IDS.forEach(id => {
+        const g = Math.pow(L[id], 1.2) * 1.2 * (ATH.MEM_CAL[id] || 1);
+        if (g > 0.002) this.sl[id].wake();
+        T(this.lv[id].gain, g, 0.3); this.sl[id].set(g > 0.002, dt);
+      });
 
       // catena
       T(this.wowG.gain, L.nastro * 0.0045, 0.3);

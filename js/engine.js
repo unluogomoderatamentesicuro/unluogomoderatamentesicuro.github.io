@@ -7,6 +7,18 @@ window.ATH = window.ATH || {};
 (function (ATH) {
   const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 
+  // Un ramo del grafo che non suona non deve costare: se resta muto per un po', lo si scollega
+  // (le sorgenti a monte non vengono più calcolate); si ricollega appena serve.
+  class Sleep {
+    constructor(node, dests, awake) { this.n = node; this.d = [].concat(dests); this.on = false; this.q = 0; if (awake) this.wake(); }
+    wake() { this.q = 0; if (!this.on) { this.d.forEach(d => this.n.connect(d)); this.on = true; } }
+    set(want, dt) {
+      if (want) this.wake();
+      else if (this.on) { this.q += dt; if (this.q > 2.5) { try { this.n.disconnect(); } catch (e) { } this.on = false; } }
+    }
+  }
+  ATH.Sleep = Sleep;
+
   function noiseBuffer(ctx, kind, seconds) {
     const sr = ctx.sampleRate, len = Math.floor(sr * seconds);
     const buf = ctx.createBuffer(2, len, sr);
@@ -76,7 +88,8 @@ window.ATH = window.ATH || {};
 
     async start() {
       const AC = window.AudioContext || window.webkitAudioContext;
-      const ctx = this.ctx = new AC({ latencyHint: 'playback' });
+      // buffer lungo: sul computer i piccoli ritardi del processore non si sentono come scricchiolii
+      let ctx; try { ctx = this.ctx = new AC({ latencyHint: 0.4 }); } catch (e) { ctx = this.ctx = new AC({ latencyHint: 'playback' }); }
       this.useWorklet = false;
       if (ctx.audioWorklet) {
         try {
@@ -122,7 +135,7 @@ window.ATH = window.ATH || {};
       this.ringDry = G(1); this.ringVCA = G(0); this.ringWet = G(0);
       this.ringOsc = c.createOscillator(); this.ringOsc.frequency.value = 130; this.ringOsc.start();
       this.ringOsc.connect(this.ringVCA.gain);
-      this.droneBus.connect(this.ringDry); this.droneBus.connect(this.ringVCA);
+      this.slDrone = new Sleep(this.droneBus, [this.ringDry, this.ringVCA], true);
       this.ringVCA.connect(this.ringWet);
       this.ringDry.connect(this.sources); this.ringWet.connect(this.sources);
 
@@ -130,14 +143,14 @@ window.ATH = window.ATH || {};
       this.noise = {};
       ['brown', 'pink', 'white'].forEach((k, i) => {
         const src = c.createBufferSource(); src.buffer = noiseBuffer(c, k, 4 + i * 0.37); src.loop = true;
-        const g = G(0); src.connect(g); g.connect(this.sources); src.start();
-        this.noise[k] = { src, g };
+        const g = G(0); src.connect(g); src.start();
+        this.noise[k] = { src, g, sl: new Sleep(g, [this.sources], true) };
       });
       // tempesta: raffica di rumore filtrato
       this.storm = G(0);
       this.stormFilter = c.createBiquadFilter(); this.stormFilter.type = 'bandpass'; this.stormFilter.Q.value = 0.7; this.stormFilter.frequency.value = 900;
       const stormSrc = c.createBufferSource(); stormSrc.buffer = this.noise.white.src.buffer; stormSrc.loop = true; stormSrc.start();
-      stormSrc.connect(this.stormFilter); this.stormFilter.connect(this.storm); this.storm.connect(this.sources);
+      stormSrc.connect(this.stormFilter); this.stormFilter.connect(this.storm); this.slStorm = new Sleep(this.storm, [this.sources], true);
 
       // —— Campane di piombo
       this.bellBus = G(0.5);
@@ -157,7 +170,7 @@ window.ATH = window.ATH || {};
         };
       }
       this.furnace = G(1);
-      this.sources.connect(this.furnace); this.furnace.connect(this.alembic);
+      this.slFur = new Sleep(this.sources, [this.furnace], true); this.furnace.connect(this.alembic);
       this.dcBlock = c.createBiquadFilter(); this.dcBlock.type = 'highpass'; this.dcBlock.frequency.value = 22;
       this.alembic.connect(this.dcBlock);
 
@@ -170,7 +183,7 @@ window.ATH = window.ATH || {};
       this.vasOut = G(1); this.gLP.connect(this.vasOut); this.gBP.connect(this.vasOut);
 
       // —— Fuoco: saturazione asimmetrica
-      this.driveIn = G(1); this.shaper = c.createWaveShaper(); this.shaper.curve = curveTanh(3); this.shaper.oversample = '4x';
+      this.driveIn = G(1); this.shaper = c.createWaveShaper(); this.shaper.curve = curveTanh(3); this.shaper.oversample = '2x';
       this.driveOut = G(0.8); this.fireDry = G(0);
       this.vasOut.connect(this.driveIn); this.driveIn.connect(this.shaper); this.shaper.connect(this.driveOut);
       this.vasOut.connect(this.fireDry);
@@ -210,7 +223,7 @@ window.ATH = window.ATH || {};
 
       // —— Sublimatio: invio brillante verso un cielo lunghissimo
       this.subHP = c.createBiquadFilter(); this.subHP.type = 'highpass'; this.subHP.frequency.value = 1400;
-      this.subSend = G(0.2); this.caelum = c.createConvolver(); this.caelum.buffer = impulse(c, 11, 2.2, 0.75, 0.5);
+      this.subSend = G(0.2); this.caelum = c.createConvolver(); this.caelum.buffer = impulse(c, 7, 2.2, 0.75, 0.5);
       this.caelumOut = G(0.7);
       this.corpus.connect(this.subHP); this.bellBus.connect(this.subHP);
       this.subHP.connect(this.subSend); this.subSend.connect(this.caelum); this.caelum.connect(this.caelumOut); this.caelumOut.connect(this.masterSum);
@@ -258,7 +271,7 @@ window.ATH = window.ATH || {};
       const q = Math.round(v * 20) / 20;
       if (q === this.cryptaSize) return;
       this.cryptaSize = q;
-      this.crypta.buffer = impulse(this.ctx, 2 + q * 9, 2.6 - q * 0.8, 0.35, 0.85);
+      this.crypta.buffer = impulse(this.ctx, 2 + q * 6, 2.6 - q * 0.8, 0.35, 0.85);
     }
 
     recStart(onChunk) {
@@ -305,7 +318,7 @@ window.ATH = window.ATH || {};
     }
 
     strike(intensity) {
-      const c = this.ctx, now = c.currentTime, g = this.storm.gain;
+      const c = this.ctx, now = c.currentTime, g = this.storm.gain; this.slStorm.wake(); this.stormUntil = this.t + 6;
       g.cancelScheduledValues(now);
       g.setValueAtTime(g.value, now);
       g.linearRampToValueAtTime(0.55 * intensity, now + 0.03);
@@ -337,7 +350,8 @@ window.ATH = window.ATH || {};
         const amp = on ? (i === 5 ? 0.3 : 0.24 / Math.sqrt(i + 1)) * breathe : 0;
         this.T(v.vg.gain, amp, 0.25);
       });
-      this.T(this.droneBus.gain, Math.pow(L.aurum, 1.5) * 0.95, 0.1);
+      const dro = Math.pow(L.aurum, 1.5) * 0.95;
+      this.T(this.droneBus.gain, dro, 0.1); this.slDrone.set(dro > 0.0008, dt);
       this.T(this.fmOsc.frequency, root * 1.4142, 0.3);
       this.T(this.fmGain.gain, L.sulphur * L.sulphur * root * 5, 0.1);
       this.T(this.ringOsc.frequency, root * (2.17 + L.coniunctio * 3) + X.px * 320, 0.1);
@@ -345,9 +359,10 @@ window.ATH = window.ATH || {};
       this.T(this.ringWet.gain, L.coniunctio * 1.3, 0.1);
 
       const p = L.putrefactio, lvl = Math.pow(L.cinis, 1.6);
-      this.T(this.noise.brown.g.gain, Math.max(0, 1 - p * 2) * lvl * 0.9, 0.1);
-      this.T(this.noise.pink.g.gain, (1 - Math.abs(p * 2 - 1)) * lvl * 0.6, 0.1);
-      this.T(this.noise.white.g.gain, Math.max(0, p * 2 - 1) * lvl * 0.22, 0.1);
+      { const nb = Math.max(0, 1 - p * 2) * lvl * 0.9, np = (1 - Math.abs(p * 2 - 1)) * lvl * 0.6, nw = Math.max(0, p * 2 - 1) * lvl * 0.22;
+        this.T(this.noise.brown.g.gain, nb, 0.1); this.T(this.noise.pink.g.gain, np, 0.1); this.T(this.noise.white.g.gain, nw, 0.1);
+        this.noise.brown.sl.set(nb > 0.0008, dt); this.noise.pink.sl.set(np > 0.0008, dt); this.noise.white.sl.set(nw > 0.0008, dt); }
+      this.slStorm.set(this.t < (this.stormUntil || 0) || (S.fulmen && L.tempestas > 0.05), dt);
 
       // campane
       const rate = L.saturnus * L.saturnus * 3;
@@ -369,7 +384,7 @@ window.ATH = window.ATH || {};
       // il rumore è una parte del viaggio, non il fondo: sale dove serve, sparisce quando serve;
       // la quiete eterea non se ne va mai del tutto
       const fur = Math.max(Math.min(1, (1 - libra) * 1.3) * (1 - hush * 0.96) * 0.82, (X.wakeF || 0) * 0.38), qui = Math.min(1, 0.3 + libQ * 1.25);
-      this.T(this.furnace.gain, fur, 0.2);
+      this.T(this.furnace.gain, fur, 0.2); this.slFur.set(fur > 0.0008, dt);
       this.T(this.quietOut.gain, qui * 0.95 * (X.breath === undefined ? 1 : X.breath), 0.25);
       this.T(this.halo.gain, 0.15 + (L.aether || 0) * 0.9, 0.2);
       this.T(this.quietEcho.gain, (L.ouroboros || 0) * 0.25, 0.2);

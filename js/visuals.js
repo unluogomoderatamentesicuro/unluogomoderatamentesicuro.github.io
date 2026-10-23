@@ -30,7 +30,7 @@ window.ATH = window.ATH || {};
     }
 
     resize() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      const dpr = Math.max(0.7, Math.min(window.devicePixelRatio || 1, 1.5, Math.sqrt(1500000 / Math.max(1, window.innerWidth * window.innerHeight))));
       this.W = window.innerWidth; this.H = window.innerHeight; this.dpr = dpr;
       this.c.width = Math.max(1, Math.floor(this.W * dpr));
       this.c.height = Math.max(1, Math.floor(this.H * dpr));

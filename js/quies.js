@@ -18,7 +18,7 @@ window.ATH = window.ATH || {};
 
       // —— velo di luce: sei voci, triangolo + sinusoide + un filo di dente di sega
       this.padFilter = c.createBiquadFilter(); this.padFilter.type = 'lowpass'; this.padFilter.Q.value = 0.6; this.padFilter.frequency.value = 1200;
-      this.padFilter.connect(e.quietIn);
+      this.slPad = new ATH.Sleep(this.padFilter, [e.quietIn], true);
       const pans = [-0.7, 0.6, -0.3, 0.35, -0.05, 0.8];
       this.pad = [];
       for (let i = 0; i < 6; i++) {
@@ -33,7 +33,7 @@ window.ATH = window.ATH || {};
       // —— coro: voci acute sinusoidali con vibrato, un'ottava sopra
       this.choirBus = G(0);
       this.choirFilter = c.createBiquadFilter(); this.choirFilter.type = 'bandpass'; this.choirFilter.frequency.value = 1100; this.choirFilter.Q.value = 0.6;
-      this.choirBus.connect(this.choirFilter); this.choirFilter.connect(e.quietIn);
+      this.slChoir = new ATH.Sleep(this.choirBus, [this.choirFilter], true); this.choirFilter.connect(e.quietIn);
       this.vib = c.createOscillator(); this.vib.frequency.value = 5.2; this.vibG = G(4); this.vib.connect(this.vibG); this.vib.start();
       this.choir = [];
       for (let i = 0; i < 4; i++) {
@@ -46,7 +46,7 @@ window.ATH = window.ATH || {};
 
       // —— coppe
       this.bowlBus = G(1); this.bowlBus.connect(e.quietIn);
-      this.cantusBus = G(0); this.cantusBus.connect(e.quietIn);
+      this.cantusBus = G(0); this.slCantus = new ATH.Sleep(this.cantusBus, [e.quietIn], true);
       this.cantus = [0, 1, 2, 3].map(i => {
         const o = c.createOscillator(); o.type = 'sine'; o.frequency.value = 300; o.start();
         const g = G(i < 2 ? 0.5 : 0.18); o.connect(g); g.connect(this.cantusBus);
@@ -58,7 +58,7 @@ window.ATH = window.ATH || {};
       this.binL.frequency.value = 180; this.binR.frequency.value = 186;
       const merger = c.createChannelMerger(2);
       this.binL.connect(merger, 0, 0); this.binR.connect(merger, 0, 1);
-      this.binGain = G(0); merger.connect(this.binGain); this.binGain.connect(e.masterSum);
+      this.binGain = G(0); merger.connect(this.binGain); this.slBin = new ATH.Sleep(this.binGain, [e.masterSum], true);
       this.binL.start(); this.binR.start();
 
       this.chordT = 999; this.deg = 0; this.chord = [0, 2, 4, 7, 9, 11];
@@ -122,11 +122,11 @@ window.ATH = window.ATH || {};
         const sw = 0.65 + 0.35 * Math.sin(t * (0.05 + i * 0.013) + v.ph);
         this.T(v.vg.gain, lvl * 0.1 * sw * (i > 3 ? 0.7 : 1), 0.4);
       });
-      this.T(this.padFilter.frequency, 300 + L.velum * L.velum * 6000, 0.3);
+      this.T(this.padFilter.frequency, 300 + L.velum * L.velum * 6000, 0.3); this.slPad.set(lvl > 0.0005, dt);
 
       // coro: le note alte dell'accordo
       const cl = Math.pow(L.chorus, 1.3);
-      this.T(this.choirBus.gain, cl * 0.6, 0.4);
+      this.T(this.choirBus.gain, cl * 0.6, 0.4); this.slChoir.set(cl > 0.0008, dt);
       this.T(this.choirFilter.frequency, 600 + L.velum * 2400, 0.4);
       this.T(this.vibG.gain, 3 + L.halitus * 10, 0.3);
       this.choir.forEach((v, i) => {
@@ -146,13 +146,13 @@ window.ATH = window.ATH || {};
       this.T(this.cantus[0].frequency, cf, 1.5); this.T(this.cantus[1].frequency, cf + 1.1, 1.5);
       this.T(this.cantus[2].frequency, cf * 2.71, 1.5); this.T(this.cantus[3].frequency, cf * 2.71 + 1.7, 1.5);
       const sw = 0.55 + 0.45 * Math.sin(t * 0.21) * Math.sin(t * 0.083 + 1);
-      this.T(this.cantusBus.gain, L.cantus * L.cantus * 0.07 * sw, 0.3);
+      this.T(this.cantusBus.gain, L.cantus * L.cantus * 0.07 * sw, 0.3); this.slCantus.set(L.cantus > 0.02, dt);
 
       // binaurale
       const carrier = clamp(root * 2, 110, 260);
       const beat = ATH.UNDA[C.unda] || 6;
       this.T(this.binL.frequency, carrier, 0.5); this.T(this.binR.frequency, carrier + beat, 0.5);
-      this.T(this.binGain.gain, L.somnus * L.somnus * 0.09, 0.3);
+      this.T(this.binGain.gain, L.somnus * L.somnus * 0.09, 0.3); this.slBin.set(L.somnus > 0.02, dt);
     }
   }
 

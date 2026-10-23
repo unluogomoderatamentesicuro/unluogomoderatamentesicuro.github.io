@@ -51,8 +51,8 @@ window.ATH = window.ATH || {};
           if (crush) y = Math.round(y * q) / q;
           if (Math.random() < dustP) this.dEnv[c] = (0.25 + Math.random() * 0.75) * (Math.random() < 0.5 ? -1 : 1);
           const d = this.dEnv[c] * (0.6 + Math.random() * 0.4);
-          this.dEnv[c] *= 0.82;
-          outs[c][i] = y * this.gateVal + d * 0.7;
+          this.dEnv[c] *= 0.9;
+          outs[c][i] = y * this.gateVal + d * 0.4;
         }
         this.cnt = (this.cnt + 1) % decim;
       }

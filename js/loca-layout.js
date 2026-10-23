@@ -34,33 +34,35 @@ window.ATH = window.ATH || {};
     ['L2', 4, 'L’ultimo piano', 'ultimo_piano', [], 'sky'],
     ['L2', 5, 'Il campanile', 'campanile', [], 'town'],
     ['L2', 6, 'Il cielo aperto', 'aquilone', [['nuvole']], 'sky'],
-    ['L1', 0, 'La montagna', 'sentiero', [['baita'], ['pascolo']], 'mount'],
+    ['L1', 0, 'La montagna', 'sentiero', [['baita'], ['pascolo', 'eco_valle']], 'mount'],
     ['L1', 1, 'La mano', 'mano_nonno', [], 'house'],
     ['L1', 3, 'Le torri', 'torre', [['biblioteca', 'ninna'], ['vita_mai', 'finestre']], 'town'],
     ['L1', 4, 'Le scale', 'scale_orfano', [['dormitorio']], 'house'],
-    ['L1', 5, 'L’ospedale', 'ospedale', [['sala_parto', 'figlio'], ['ultimo_respiro']], 'town'],
+    ['L1', 5, 'L’ospedale', 'ospedale', [['sala_parto', 'figlio', 'notti_neonato', 'primi_passi'], ['ultimo_respiro']], 'town'],
     ['L1', 6, 'La rinascita', 'germoglio', [['ricominciare', 'finestra_aperta'], ['perdono', 'prima_volta', 'respiro_lungo']], 'field'],
-    ['T0', 0, 'Il mare', 'mare', [['stelle', 'lorenzo', 'faro'], ['porto', 'molo', 'spiaggia_inverno', 'mare_aperto']], 'sea'],
-    ['T0', 1, 'La campagna', 'campagna', [['strade_nebbia', 'grano', 'neve', 'felicita'], ['vigna', 'uliveto', 'treno_merci', 'giardino']], 'field'],
-    ['T0', 2, 'Il fiume', 'ruscello', [['ponte', 'mulino', 'cascata'], ['canneto', 'lago_ghiacciato', 'tuffi']], 'water'],
-    ['T0', 3, 'Il bosco', 'bosco', [['fuga', 'conca', 'bosco_profondo', 'palude', 'lago'], ['porta_bosco']], 'trees'],
+    ['T0', 0, 'Il mare', 'mare', [['stelle', 'lorenzo', 'faro'], ['porto', 'alba_porto', 'molo', 'spiaggia_inverno', 'mareggiata', 'mare_aperto']], 'sea'],
+    ['T0', 1, 'La campagna', 'campagna', [['strade_nebbia', 'grano', 'neve', 'felicita', 'san_lorenzo'], ['vigna', 'vendemmia', 'uliveto', 'temporale_aia', 'treno_merci', 'giardino']], 'field'],
+    ['T0', 2, 'Il fiume', 'ruscello', [['ponte', 'mulino', 'cascata', 'lanterne_fiume'], ['canneto', 'stagno_rane', 'lago_ghiacciato', 'tuffi']], 'water'],
+    ['T0', 3, 'Il bosco', 'bosco', [['fuga', 'conca', 'bosco_profondo', 'palude', 'lago'], ['porta_bosco', 'casa_albero']], 'trees'],
     ['T0', 4, 'Il borgo', 'borgo', [['mura', 'fontana'], ['orologio_fermo', 'campana_sola', 'casa_luce']], 'town'],
-    ['T0', 5, 'Il paese', 'domenica', [['incontro', 'parco_giochi', 'festa_finita'], ['fiera']], 'town'],
+    ['T0', 5, 'Il paese', 'domenica', [['incontro', 'parco_giochi', 'festa_finita', 'falo_giovanni'], ['fiera', 'mercato', 'perso_mercato']], 'town'],
     ['T0', 7, 'La casa al mare', 'casa_mare_inverno', [['persiane'], ['notte_finestra', 'sole_sveglia']], 'sea'],
-    ['T0', 6, 'Il nulla', 'campo_nulla', [['strada_nulla', 'pensilina', 'palo_luce'], ['cammino_notte', 'deserto_sale', 'orizzonte']], 'void'],
+    ['T0', 6, 'Il nulla', 'campo_nulla', [['strada_nulla', 'pensilina', 'palo_luce', 'eclissi'], ['cammino_notte', 'deserto_sale', 'orizzonte']], 'void'],
     ['T1', 0, 'La casa vuota', 'casa_vuota', [['moquette', 'ripostiglio', 'macchinina'], ['stanza_vuota', 'occasioni', 'fotografie']], 'house'],
-    ['T1', 1, 'I nonni', 'giorni_nonni', [['estate', 'cucina', 'sottoscala'], ['nonno_malato', 'letto_nonni', 'casa_venduta']], 'house'],
-    ['T1', 2, 'La notte', 'letto', [['pioggia', 'insonnia', 'nessuno_parla', 'famiglia_spezzata'], ['male', 'veglia', 'risalita', 'risveglio', 'alba']], 'house'],
+    ['T1', 1, 'I nonni', 'giorni_nonni', [['estate', 'pomeriggio_infinito', 'cucina', 'sottoscala'], ['nonno_malato', 'letto_nonni', 'casa_venduta']], 'house'],
+    ['T1', 2, 'La notte', 'letto', [['pioggia', 'insonnia', 'passi_sopra', 'nessuno_parla', 'famiglia_spezzata'], ['male', 'veglia', 'risalita', 'risveglio', 'alba']], 'house'],
     ['T1', 3, 'La soglia', 'soglia', [['giugno', 'dubbio'], ['salvezza']], 'field'],
-    ['T1', 4, 'Le voci della notte', 'voci_notte', [['radio_notte', 'lettera_mai', 'ultima_telefonata']], 'town'],
+    ['T1', 4, 'Le voci della notte', 'voci_notte', [['radio_notte', 'lettera_mai', 'ultima_telefonata'], ['numero_memoria', 'amico_chiamata']], 'town'],
     ['T1', 5, 'La casa abbandonata', 'casa', [['soffitta', 'casa_velo'], ['stanza', 'stanza_specchi']], 'ruin'],
     ['T1', 6, 'Le feste', 'sedia_vuota', [['compleanno_solo', 'cane_vecchio'], ['natale_bambino', 'letterina', 'uovo_pasqua', 'giorni_uguali']], 'house'],
+    ['T1', 9, 'La camera', 'camera_ragazzo', [['cassetta_radio', 'walkman', 'stelle_soffitto', 'voce_nastro'], ['telefono_filo', 'diario']], 'house'],
+    ['T1', 10, 'La scuola', 'campanella', [['ultimo_banco', 'interrogazione', 'ricreazione'], ['ultimo_giorno_scuola', 'gita_pullman']], 'house'],
     ['T1', 8, 'Il cuore', 'domenica_sera', [['nostalgia', 'rimpianto', 'vergogna', 'paura_perdere'], ['gratitudine', 'tenerezza', 'stupore', 'sollievo', 'calma_dopo']], 'mind'],
     ['T1', 7, 'La casa lasciata', 'casa_fretta', [['spartito', 'seduta'], ['casa_vandali']], 'ruin'],
     ['T2', 0, 'L’orfanotrofio', 'orfanotrofio', [['cortile', 'refettorio', 'aula', 'lavatoio'], ['parlatorio', 'infermeria', 'cappella']], 'house'],
     ['T2', 1, 'Il manicomio', 'manicomio', [['manicomio_abb', 'ospedale_abb'], ['pronto_soccorso', 'ospizio']], 'ruin'],
-    ['T2', 2, 'La chiesa', 'chiesa', [['cappella_funebre', 'funerale']], 'tomb'],
-    ['T2', 3, 'Il cimitero', 'cimitero', [['massimo', 'monumentale', 'fuochi_fatui'], ['venticinque', 'madre']], 'tomb'],
+    ['T2', 2, 'La chiesa', 'chiesa', [['cappella_funebre', 'funerale', 'pranzo_dopo']], 'tomb'],
+    ['T2', 3, 'Il cimitero', 'cimitero', [['massimo', 'monumentale', 'fuochi_fatui'], ['venticinque', 'madre', 'anniversario']], 'tomb'],
     ['T2', 4, 'La città', 'centro', [['citta_vecchia', 'crocevia'], ['sala_giochi', 'cabina']], 'city'],
     ['T2', 5, 'La stazione', 'stazione', [['attesa', 'amore', 'addio'], ['periferia', 'treno_notte', 'binario_morto', 'citta_lontana']], 'city'],
     ['T2', 8, 'I posti di passaggio', 'autogrill', [['lavanderia', 'edicola'], ['cinema_paese']], 'city'],
@@ -68,13 +70,13 @@ window.ATH = window.ATH || {};
     ['T2', 6, 'Le rovine', 'citta_abbandonata', [['fabbrica', 'reparto'], ['studio_cine', 'set_film', 'sala_proiezione']], 'ruin'],
     ['M', 0, 'La folla', 'folla', [['festa_folla', 'palco']], 'mind'],
     ['M', 1, 'L’impostore', 'ufficio', [['esame', 'riunione'], ['complimento', 'sportello']], 'mind'],
-    ['M', 2, 'Le domande', 'stanza_domande', [['specchio_parla', 'confessionale'], ['bivio']], 'mind'],
-    ['M', 3, 'Il sogno', 'dormiveglia', [['madre_sogno', 'casa_mai', 'voce_telefono'], ['bambino_sconosciuto', 'festa_mai', 'padre_treno']], 'dream'],
-    ['M', 4, 'Le cose ritrovate', 'cassetto', [['oggetto_perduto', 'quaderno', 'giocattolo'], ['spiaggia_foto', 'canzone']], 'dream'],
+    ['M', 2, 'Le domande', 'stanza_domande', [['specchio_parla', 'confessionale'], ['bivio', 'sala_attesa']], 'mind'],
+    ['M', 3, 'Il sogno', 'dormiveglia', [['madre_sogno', 'casa_mai', 'voce_telefono'], ['bambino_sconosciuto', 'festa_mai', 'padre_treno'], ['deja_vu', 'sogno_volare', 'sogno_cadere', 'sogno_lucido']], 'dream'],
+    ['M', 4, 'Le cose ritrovate', 'cassetto', [['oggetto_perduto', 'quaderno', 'giocattolo'], ['spiaggia_foto', 'canzone', 'scatola_scarpe']], 'dream'],
     ['M', 5, 'I ritorni', 'sala_ritorni', [['amico_perso', 'nonno_orto', 'massimo_partita']], 'dream'],
-    ['M', 7, 'L’immaginato', 'teatro_vuoto', [['corridoio_compleanni', 'pioggia_casa', 'ascensore', 'stanza_rovescia'], ['paese_bambini', 'neve_agosto', 'figlio_grande', 'biblioteca_lettere']], 'dream'],
-    ['M', 6, 'La testa', 'fuori_posto', [['impazzito', 'sbagliato_tutto'], ['pensieri_neri']], 'mind'],
-    ['U1', 0, 'La grotta', 'grotta', [], 'under'],
+    ['M', 7, 'L’immaginato', 'teatro_vuoto', [['corridoio_compleanni', 'pioggia_casa', 'ascensore', 'stanza_rovescia'], ['paese_bambini', 'neve_agosto', 'figlio_grande', 'biblioteca_lettere', 'orologi', 'mondo_fermo']], 'dream'],
+    ['M', 6, 'La testa', 'fuori_posto', [['impazzito', 'sbagliato_tutto', 'critico'], ['pensieri_neri']], 'mind'],
+    ['U1', 0, 'La grotta', 'grotta', [['radici']], 'under'],
     ['U1', 1, 'La cantina', 'cantina', [], 'under'],
     ['U1', 2, 'I volti', 'volti', [['voce_persa']], 'under'],
     ['U1', 3, 'Il pianto', 'pianto', [['pavimento', 'vuoto'], ['dolore', 'rabbia']], 'under'],
@@ -83,8 +85,8 @@ window.ATH = window.ATH || {};
     ['U1', 6, 'Sotto la città', 'metro', [['rifugio']], 'under'],
     ['U2', 0, 'Il fondo del mare', 'affondati', [['relitto']], 'deep'],
     ['U2', 1, 'Sotto il lago', 'paese_sommerso', [], 'deep'],
-    ['U2', 3, 'Il mondo sommerso', 'sommerso', [], 'deep'],
-    ['U2', 4, 'Il fiume', 'lete', [['silenzio'], ['dimenticarsi']], 'deep'],
+    ['U2', 3, 'Il mondo sommerso', 'sommerso', [['sorgente']], 'deep'],
+    ['U2', 4, 'Il fiume', 'lete', [['silenzio', 'traghettatore'], ['dimenticarsi']], 'deep'],
     ['U3', 3, 'Il grembo', 'grembo', [['primo_ricordo']], 'deep']
   ];
   // le porte: tra livelli diversi, e tra la terra e la mente
@@ -104,7 +106,16 @@ window.ATH = window.ATH || {};
     ['obitorio', 'ultimo_respiro'], ['casa_mare_inverno', 'spiaggia_inverno'], ['uovo_pasqua', 'letto_nonni'], ['letterina', 'figlio'], ['seduta', 'voci'],
     ['spartito', 'canzone'], ['teatro_vuoto', 'studio_cine'], ['neve_agosto', 'neve'], ['paese_bambini', 'parco_giochi'], ['figlio_grande', 'figlio'],
     ['biblioteca_lettere', 'lettera_mai'], ['stanza_rovescia', 'capovolta'], ['pioggia_casa', 'pioggia'], ['ascensore', 'ufficio'], ['notte_finestra', 'letto'],
-    ['casa_vandali', 'casa'], ['giorgio_moto', 'strade_nebbia'], ['corridoio_compleanni', 'compleanno_solo'], ['giorgio_moto', 'fuochi_fatui'], ['nostalgia', 'canzone'], ['paura_perdere', 'figlio'], ['stupore', 'stelle'], ['calma_dopo', 'alba'], ['vergogna', 'folla'], ['autogrill', 'treno_notte'], ['edicola', 'paese_bambini'], ['cinema_paese', 'sala_proiezione'], ['tuffi', 'estate'], ['domenica_sera', 'giorni_uguali']
+    ['casa_vandali', 'casa'], ['giorgio_moto', 'strade_nebbia'], ['corridoio_compleanni', 'compleanno_solo'], ['giorgio_moto', 'fuochi_fatui'], ['nostalgia', 'canzone'], ['paura_perdere', 'figlio'], ['stupore', 'stelle'], ['calma_dopo', 'alba'], ['vergogna', 'folla'], ['autogrill', 'treno_notte'], ['edicola', 'paese_bambini'], ['cinema_paese', 'sala_proiezione'], ['tuffi', 'estate'], ['domenica_sera', 'giorni_uguali'],
+    ['lanterne_fiume', 'cimitero'], ['falo_giovanni', 'giugno'], ['san_lorenzo', 'lorenzo'], ['eco_valle', 'vetta'], ['casa_albero', 'giardino'],
+    ['eclissi', 'orizzonte'], ['mareggiata', 'casa_mare_inverno'], ['camera_ragazzo', 'letto'], ['cassetta_radio', 'radio_notte'], ['telefono_filo', 'ultima_telefonata'],
+    ['campanella', 'esame'], ['interrogazione', 'esame'], ['ultimo_giorno_scuola', 'giugno'], ['ultimo_banco', 'finestre'], ['gita_pullman', 'treno_notte'],
+    ['pranzo_dopo', 'cucina'], ['anniversario', 'massimo'], ['numero_memoria', 'amico_perso'], ['mercato', 'folla'], ['perso_mercato', 'folla'],
+    ['critico', 'sbagliato_tutto'], ['sala_attesa', 'stazione'], ['orologi', 'orologio_fermo'], ['deja_vu', 'dormiveglia'], ['sogno_volare', 'aquilone'],
+    ['sogno_cadere', 'insonnia'], ['sogno_lucido', 'stanza_domande'], ['mondo_fermo', 'campo_nulla'], ['radici', 'bosco_profondo'], ['traghettatore', 'lete'],
+    ['sorgente', 'ruscello'], ['sorgente', 'grembo'], ['notti_neonato', 'ninna'], ['primi_passi', 'giardino'], ['pomeriggio_infinito', 'estate'],
+    ['scatola_scarpe', 'ripostiglio'], ['passi_sopra', 'letto'], ['voce_nastro', 'canzone'], ['amico_chiamata', 'sala_ritorni'], ['alba_porto', 'porto'],
+    ['temporale_aia', 'pioggia'], ['stagno_rane', 'palude'], ['vendemmia', 'vigna']
   ];
 
   // quanto bisogna restare per scoprire un luogo nascosto
@@ -117,7 +128,7 @@ window.ATH = window.ATH || {};
 
   // —— geometria
   const SW = 166, RH = 64, PAD = 92;
-  const cols = 9;
+  const cols = 12;
   const colW = new Array(cols).fill(1);
   D.forEach(d => { colW[d[1]] = Math.max(colW[d[1]], Math.max(1, d[4].length)); });
   const colX = []; let cx = 40;

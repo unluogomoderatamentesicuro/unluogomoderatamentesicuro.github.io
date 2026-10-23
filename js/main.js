@@ -380,7 +380,7 @@ window.ATH = window.ATH || {};
   let askT = null;
   function renderAsk(pl) {
     clearTimeout(askT);
-    const box = $('plAsk'); box.innerHTML = ''; box.hidden = !pl.ask;
+    const box = $('plAsk'); box.innerHTML = ''; box.hidden = !pl.ask; $('place').classList.remove('asking');
     if (!pl.ask) return;
     const okQ = q => (!q.if || state.flags[q.if]) && (!q.ifnot || !state.flags[q.ifnot]);
     const qs = pl.ask;
@@ -401,7 +401,7 @@ window.ATH = window.ATH || {};
         // la stessa domanda, un'altra volta: non sempre la stessa risposta
         let say = a.say;
         if (again && prev !== undefined) say = prev === k ? (Math.random() < 0.5 ? 'L’altra volta avevi detto lo stesso. Ne sei ancora sicuro?' : say) : 'L’altra volta avevi risposto un’altra cosa. Quale delle due è vera?';
-        box.innerHTML = ''; const r = document.createElement('p'); r.className = 'ask-say'; r.textContent = say; box.appendChild(r);
+        $('place').classList.remove('asking'); box.innerHTML = ''; const r = document.createElement('p'); r.className = 'ask-say'; r.textContent = say; box.appendChild(r);
         pulse(0.1); persist();
         if (memoria && Math.random() < 0.5) memoria.newMemory();
         checkSecrets(pl.id, false);
@@ -409,7 +409,7 @@ window.ATH = window.ATH || {};
       });
       row.appendChild(b);
     });
-    box.appendChild(row);
+    box.appendChild(row); $('place').classList.add('asking');
   }
   // —— il nascondiglio: da qualunque posto, quando non hai più voglia di girare
   let prevScene = null;
@@ -910,7 +910,7 @@ window.ATH = window.ATH || {};
     const q = l < 0.5 ? l * (1 + s) : l + s - l * s, p = 2 * l - q;
     return [f(p, q, h + 1 / 3) * 255, f(p, q, h) * 255, f(p, q, h - 1 / 3) * 255];
   }
-  const MOTIFS = ['clutter', 'wallpaper', 'toycar', 'loculi', 'cameo', 'hand', 'womb', 'face', 'scents', 'doubt', 'purify', 'stars', 'snow', 'haze', 'motes', 'field', 'beam', 'ceiling', 'glass', 'monitor', 'fever', 'sun', 'meet', 'train', 'lights', 'ruin', 'well', 'rose', 'nebula', 'throne', 'city', 'cityFlip', 'windows', 'stairs', 'candles', 'tombs', 'forest', 'whispers', 'void', 'tears', 'cracks', 'river', 'underwater', 'nook', 'corridor', 'swing', 'trees', 'lake', 'fireflies', 'fog', 'veil', 'vetrate', 'arcade', 'machine', 'film', 'cradle', 'mountain', 'deep', 'rainfall', 'wisps', 'path', 'sprout', 'ice', 'door', 'crowd', 'dream', 'xmas', 'egg', 'board', 'siren', 'blanket'];
+  const MOTIFS = ['clutter', 'wallpaper', 'toycar', 'loculi', 'cameo', 'hand', 'womb', 'face', 'scents', 'doubt', 'purify', 'stars', 'snow', 'haze', 'motes', 'field', 'beam', 'ceiling', 'glass', 'monitor', 'fever', 'sun', 'meet', 'train', 'lights', 'ruin', 'well', 'rose', 'nebula', 'throne', 'city', 'cityFlip', 'windows', 'stairs', 'candles', 'tombs', 'forest', 'whispers', 'void', 'tears', 'cracks', 'river', 'underwater', 'nook', 'corridor', 'swing', 'trees', 'lake', 'fireflies', 'fog', 'veil', 'vetrate', 'arcade', 'machine', 'film', 'cradle', 'mountain', 'deep', 'rainfall', 'wisps', 'path', 'sprout', 'ice', 'door', 'crowd', 'dream', 'xmas', 'egg', 'board', 'siren', 'blanket', 'lantern', 'bonfire', 'meteors', 'echo', 'clock', 'chalk', 'roots'];
   let hueShift = 0, qVis = 0; const motif = {}; MOTIFS.forEach(m => motif[m] = 0);
 
   // —— registrazione
@@ -1241,7 +1241,22 @@ window.ATH = window.ATH || {};
   let skipN = 0;
   function loop(now) { requestAnimationFrame(loop); const mapOpen = !$('mapov').hidden; try { step(now, !mapOpen || (++skipN % 6 === 0)); } catch (err) { if (window.console) console.error(err); } }
   requestAnimationFrame(loop);
-  setInterval(() => { if (document.hidden) step(performance.now(), false); }, 200);
+  // con la finestra coperta o in un'altra scheda il browser rallenta i timer e ferma i frame:
+  // il cuore del suono batte allora in un Worker, che non viene rallentato
+  (function () {
+    let tk = null;
+    try {
+      const src = 'let t=setInterval(()=>postMessage(0),100);';
+      tk = new Worker(URL.createObjectURL(new Blob([src], { type: 'application/javascript' })));
+      tk.onmessage = () => { if (document.hidden) step(performance.now(), false); };
+    } catch (e) { tk = null; }
+    setInterval(() => { if (document.hidden && !tk) step(performance.now(), false); }, 200);
+    // se il sistema sospende l'audio (finestra coperta, risparmio energia) lo si riaccende, a meno che non sia la Quiete
+    const wakeCtx = () => { try { if (engine.ready && !document.body.classList.contains('quiet') && engine.ctx.state !== 'running') engine.ctx.resume(); } catch (e) { } };
+    document.addEventListener('visibilitychange', () => { last = performance.now(); wakeCtx(); });
+    window.addEventListener('focus', wakeCtx);
+    setInterval(wakeCtx, 3000);
+  })();
 
   ATH.state = state; ATH.live = live; ATH.engine = engine;
   ATH.recall = recall; ATH.showTab = showTab; ATH.travel = travel; ATH.reveal = reveal;
