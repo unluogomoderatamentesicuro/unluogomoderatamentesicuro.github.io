@@ -57,6 +57,9 @@ window.ATH = window.ATH || {};
     ['T1', 6, 'Le feste', 'sedia_vuota', [['compleanno_solo', 'cane_vecchio'], ['natale_bambino', 'letterina', 'uovo_pasqua', 'giorni_uguali']], 'house'],
     ['T1', 9, 'La camera', 'camera_ragazzo', [['cassetta_radio', 'walkman', 'stelle_soffitto', 'voce_nastro'], ['telefono_filo', 'diario']], 'house'],
     ['T1', 10, 'La scuola', 'campanella', [['ultimo_banco', 'interrogazione', 'ricreazione'], ['ultimo_giorno_scuola', 'gita_pullman']], 'house'],
+    ['T1', 11, 'La routine', 'sveglia', [['caffe_mattino', 'porta_aperta', 'specchio_bagno', 'traffico', 'notifiche'], ['lista_cose', 'ruota', 'semaforo_rosso', 'ritorno_sera', 'cena_tv']], 'town'],
+    ['T1', 12, 'La casa dentro', 'casa_dentro', [['soglia_interna', 'fermarsi', 'tre_respiri', 'stanza_silenzio', 'finestra_dentro', 'porta_senza_maniglia'], ['camino_interno', 'letto_riparo', 'giardino_interno', 'panchina', 'ansia_onda']], 'house'],
+    ['T1', 13, 'Il riparo', 'ripararsi', [['lasciare_andare', 'silenzio_dopo_rumore', 'abbraccio_se', 'stanza_ancora_tua', 'ritorno_riva']], 'house'],
     ['T1', 8, 'Il cuore', 'domenica_sera', [['nostalgia', 'rimpianto', 'vergogna', 'paura_perdere'], ['gratitudine', 'tenerezza', 'stupore', 'sollievo', 'calma_dopo']], 'mind'],
     ['T1', 7, 'La casa lasciata', 'casa_fretta', [['spartito', 'seduta'], ['casa_vandali']], 'ruin'],
     ['T2', 0, 'L’orfanotrofio', 'orfanotrofio', [['cortile', 'refettorio', 'aula', 'lavatoio'], ['parlatorio', 'infermeria', 'cappella']], 'house'],
@@ -115,7 +118,12 @@ window.ATH = window.ATH || {};
     ['sogno_cadere', 'insonnia'], ['sogno_lucido', 'stanza_domande'], ['mondo_fermo', 'campo_nulla'], ['radici', 'bosco_profondo'], ['traghettatore', 'lete'],
     ['sorgente', 'ruscello'], ['sorgente', 'grembo'], ['notti_neonato', 'ninna'], ['primi_passi', 'giardino'], ['pomeriggio_infinito', 'estate'],
     ['scatola_scarpe', 'ripostiglio'], ['passi_sopra', 'letto'], ['voce_nastro', 'canzone'], ['amico_chiamata', 'sala_ritorni'], ['alba_porto', 'porto'],
-    ['temporale_aia', 'pioggia'], ['stagno_rane', 'palude'], ['vendemmia', 'vigna']
+    ['temporale_aia', 'pioggia'], ['stagno_rane', 'palude'], ['vendemmia', 'vigna'],
+    ['sveglia', 'letto'], ['porta_aperta', 'soglia'], ['notifiche', 'folla'], ['ruota', 'impazzito'], ['semaforo_rosso', 'crocevia'], ['ritorno_sera', 'stazione'],
+    ['cena_tv', 'domenica_sera'], ['traffico', 'autogrill'], ['casa_dentro', 'soglia'], ['fermarsi', 'respiro_lungo'], ['tre_respiri', 'respiro_lungo'],
+    ['stanza_silenzio', 'silenzio'], ['finestra_dentro', 'finestre'], ['camino_interno', 'camino'], ['letto_riparo', 'letto'], ['giardino_interno', 'giardino'],
+    ['panchina', 'tetti'], ['ansia_onda', 'mare'], ['silenzio_dopo_rumore', 'silenzio'], ['abbraccio_se', 'primo_ricordo'],
+    ['ripararsi', 'baita'], ['ritorno_riva', 'germoglio'], ['porta_senza_maniglia', 'dormiveglia'], ['stanza_ancora_tua', 'cassetto']
   ];
 
   // quanto bisogna restare per scoprire un luogo nascosto
@@ -128,7 +136,7 @@ window.ATH = window.ATH || {};
 
   // —— geometria
   const SW = 166, RH = 64, PAD = 92;
-  const cols = 12;
+  const cols = 15;
   const colW = new Array(cols).fill(1);
   D.forEach(d => { colW[d[1]] = Math.max(colW[d[1]], Math.max(1, d[4].length)); });
   const colX = []; let cx = 40;

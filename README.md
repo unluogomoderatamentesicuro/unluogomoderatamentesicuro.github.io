@@ -71,6 +71,9 @@ Il mercato del sabato e la mano che non c'è più. Il pranzo dopo il funerale, l
 **Nella testa, e sotto.**
 La voce che ti giudica, e che forse non è la tua. La sala d'attesa dove nessuno ti chiama. La stanza degli orologi, ognuno con la sua ora. Il déjà vu. Il sogno di volare, quello in cui cadi, quello lucido, e il mondo che per un secondo si ferma. Sotto: le radici che si parlano, il traghettatore che porta via un solo ricordo, la sorgente da cui l'acqua ricomincia.
 
+**La routine, e la casa dentro di te.**
+I giorni che si somigliano: la sveglia che suona uguale, il caffè in piedi, la porta che si apre e porta con sé un pensiero, la coda del mattino, il rumore del mondo che chiede tutto e subito, la lista che non finisce, la ruota dei giorni. E poi un posto dove ripararsi: fermarsi, i tre respiri, una casa piccola con il fuoco acceso, la stanza del silenzio, la finestra da cui guardare il mondo correre, l'onda che sale e si ritira, il tavolo vuoto dove appoggiare un peso, il silenzio dopo il rumore, l'abbraccio a se stessi. Nascosta, una porta senza maniglia.
+
 **Il nascondiglio** — quando non hai più voglia di girare.
 Da qualunque posto, *Nasconditi*: un posto sotto le coperte, caldo, silenzioso, con una lucina, la pioggia fuori e le tue cose intorno. Nessuno entra, nessuno ti chiede niente. Quando vuoi, esci piano e torni dov'eri.
 
